@@ -13,7 +13,6 @@
 (use-package yasnippet
   :config
   (yas-global-mode 1)
-  (define-key toggle-mode-map (kbd "y") 'menu-bar-mode)
   :ensure t)
 
 (provide 'init-yasnippet)

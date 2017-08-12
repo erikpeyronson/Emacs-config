@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: cerr
+# key: cerr
+# --
+std::cerr ${1:<< "DBG: " ${2:<< __FILE__ << " "} ${3:<< __func__ ${4:<< "@" << __LINE__}}}<< "$5" << $6std::endl;
+  $7
