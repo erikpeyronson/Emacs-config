@@ -56,6 +56,7 @@
 (require 'init-ggtags)
 (require 'init-magit)
 (require 'init-cedet)
+(require 'init-desktop+)
 
 ;; Standalone
 (require 'init-eval-replace)

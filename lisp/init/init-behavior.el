@@ -45,7 +45,7 @@
 
 (transient-mark-mode 0)
 
-(set-face-attribute 'default nil :height 100);
+(set-face-attribute 'default nil :height 90);
 
 (setq inhibit-startup-screen t)
 
