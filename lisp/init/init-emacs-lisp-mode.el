@@ -5,7 +5,7 @@
 ;; emacs-lisp-mode
 
 ;;; Code:
-(add-hook 'emacs-lisp-mode-hook #'(lambda () (electric-pair-local-mode)))
+;;(add-hook 'emacs-lisp-mode-hook #'(lambda () (electric-pair-local-mode)))
 
 (provide 'init-emacs-lisp-mode)
 ;;; init-emacs-lisp-mode.el ends here
