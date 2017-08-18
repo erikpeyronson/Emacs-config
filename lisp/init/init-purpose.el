@@ -20,6 +20,7 @@
   (add-to-list 'purpose-user-mode-purposes '(eww-mode . doc))
   (add-to-list 'purpose-user-mode-purposes '(org-mode . doc))
   (add-to-list 'purpose-user-mode-purposes '(magit-mode . msg))
+  (add-to-list 'purpose-user-name-purposes '("*Flycheck errors*" . msg))
   (add-to-list 'purpose-user-name-purposes '("*Messages*" . msg))
   (add-to-list 'purpose-user-name-purposes '("*Ido Completions*" . msg))
   (add-to-list 'purpose-user-name-purposes '("*compilation*" . msg))

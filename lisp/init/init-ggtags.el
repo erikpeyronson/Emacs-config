@@ -9,6 +9,7 @@
 (use-package ggtags
   :config
   (define-key toggle-mode-map (kbd "g") 'ggtags-mode)
+  (add-hook 'prog-mode-hook 'ggtags-mode)
   :ensure t)
 
 (provide 'init-ggtags)

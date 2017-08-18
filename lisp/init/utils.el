@@ -71,6 +71,26 @@
     (when dir
       (concat dir "Makefile"))))
 
+(defun set-window-width (n)
+  "Set the selected window's width to N columns."
+  (adjust-window-trailing-edge (selected-window) (- n (window-width)) t))
+
+(defun set-80-columns ()
+  "Set the selected window to 80 columns."
+  (interactive)
+  (set-window-width 80))
+
+(defun indent-buffer ()
+  "Mark the whole buffer indent and return to the position started."
+  (interactive)
+  (interactive)
+  (save-excursion
+    (indent-region (point-min) (point-max) nil)))
+
+(global-set-key (kbd "C-c H") 'indent-buffer)
+
+(global-set-key "\C-x~" 'set-80-columns)
+
 ;; bind compiling with get-above-makefile to f5
 (global-set-key [f5] (lambda () (interactive) (compile (format
                                                         "make -f %s" (get-above-makefile)))))

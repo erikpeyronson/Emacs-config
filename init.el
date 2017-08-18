@@ -57,6 +57,7 @@
 (require 'init-magit)
 (require 'init-cedet)
 (require 'init-desktop+)
+(require 'init-neotree)
 
 ;; Standalone
 (require 'init-eval-replace)

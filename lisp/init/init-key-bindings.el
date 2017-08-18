@@ -6,11 +6,11 @@
 ;;
 ;; Rebinds C-h M-C-h to allow for bash C-h
 ;; behaviour.
-;; 
+;;
 ;; Introduces a prefix key C-c m to toggle minor modes and
 ;; sets up key bindings for some built in modes.
 ;;
-;; 
+;;
 
 ;;; Code:
 ;; Swap C-j and RET behavior
@@ -41,8 +41,10 @@
 (global-set-key (kbd "C-c m") 'toggle-mode-map)
 (define-prefix-command 'toggle-mode-map)
 
-(define-key toggle-mode-map (kbd "w") 'whitespace-mode)
-(define-key toggle-mode-map (kbd "t") 'transient-mark-mode)
+(define-key toggle-mode-map (kbd "w m") 'whitespace-mode)
+(define-key toggle-mode-map (kbd "w c") 'whitespace-cleanup)
+(define-key toggle-mode-map (kbd "t t") 'transient-mark-mode)
+(define-key toggle-mode-map (kbd "t l") 'toggle-truncate-lines)
 (define-key toggle-mode-map (kbd "m b") 'menu-bar-mode)
 
 (global-unset-key (kbd "C-x C-z"))
