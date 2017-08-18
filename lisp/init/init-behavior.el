@@ -4,7 +4,7 @@
 ;; Place backup-files and other temporary files .emacs.d/tmp
 
 ;;; Code:
-
+(require 'init-key-bindings)
 ;; Keep backups and auto-saves out of source directory
 (defvar tramp-backup-directory-alist)
 (defvar tramp-auto-save-directory)
@@ -43,9 +43,13 @@
 
 (setq compilation-scroll-output t)
 
+(use-package neotree
+  :config
+  (define-key toggle-mode-map (kbd "n") 'neotree-toggle))
+
 (transient-mark-mode 0)
 
-(set-face-attribute 'default nil :height 90);
+(set-face-attribute 'default nil :height 115);
 
 (setq inhibit-startup-screen t)
 
