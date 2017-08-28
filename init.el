@@ -58,6 +58,7 @@
 (require 'init-cedet)
 (require 'init-desktop+)
 (require 'init-neotree)
+;;(require 'init-irony)
 
 ;; Standalone
 (require 'init-eval-replace)
