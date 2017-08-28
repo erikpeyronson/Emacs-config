@@ -15,12 +15,12 @@
 
 (use-package company
   :config
-  (setq company-backends (delete 'company-clang company-backends))
+;;  (setq company-backends (delete 'company-clang company-backends))
   (use-package company-c-headers
     :config
     (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4")
     (add-to-list 'company-backends 'company-c-headers)
-    (remove 'company-backends 'Clang)
+;;    (remove 'company-backends 'Clang)
     :ensure t)
   
   (when (package-installed-p 'erlang-mode)  

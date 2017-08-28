@@ -93,14 +93,14 @@
 
 ;; bind compiling with get-above-makefile to f5
 (global-set-key [f5] (lambda () (interactive) (compile (format
-                                                        "make -f %s" (get-above-makefile)))))
+                                                        "make -j8 -f %s" (get-above-makefile)))))
 (global-set-key [f6] (lambda () (interactive) (compile (format
-							"make -f %s test" (get-above-makefile)))))
+							"make -j8 -f %s test" (get-above-makefile)))))
 (global-set-key [f7] (lambda () (interactive) (compile (format
                                                         "make -f %s clean" (get-above-makefile)))))
 (global-set-key [f8] (lambda () (interactive) (compile (format
-                                                        "make -f %s bit-run" (get-above-makefile)))))
+                                                        "make -j8 -f %s bit-run" (get-above-makefile)))))
 (global-set-key [f9] (lambda () (interactive) (compile (format
-                                                        "make -f %s bit-memcheck" (get-above-makefile)))))
+                                                        "make -j8 -f %s bit-memcheck" (get-above-makefile)))))
 (provide 'utils)
 ;;; utils.el ends here
