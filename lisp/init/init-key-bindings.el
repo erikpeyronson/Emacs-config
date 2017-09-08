@@ -14,8 +14,8 @@
 
 ;;; Code:
 ;; Swap C-j and RET behavior
-(global-set-key (kbd "C-j") 'newline-and-indent)
-(global-set-key (kbd "RET") 'newline)
+(global-set-key (kbd "C-j") 'newline)
+(global-set-key (kbd "RET") 'newline-and-indent)
 
 ;; Use ibuffer instead of bs show for C-x C-b
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)

@@ -9,6 +9,7 @@
 (require 'init-key-bindings)
 (use-package neotree
   :config
+;l  (setq neo-window-width 30)
   (define-key toggle-mode-map (kbd "n") 'neotree-toggle)
   :ensure t)
 

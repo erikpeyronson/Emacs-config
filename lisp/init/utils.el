@@ -25,6 +25,18 @@
       (delete-other-windows)
       (put 'toggle-window-layout 'state t))))
 
+(defun toggle-window-layout ()
+  "Toggle between the selected window layout and single window."
+  ;; (defvar window-layout-state)
+  (interactive)
+  (if (get 'toggle-window-layout 'state)
+      (progn
+        (purpose-load-window-layout-file "~/.emcas.d/layouts/c++.window-layout")
+	(put 'toggle-window-layout 'state nil))
+    (progn
+      (purpose-load-window-layout-file "~/.emcas.d/layouts/c++-big-compile.window-layout")
+      (put 'toggle-window-layout 'state t))))
+
 ;;; Comment-or-uncomment-region-or-line
 ;; Author: Stack overflow user gerstmann
 ;; Source: https://sites.google.com/site/steveyegge2/my-dot-emacs-file

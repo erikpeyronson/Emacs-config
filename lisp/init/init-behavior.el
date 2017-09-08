@@ -50,7 +50,7 @@
 (transient-mark-mode 0)
 
 (set-face-attribute 'default nil :height 115);
-
+(set-face-attribute 'default t :font "DejaVu Sans Mono" )
 (setq inhibit-startup-screen t)
 
 (provide 'init-behavior)
