@@ -8,7 +8,7 @@
 (require 'init-key-bindings)
 (use-package ggtags
   :config
-  (define-key toggle-mode-map (kbd "g") 'ggtags-mode)
+  (define-key toggle-mode-map (kbd "C-g") 'ggtags-mode)
   (add-hook 'prog-mode-hook 'ggtags-mode)
   :ensure t)
 

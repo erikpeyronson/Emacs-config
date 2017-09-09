@@ -51,14 +51,14 @@
 (require 'init-company-mode)
 (require 'init-flycheck)
 (require 'init-projectile)
-(require 'init-sr-speedbar)
+;; (require 'init-sr-speedbar)
 (require 'init-purpose)
 (require 'init-ggtags)
 (require 'init-magit)
 (require 'init-cedet)
 (require 'init-desktop+)
 (require 'init-neotree)
-;;(require 'init-irony)
+(require 'init-god-mode)
 
 ;; Standalone
 (require 'init-eval-replace)

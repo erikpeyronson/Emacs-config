@@ -26,8 +26,6 @@
       kept-old-versions 2)   ; and some old ones, too
 
 (setq-default indent-tabs-mode nil)
-;;(desktop-save-mode 1)
-
 
 (use-package zenburn-theme
   :ensure t)
@@ -45,12 +43,13 @@
 
 (use-package neotree
   :config
-  (define-key toggle-mode-map (kbd "n") 'neotree-toggle))
+  (define-key toggle-mode-map (kbd "C-n") 'neotree-toggle))
 
 (transient-mark-mode 0)
 
 (set-face-attribute 'default nil :height 115);
 (set-face-attribute 'default t :font "DejaVu Sans Mono" )
+(setq-default cursor-type 'bar)
 (setq inhibit-startup-screen t)
 
 (provide 'init-behavior)

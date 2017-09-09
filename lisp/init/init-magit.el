@@ -7,7 +7,7 @@
 
 
 
-
+(require 'init-desktop+)
 (defun desktop+-load-git-branch(&optional args)
   ;;(interactive)
   (setq current-branch (shell-command-to-string "python ~/bin/git-info"))
@@ -21,7 +21,7 @@
 
 (use-package magit
   :config
-  (define-key toggle-mode-map (kbd "m g") 'magit-status)
+  (define-key toggle-mode-map (kbd "C-x C-g") 'magit-status)
   (add-hook 'after-init-hook 'desktop+-load-git-branch)
   :ensure t
   )

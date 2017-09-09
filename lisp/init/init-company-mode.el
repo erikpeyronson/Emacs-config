@@ -36,7 +36,7 @@
       :ensure t))
   
   (add-hook 'c++-mode-hook 'company-mode)
-  (define-key toggle-mode-map (kbd "c") 'company-mode)
+  (define-key toggle-mode-map (kbd "C-c") 'company-mode)
   :ensure t)
 
 

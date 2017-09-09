@@ -17,7 +17,7 @@
 (use-package flycheck
   :config
   (global-flycheck-mode)
-  (define-key toggle-mode-map (kbd "f") 'flycheck-mode)
+  (define-key toggle-mode-map (kbd "C-f") 'flycheck-mode)
   :ensure t)
 
 (provide 'init-flycheck)
