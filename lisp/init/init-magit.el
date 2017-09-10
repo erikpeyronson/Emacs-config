@@ -8,21 +8,13 @@
 
 
 (require 'init-desktop+)
-(defun desktop+-load-git-branch(&optional args)
-  ;;(interactive)
-  (setq current-branch (shell-command-to-string "python ~/bin/git-info"))
-  (if (not (file-exists-p (concat "~/.emacs.d/desktops/" current-branch)))
-      (desktop+-create current-branch)
-    (desktop+-load current-branch)))
 
-
-(advice-add 'magit-checkout :after 'desktop+-load-git-branch)
+;; (advice-add 'magit-checkout :after 'desktop+-load-git-branch)
 
 
 (use-package magit
   :config
-  (define-key toggle-mode-map (kbd "C-x C-g") 'magit-status)
-  (add-hook 'after-init-hook 'desktop+-load-git-branch)
+  (global-set-key (kbd "C-x g") 'magit-status)
   :ensure t
   )
 

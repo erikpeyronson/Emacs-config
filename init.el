@@ -1,4 +1,4 @@
-;;; init.el --- Emacs init-file
+;; init.el --- Emacs init-file
 
 ;; Author: Erik Peyronson
 
@@ -49,13 +49,13 @@
 (require 'init-yasnippet)
 (require 'init-ido-mode)
 (require 'init-company-mode)
-(require 'init-flycheck)
+;; (require 'init-flycheck)
 (require 'init-projectile)
-;; (require 'init-sr-speedbar)
-(require 'init-purpose)
+(require 'init-sr-speedbar)
+;;(require 'init-purpose)
 (require 'init-ggtags)
 (require 'init-magit)
-(require 'init-cedet)
+;;(require 'init-cedet)
 (require 'init-desktop+)
 (require 'init-neotree)
 (require 'init-god-mode)
@@ -72,5 +72,5 @@
 (load custom-file)
 ;;; init.el ends here
 
+;; (put 'narrow-to-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
-(put 'narrow-to-region 'disabled nil)

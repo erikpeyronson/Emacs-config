@@ -52,5 +52,7 @@
 (setq-default cursor-type 'bar)
 (setq inhibit-startup-screen t)
 
+(global-hl-line-mode)
+
 (provide 'init-behavior)
 ;;; init-behavior.el ends here

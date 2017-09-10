@@ -41,11 +41,15 @@
 (global-set-key (kbd "C-c m") 'toggle-mode-map)
 (define-prefix-command 'toggle-mode-map)
 
-(define-key toggle-mode-map (kbd "C-w C-m") 'whitespace-mode)
-(define-key toggle-mode-map (kbd "C-w C-c") 'whitespace-cleanup)
+(global-set-key (kbd "C-c s") 'speedbar)
+
+(define-key toggle-mode-map (kbd "w m") 'whitespace-mode)
+(define-key toggle-mode-map (kbd "w c") 'whitespace-cleanup)
 (define-key toggle-mode-map (kbd "C-t C-t") 'transient-mark-mode)
 (define-key toggle-mode-map (kbd "C-t C-l") 'toggle-truncate-lines)
 (define-key toggle-mode-map (kbd "C-m C-b") 'menu-bar-mode)
+
+
 
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-z"))

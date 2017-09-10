@@ -35,8 +35,8 @@
       (add-hook 'arduino-mode-hook (lambda () (add-to-list 'company-backends 'company-erlang)))
       :ensure t))
   
-  (add-hook 'c++-mode-hook 'company-mode)
-  (define-key toggle-mode-map (kbd "C-c") 'company-mode)
+ ;; (add-hook 'c++-mode-hook 'company-mode)
+  (define-key toggle-mode-map (kbd "c") 'company-mode)
   :ensure t)
 
 
