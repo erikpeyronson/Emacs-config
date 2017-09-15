@@ -27,32 +27,13 @@
 
 (setq-default indent-tabs-mode nil)
 
-(use-package zenburn-theme
-  :ensure t)
-
-(use-package nlinum
-  :config
-  (global-nlinum-mode)
-  :ensure t)
-
-(setq-default frame-title-format '("emacs: %f"))
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-
 (setq compilation-scroll-output t)
 
 (use-package neotree
   :config
   (define-key toggle-mode-map (kbd "C-n") 'neotree-toggle))
 
-(transient-mark-mode 0)
-
-(set-face-attribute 'default nil :height 115);
-(set-face-attribute 'default t :font "DejaVu Sans Mono" )
-(setq-default cursor-type 'bar)
 (setq inhibit-startup-screen t)
-
-(global-hl-line-mode)
 
 (provide 'init-behavior)
 ;;; init-behavior.el ends here

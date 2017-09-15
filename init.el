@@ -31,6 +31,7 @@
 
 ;; Basic stup
 ;; Provides dependances DO NOT REMOVE THESE
+(require 'init-appearence)
 (require 'init-package)
 (require 'init-behavior)
 (require 'init-key-bindings)
