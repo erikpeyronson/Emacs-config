@@ -27,7 +27,7 @@
   ;; (setq god-exempt-major-modes nil)
   ;; (setq god-exempt-predicates nil)
 
-  (global-set-key (kbd "<escape>") 'god-mode-all)
+  (global-set-key (kbd "<escape>") 'god-mode)
   
   (define-key god-local-mode-map (kbd "i") 'god-mode)
   (define-key god-local-mode-map (kbd ".") 'repeat)
