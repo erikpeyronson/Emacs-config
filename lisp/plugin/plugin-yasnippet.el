@@ -13,6 +13,7 @@
 (use-package yasnippet
   :config
   (yas-global-mode 1)
+  :defer 5
   :ensure t)
 
 (provide 'plugin-yasnippet)

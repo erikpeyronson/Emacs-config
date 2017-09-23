@@ -17,6 +17,8 @@
 ;; - Provides utility functions
 
 ;;; Code:
+(setq gc-cons-threshold 100000000)
+
 (package-initialize)
 (let ((default-directory  "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
