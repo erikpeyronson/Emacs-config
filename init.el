@@ -31,7 +31,7 @@
 ;; Mode Hooks
 (defvar cfg-company-hooks nil)
 (defvar cfg-flycheck-hooks nil)
-(defvar cfg-ggtags-hooks nil)
+(defvar cfg-ggtags-hooks t)
 
 ;; After init hooks
 (defvar cfg-neotree-hook nil)
@@ -60,7 +60,6 @@
 (require 'plugin-company)
 (require 'plugin-flycheck)
 (require 'plugin-projectile)
-(require 'plugin-purpose)
 (require 'plugin-ggtags)
 (require 'plugin-god-mode)
 (require 'plugin-cedet)
@@ -75,3 +74,4 @@
 (setq custom-file "~/.emacs.d/emacs-custom.el")
 (load custom-file)
 ;;; init.el ends here
+(put 'upcase-region 'disabled nil)
