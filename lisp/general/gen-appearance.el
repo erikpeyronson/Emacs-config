@@ -19,10 +19,9 @@
 (set-face-attribute 'default nil :height 100);
 
 ;; Theme and modeline
-;; (use-package zenburn-theme
-;;   :ensure t)
-(load-theme 'wombat)
-(set-cursor-color "#00FFFF")
+(use-package zenburn-theme
+  :ensure t)
+
 (use-package powerline
   :ensure t)
 
