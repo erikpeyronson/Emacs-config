@@ -69,6 +69,9 @@
 (require 'plugin-sr-speedbar)
 (require 'plugin-cmake-ide)
 
+;; machine independent configuration
+(load "~/.emacs.d/init-local.el")
+
 ;; Standalone
 (require 'plugin-eval-replace)
 

@@ -15,3 +15,5 @@ irony
 desktops
 projectile.cache
 .python-environments
+init-local
+lisp/local
