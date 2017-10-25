@@ -68,7 +68,7 @@
 (require 'plugin-neotree)
 (require 'plugin-sr-speedbar)
 (require 'plugin-cmake-ide)
-
+(require 'plugin-protobuf-mode)
 ;; machine independent configuration
 (load "~/.emacs.d/init-local.el")
 
