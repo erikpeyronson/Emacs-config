@@ -55,6 +55,7 @@
 
 ;; Modes
 (require 'mode-markdown)
+(require 'mode-yaml)
 
 ;; Minor mode configurations
 ;; Melpa or built in
