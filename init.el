@@ -53,6 +53,9 @@
 (when cfg-enable-erlang (require 'lang-erlang))
 (when cfg-enable-emacs-lisp (require 'lang-emacs-lisp))
 
+;; Modes
+(require 'mode-markdown)
+
 ;; Minor mode configurations
 ;; Melpa or built in
 (require 'plugin-desktop+)
