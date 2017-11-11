@@ -1,4 +1,4 @@
-;;; plugin-neotree -- Setup neotree
+;;; plugin-neotree -- Configure neotree
 
 ;;; Commentary:
 ;; Side bar file browser:
@@ -10,7 +10,6 @@
 (use-package neotree
   :config
   (define-key toggle-mode-map (kbd "n") 'neotree-toggle)
-  (when cfg-neotree-hook (add-hook 'after-init-hook #'neotree-toggle))
   :ensure t)
 
 (provide 'plugin-neotree)

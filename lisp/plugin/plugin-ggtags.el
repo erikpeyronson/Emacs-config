@@ -1,7 +1,8 @@
-;;; plugin-ggtags -- Setup ggtags
+;;; plugin-ggtags -- Configure ggtags
 
 ;;; Commentary:
-;; install and configure ggtags
+;; Install and configure ggtags sets up hooks
+;; according to flags set in init.el
 
 ;;; Code:
 (require 'gen-package)
@@ -11,10 +12,31 @@
   :config
   (define-key toggle-mode-map (kbd "g") 'ggtags-mode)
 
-  ;; Hooks
-  (when cfg-ggtags-hooks
-    (when cfg-enable-c++ (add-hook 'c++-mode-hook 'ggtags-mode)))
-  :ensure t)
+  ;; c++ configuration
+  (when cfg-cpp-enable
+    (when cfg-cpp-ggtags-hook
+      (add-hook 'c++mode-hook 'ggtags-mode)))
 
+  ;; python configuration
+  (when cfg-python-enable
+    (when cfg-python-ggtags-hook
+      (add-hook 'python-mode-hook 'ggtags-mode)))
+
+  ;; erlang configuration
+  (when cfg-erlang-enable
+    (when cfg-erlang-ggtags-hook
+      (add-hook 'erlang-mode-hook 'ggtags-mode)))
+
+  ;; Emacs lisp configuration
+  (when cfg-emacs-lisp-enable
+    (when cfg-emacs-lisp-ggtags-hook
+      (add-hook 'emacs-lisp-mode-hook 'ggtags-mode)))
+
+  ;; Go configuration
+  (when cfg-go-enable
+    (when cfg-go-ggtags-hook
+      (add-hook 'go-mode-hook 'ggtags-mode)))
+
+  :ensure t)
 (provide 'plugin-ggtags)
 ;;; plugin-ggtags.el ends here

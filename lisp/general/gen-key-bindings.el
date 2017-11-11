@@ -26,7 +26,8 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 
 ;; compile bound to C-c m
-(global-set-key (kbd "C-c RET") 'compile)
+(global-set-key (kbd "C-c RET") 'recompile)
+(global-set-key (kbd "C-c M-m") 'compile)
 
 ;; Insert some shift level 3 characters using C-M
 (global-set-key (kbd "C-M-7") (lambda () (interactive) (insert "{")))

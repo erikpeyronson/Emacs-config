@@ -1,9 +1,9 @@
-;;; plugin-yasnippet.el --- yassnippet configuaration
+;;; plugin-yasnippet.el --- Configuration for yasnippet
 
 ;; Author: Erik Peyronson
 
 ;;; Commentary:
-;; Install and globally enable yasnippet
+;; Install and configures yasnippet
 ;;
 ;; More info: https://github.com/joaotavora/yasnippet
 
@@ -12,11 +12,16 @@
 
 (use-package yasnippet
   :config
-  (yas-global-mode 1)
-  :defer 5
+  (when cfg-go-enable
+
+    ;; Go snippets
+    (use-package go-snippets
+      :ensure t))
+
+  (add-hook 'prog-mode-hook 'yas-minor-mode)
   :ensure t)
 
-(provide 'plugin-yasnippet)
+  (provide 'plugin-yasnippet)
 ;;; plugin-yasnippet.el ends here
 
 

@@ -1,4 +1,4 @@
-;;; plugin-projectile.el --- Setup projectile
+;;; plugin-projectile.el --- Configure projectile
 
 ;; Author: Erik Peyronson
 
@@ -13,8 +13,9 @@
 
 (use-package projectile
   :config
+  ;; Toggle key
   (define-key toggle-mode-map (kbd "C-p") 'projectile-mode)
-  
+
   (projectile-mode 1)
   (setq projectile-enable-caching t)
   :ensure t)

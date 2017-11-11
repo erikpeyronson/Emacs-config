@@ -1,13 +1,9 @@
-;;; plugin-magit -- Setup magit
+;;; plugin-magit -- Configuration for magit
 
 ;;; Commentary:
 ;; Installs and sets up magit git version control integration
 
 ;;; Code:
-
-(require 'plugin-desktop+)
-
-;; (advice-add 'magit-checkout :after 'desktop+-load-git-branch)
 
 (use-package magit
   :config

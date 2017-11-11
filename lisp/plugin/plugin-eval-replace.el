@@ -1,8 +1,8 @@
-;;; plugin-eval-replace -- Setup eval-replace-mode
+;;; plugin-eval-replace -- Configuration for eval-replace-mode
 
 ;;; Commentary:
 ;; Small standalone plugin for inserting the output of inline lisp
-;; expression
+;; expressions
 
 ;;; Code:
 (require 'eval-replace)

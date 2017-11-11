@@ -1,9 +1,10 @@
-;;; plugin-cmake-ide.el --- Setup cmake-ide
+;;; plugin-cmake-ide.el --- Configuration for cmake-ide
 
 ;; Author: Erik Peyronson
 
 ;;; Commentary:
-;; Collection of  package with ide tools based on
+;; Installs and configures cmake-ide
+;; Collection of packages with ide tools
 ;; cmake projects
 ;;
 ;; More info https://github.com/atilaneves/cmake-ide

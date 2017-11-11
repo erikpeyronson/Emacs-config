@@ -1,4 +1,4 @@
-;;; lang-emacs-lisp -- Emacs lisp mode configuration
+;;; lang-emacs-lisp -- Emacs lisp configuration
 
 ;;; Commentary:
 ;; Adds a hook to enable electric-pair mode for all buffers running

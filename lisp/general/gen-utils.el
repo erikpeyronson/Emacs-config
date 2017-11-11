@@ -94,7 +94,7 @@
   nil)
  (defun add-remove-trailing-whitespace-hook ()
   (add-hook 'local-write-file-hooks 'remove-trailing-whitespace))
- 
+
  (add-hook 'awk-mode-hook 'add-remove-trailing-whitespace-hook)
  (add-hook 'c++-mode-hook 'add-remove-trailing-whitespace-hook)
  (add-hook 'c-mode-hook 'add-remove-trailing-whitespace-hook)

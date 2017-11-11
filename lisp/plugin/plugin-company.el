@@ -1,9 +1,11 @@
-;;; plugin-company.el --- Setup company mode 
+;;; plugin-company.el --- Configuration for company mode
 
 ;; Author: Erik Peyronson
 
 ;;; Commentary:
-;; Installs and configures company-mode auto-completion
+;; Installs and configures company-mode auto-completion and extra
+;; backends for enabled languages, sets up hooks according to flags
+;; set in init.el
 ;;
 ;; More info https://github.com/company-mode/company-mode
 
@@ -13,40 +15,55 @@
 
 (use-package company
   :config
-  
+  ;; Toggle key
   (define-key toggle-mode-map (kbd "c") 'company-mode)
- 
-  (when cfg-enable-python
+
+  ;; c++ configuration
+  (when cfg-cpp-enable
+    (when cfg-cpp-company-hook
+      (add-hook 'c++-mode-hook 'company-mode))
+
+    (use-package company-c-headers
+      :config
+      (add-to-list 'company-backends 'company-c-headers)
+      :ensure t))
+
+  ;; Python configuration
+  (when cfg-python-enable
+    (when cfg-python-company-hook
+      (add-hook 'python-mode-hook 'company-mode))
     (use-package jedi-core
       :ensure t)
     (use-package company-jedi
       :config
       (add-hook 'python-mode-hook (lambda () (add-to-list 'company-backends 'company-jedi)))
       :ensure t))
-  
-  (when cfg-enable-c++
-    (use-package company-c-headers
-      :config
-      (add-to-list 'company-c-headers-path-system "/usr/include/c++/4.4.4")
-      (add-to-list 'company-backends 'company-c-headers)
-      ;;    (remove 'company-backends 'Clang)
-      :ensure t))
-  
-  (when cfg-enable-erlang
+
+  ;; Erlang configuration
+  (when cfg-erlang-enable
     (use-package company-erlang
       :config
       (add-hook 'erlang-mode-hook (lambda () (add-to-list 'company-backends 'company-erlang)))
+
+      (when cfg-erlang-company-hook
+        (add-hook 'erlang-mode-hook 'company-mode))
       :ensure t))
 
-  ;; Hooks
-  (when cfg-company-hooks
-    (when cfg-enable-emacs-lisp (add-hook 'emacs-lisp-mode-hook 'company-mode))
-    (when cfg-enable-c++ (add-hook 'c++-mode-hook 'company-mode))
-    (when cfg-enable-python (add-hook 'python-mode-hook 'company-mode))
-    (when cfg-enable-erlang (add-hook 'erlang-mode-hook 'company-mode)))
-  
-  :ensure t)
+  ;; Emacs lisp configuration
+  (when cfg-emacs-lisp-enable
+    (when cfg-emacs-lisp-company-hook
+      (add-hook 'emacs-lisp-mode-hook 'company-mode)))
 
+  ;; Go configuration
+  (when cfg-go-enable
+    (use-package company-go
+      :config
+      (add-hook 'go-mode-hook (lambda () (add-to-list 'company-backends 'company-go)))
+      (when cfg-go-company-hook
+        (add-hook 'go-mode-hook 'company-mode))
+      :ensure t))
+
+  :ensure t)
 
 (provide 'plugin-company)
 ;;; plugin-company.el ends here

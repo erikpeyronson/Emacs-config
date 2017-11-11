@@ -23,23 +23,43 @@
 (let ((default-directory  "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
 
-;; Set to t to enable language configuration
-(defvar cfg-enable-c++ t)
-(defvar cfg-enable-python t)
-(defvar cfg-enable-erlang t)
-(defvar cfg-enable-emacs-lisp t)
+;;; Configuration flags
+;; Set to t to disable plugins with external dependencies
+(defvar cfg-native-only nil)
 
-;;; Mode set to t to enable autostostart of plugins
-;; Mode Hooks
-(defvar cfg-company-hooks nil)
-(defvar cfg-flycheck-hooks nil)
-(defvar cfg-ggtags-hooks t)
+;; Set to t to enable language configuration and plugin hooks
+(defvar cfg-cpp-enable t)
+(defvar cfg-cpp-company-hook t)
+(defvar cfg-cpp-flycheck-hook t)
+(defvar cfg-cpp-ggtags-hook t)
 
-;; After init hooks
-(defvar cfg-neotree-hook nil)
+(defvar cfg-python-enable t)
+(defvar cfg-python-company-hook t)
+(defvar cfg-python-flycheck-hook t)
+(defvar cfg-python-ggtags-hook t)
 
-;; General configuration, provides dependencies to alot of the
-;; plugin-initializers so dont remove
+(defvar cfg-erlang-enable t)
+(defvar cfg-erlang-company-hook t)
+(defvar cfg-erlang-flycheck-hook t)
+(defvar cfg-erlang-ggtags-hook t)
+
+(defvar cfg-emacs-lisp-enable t)
+(defvar cfg-emacs-lisp-company-hook t)
+(defvar cfg-emacs-lisp-flycheck-hook t)
+(defvar cfg-emacs-lisp-ggtags-hook t)
+
+(defvar cfg-go-enable t)
+(defvar cfg-go-company-hook t)
+(defvar cfg-go-flycheck-hook t)
+(defvar cfg-go-ggtags-hook t)
+
+(defvar cfg-markdown-enable t)
+
+(defvar cfg-yaml-enable t)
+
+(defvar cfg-protobuf-enable t)
+
+;;; General configuration, provides dependencies to alot of the
 (require 'gen-package)
 (require 'gen-utils)
 (require 'gen-appearance)
@@ -47,18 +67,17 @@
 (require 'gen-key-bindings)
 (require 'gen-org)
 
-;; Programming language initialization
-(when cfg-enable-c++ (require 'lang-c++))
-(when cfg-enable-python (require 'lang-python))
-(when cfg-enable-erlang (require 'lang-erlang))
-(when cfg-enable-emacs-lisp (require 'lang-emacs-lisp))
-
-;; Modes
-(require 'mode-markdown)
-(require 'mode-yaml)
+;; Language initialization
+(when cfg-cpp-enable (require 'lang-c++))
+(when cfg-python-enable (require 'lang-python))
+(when cfg-erlang-enable (require 'lang-erlang))
+(when cfg-emacs-lisp-enable (require 'lang-emacs-lisp))
+(when cfg-go-enable (require 'lang-go))
+(when cfg-markdown-enable(require 'lang-markdown))
+(when cfg-yaml-enable(require 'lang-yaml))
+(when cfg-protobuf-enable(require 'lang-protobuf))
 
 ;; Minor mode configurations
-;; Melpa or built in
 (require 'plugin-desktop+)
 (require 'plugin-magit)
 (require 'plugin-yasnippet)
@@ -68,11 +87,9 @@
 (require 'plugin-projectile)
 (require 'plugin-ggtags)
 (require 'plugin-god-mode)
-(require 'plugin-cedet)
 (require 'plugin-neotree)
-(require 'plugin-sr-speedbar)
 (require 'plugin-cmake-ide)
-(require 'plugin-protobuf-mode)
+
 ;; machine independent configuration
 (load "~/.emacs.d/init-local.el")
 

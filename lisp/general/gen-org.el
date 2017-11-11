@@ -4,7 +4,6 @@
 ;; Basic org-mode configuration
 
 ;;; Code:
-;; Move emacs and 
 (setq org-todo-keywords
       '((sequence "TODO" "STARTED" "VERIFY" "|" "DONE")))
 (setq org-todo-keyword-faces

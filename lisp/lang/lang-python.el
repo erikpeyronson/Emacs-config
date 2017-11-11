@@ -1,7 +1,7 @@
-;;; lang-python -- Setup Python configuration
+;;; lang-python -- Python configuration
 
 ;;; Commentary:
-;; 
+;; Some utility functions for python currently not working
 
 ;;; Code:
 (require 'gen-package)
@@ -15,11 +15,6 @@
     (with-current-buffer buff
       (compilation-mode))))
 
-;;                                         ; This hook runs the tests after each save, a TDD-esque workflow.
-;; (add-hook 'after-save-hook
-;; 	  (lambda () (run-python-tests "~/projects/project_name/"
-;; 				       "project_name/test"
-;; 				       "*python-tests*")))
 (defun pyton-unit-test ()
   (interactive)
   (setq module-name (buffer-name))

@@ -25,12 +25,18 @@
     map)
   "Eval-replace-mode keymap." )
 
-;; Minor mode to overwrite eval with eval-and replace
 (define-minor-mode c++-extra-keys
   :init-value nil
   :lighter nil)
 
-(add-hook 'c++-mode-hook 'c++-extra-keys)
+(add-hook
+ 'c++-mode-hook
+ (lambda ()
+   (if (setq makefile-path (get-above-makefile))
+       (set (make-local-variable 'compile-command) (format "make -j12 -f %s " makefile-path))
+     (set (make-local-variable 'compile-command)
+          (format "g++ -std=c++14 -o %s %s " (file-name-base buffer-file-name) (buffer-name))))))
+
 
 (provide 'lang-c++)
 ;;; lang-c++.el ends here

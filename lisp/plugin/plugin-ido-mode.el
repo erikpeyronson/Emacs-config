@@ -1,12 +1,8 @@
-;;; plugin-ido-mode.el --- Installs and sets up ido-mode
+;;; plugin-ido-mode.el --- Configure ido-mode
 
 ;;; Commentary:
-;; Installs ido-mode, smex and flx and makes sure ido-mode is used
-;; whenever possible
-;;
-;; Key-bindings
-;; C-c m i - toggle ido mode
-;; C-c C-c - use native M-x
+;; Installs smex, flx and ido vertical and makes sure ido-mode is used
+;; practically everywhere
 ;;
 ;; More info
 ;; - https://github.com/creichert/ido-vertical-mode.el

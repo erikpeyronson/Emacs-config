@@ -1,8 +1,9 @@
-;; plugin-god-mode -- Setup god-mode
+;; plugin-god-mode -- Configure god mode
 
 ;;; Commentary:
-;; God mode provides semi-modal editing for emacs.
-;; 
+;; Installs and configures god-mode provides semi-modal editing for
+;; emacs.
+;;
 ;; More info https://github.com/chrisdone/god-mode
 
 ;;; Code:
@@ -17,7 +18,6 @@
             'box
           'bar)))
 
-
 (use-package god-mode
   :config
   (require 'god-mode-isearch)
@@ -28,19 +28,19 @@
   ;; (setq god-exempt-predicates nil)
 
   (global-set-key (kbd "<escape>") 'god-mode)
-  
+
   (define-key god-local-mode-map (kbd "i") 'god-mode)
   (define-key god-local-mode-map (kbd ".") 'repeat)
   (define-key god-local-mode-map (kbd "z") 'repeat)
 
   (define-key god-local-mode-map (kbd "C-x C-o") 'other-window)
   (define-key god-local-mode-map (kbd "C-x o") 'delete-blank-lines)
-  
+
   (define-key god-local-mode-map (kbd "C-x C-1") 'delete-other-windows)
   (define-key god-local-mode-map (kbd "C-x C-2") 'split-window-below)
   (define-key god-local-mode-map (kbd "C-x C-3") 'split-window-right)
   (define-key god-local-mode-map (kbd "C-x C-0") 'delete-window)
-  
+
   (define-key god-local-mode-map (kbd "C-c C-c") 'comment-or-uncomment-region-or-line)
 
   (define-key god-local-mode-map (kbd "C-x C-x") 'exchange-point-and-mark)
@@ -56,6 +56,3 @@
 
 (provide 'plugin-god-mode)
 ;;; plugin-god-mode.el ends here
-
-
-
