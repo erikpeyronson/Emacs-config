@@ -11,6 +11,7 @@
 (require 'gen-package)
 
 (use-package yasnippet
+  :defer 10
   :config
   (when cfg-go-enable
 

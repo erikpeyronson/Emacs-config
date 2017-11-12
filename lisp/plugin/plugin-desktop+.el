@@ -9,6 +9,7 @@
 (require 'use-package)
 
 (use-package desktop+
+  :if window-system
   :config
   (defvar desktop+-map (make-sparse-keymap))
   (define-key desktop+-map (kbd "C-c d l") 'desktop+-load)

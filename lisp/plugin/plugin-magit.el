@@ -6,9 +6,9 @@
 ;;; Code:
 
 (use-package magit
+  :defer 15
   :config
   (global-set-key (kbd "C-x g") 'magit-status)
-  :defer 5
   :ensure t)
 
 (provide 'plugin-magit)
