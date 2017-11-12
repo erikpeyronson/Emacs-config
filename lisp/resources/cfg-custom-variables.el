@@ -12,8 +12,8 @@
 (defvar cfg-cpp-ggtags-hook t)
 
 (defvar cfg-python-enable t)
-(defvar cfg-python-company-hook t)
-(defvar cfg-python-flycheck-hook t)
+(defvar cfg-python-company-hook nil)
+(defvar cfg-python-flycheck-hook nil)
 
 (defvar cfg-python-ggtags-hook t)
 (defvar cfg-erlang-enable t)
@@ -35,5 +35,6 @@
 (defvar cfg-yaml-enable t)
 (defvar cfg-protobuf-enable t)
 
+(defvar cfg-tmp-directory (concat user-emacs-directory "tmp/"))
 (provide 'cfg-custom-variables)
 ;;; cfg-custom-variables.el ends here

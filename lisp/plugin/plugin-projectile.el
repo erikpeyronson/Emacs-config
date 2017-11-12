@@ -18,6 +18,7 @@
 
   (projectile-mode 1)
   (setq projectile-enable-caching t)
+
   :ensure t)
 
 (provide 'plugin-projectile)

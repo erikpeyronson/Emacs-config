@@ -23,7 +23,8 @@
 (global-set-key (kbd "RET") 'newline-and-indent)
 
 ;; Use ibuffer instead of bs show for C-x C-b
-(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-x C-4 C-x C-b") 'ibuffer-other-window)
 
 
 ;; Insert some shift level 3 characters using C-M

@@ -8,10 +8,10 @@
 (require 'use-package)
 (require 'gen-key-bindings)
 (use-package neotree
+  :ensure t
   :if window-system
   :config
-  (define-key toggle-mode-map (kbd "n") 'neotree-toggle)
-  :ensure t)
+  (define-key toggle-mode-map (kbd "n") 'neotree-toggle))
 
 (provide 'plugin-neotree)
 ;;; plugin-neotree.el ends here

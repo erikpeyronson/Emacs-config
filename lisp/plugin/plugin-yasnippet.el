@@ -11,6 +11,7 @@
 (require 'gen-package)
 
 (use-package yasnippet
+  :ensure t
   :defer 10
   :config
   (when cfg-go-enable
@@ -19,8 +20,7 @@
     (use-package go-snippets
       :ensure t))
 
-  (add-hook 'prog-mode-hook 'yas-minor-mode)
-  :ensure t)
+  (add-hook 'prog-mode-hook 'yas-minor-mode))
 
   (provide 'plugin-yasnippet)
 ;;; plugin-yasnippet.el ends here
