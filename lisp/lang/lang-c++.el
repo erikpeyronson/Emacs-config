@@ -5,38 +5,51 @@
 ;; c++-mode Set up a key-map to override some built in key-bindings
 ;; while in c++-mode
 
-
+;;; Code:
 (require 'gen-package)
-(require 'gen-utils)
-
+(require 'cfg-custom-variables)
 (use-package google-c-style
   :config
-  (add-hook 'c-mode-common-hook 'google-set-c-style)
   :ensure t)
 
-;;; Code:
+(defvar my-cxx-flags "-Wall -Wextra"
+  "Flags passed to 'compile command' for c++-mode buffers visiting a file with no Makefile.")
+(defvar my-make-flags "-j16"
+  "Flags passed to 'compile command' for c++-mode buffers visiting a file with Makefile.")
+(defvar my-cxx-standard "-std=c++14"
+  "C++ standard passed to various plugins and 'compile-command'.")
+
+
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.tcc\\'" . c++-mode))
 
-;; Overwrite C-c C-c with better comment function
-(defvar c++-extra-keys-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-c") 'comment-or-uncomment-region-or-line)
-    map)
-  "Eval-replace-mode keymap." )
+(defun my-get-above-makefile ()
+  "Get path to the closest above Makefile."
+  (let ((dir (locate-dominating-file "." "Makefile")))
+    (when dir
+      (concat dir "Makefile"))))
 
-(define-minor-mode c++-extra-keys
-  :init-value nil
-  :lighter nil)
+(defun my-generate-c++-compile-command ()
+  "Set the 'compile-command' variable for c++ mode if the buffer is visiting a file."
+     (when (buffer-file-name)
+       (if (let makefile-path (my-get-above-makefile))
+           (set (make-local-variable 'compile-command)
+                (format "make %s -f %s " my-make-flags makefile-path))
+         (set
+          (make-local-variable 'compile-command)
+          (format "g++ %s -o %s %s "
+                  my-cxx-standard my-cxx-flags
+                  (file-name-base buffer-file-name)
+                  (buffer-name))))))
 
-(add-hook
- 'c++-mode-hook
- (lambda ()
-   (if (setq makefile-path (get-above-makefile))
-       (set (make-local-variable 'compile-command) (format "make -j12 -f %s " makefile-path))
-     (set (make-local-variable 'compile-command)
-          (format "g++ -std=c++14 -o %s %s " (file-name-base buffer-file-name) (buffer-name))))))
+(defun my-c++-mode-setup ()
+  "Configuration hooked to 'c++-mode-hook' keybindings, indentation style, 'compile-command' etc."
+  (define-key c++-mode-map (kbd "C-c RET") 'recompile)
+  (define-key c++-mode-map (kbd "C-c M-m") 'compile)
+  (google-set-c-style)
+  (my-generate-c++-compile-command))
 
+(add-hook 'c++-mode-hook 'my-c++-mode-setup)
 
 (provide 'lang-c++)
 ;;; lang-c++.el ends here

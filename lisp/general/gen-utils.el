@@ -64,12 +64,6 @@
       (set-visited-file-name new-name)
       (rename-buffer new-name))))
 
-(defun get-above-makefile ()
-  "Compile with makefile in parent dir"
-  (let ((dir (locate-dominating-file "." "Makefile")))
-    (when dir
-      (concat dir "Makefile"))))
-
 (defun set-window-width (n)
   "Set the selected window's width to N columns."
   (adjust-window-trailing-edge (selected-window) (- n (window-width)) t))

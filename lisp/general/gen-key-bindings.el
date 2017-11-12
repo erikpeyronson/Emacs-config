@@ -25,9 +25,6 @@
 ;; Use ibuffer instead of bs show for C-x C-b
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 
-;; compile bound to C-c m
-(global-set-key (kbd "C-c RET") 'recompile)
-(global-set-key (kbd "C-c M-m") 'compile)
 
 ;; Insert some shift level 3 characters using C-M
 (global-set-key (kbd "C-M-7") (lambda () (interactive) (insert "{")))
@@ -50,18 +47,6 @@
 (define-key toggle-mode-map (kbd "C-t C-t") 'transient-mark-mode)
 (define-key toggle-mode-map (kbd "C-t C-l") 'toggle-truncate-lines)
 (define-key toggle-mode-map (kbd "C-m C-b") 'menu-bar-mode)
-
-;; Some different Make commands using the closest availiable makefile
-(global-set-key [f5] (lambda () (interactive) (compile (format
-                                                        "make -j8 -f %s" (get-above-makefile)))))
-(global-set-key [f6] (lambda () (interactive) (compile (format
-							"make -j8 -f %s test" (get-above-makefile)))))
-(global-set-key [f7] (lambda () (interactive) (compile (format
-                                                        "make -f %s clean" (get-above-makefile)))))
-(global-set-key [f8] (lambda () (interactive) (compile (format
-                                                        "make -j8 -f %s bit-run" (get-above-makefile)))))
-(global-set-key [f9] (lambda () (interactive) (compile (format
-                                                        "make -j8 -f %s bit-memcheck" (get-above-makefile)))))
 
 ;; Indent whole buffer
 (global-set-key (kbd "C-c H") 'indent-buffer)

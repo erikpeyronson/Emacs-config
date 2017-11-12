@@ -5,7 +5,14 @@
 ;; emacs-lisp-mode
 
 ;;; Code:
-(add-hook 'emacs-lisp-mode-hook #'(lambda () (electric-pair-local-mode)))
+
+(defun my-emacs-lisp-mode-setup ()
+  "Function that run configuration hooked to 'emacs-lisp-mode-hook'."
+  (define-key emacs-lisp-mode-map (kbd "C-c RET") 'emacs-lisp-byte-compile)
+  (electric-pair-local-mode))
+
+(add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-setup)
+;; (add-hook 'emacs-lisp-mode-hook #'(lambda () ()))
 
 (provide 'lang-emacs-lisp)
 ;;; lang-emacs-lisp.el ends here
