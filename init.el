@@ -23,11 +23,14 @@
 (let ((default-directory  "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
 
-;;; Configuration flags use to toggle functionality
+;; Create machine local files on first start
 (unless (file-exists-p (concat user-emacs-directory "lisp/local/cfg-custom-variables.el"))
 	(copy-file (concat user-emacs-directory "resources/cfg-custom-variables.el")
 		   (concat user-emacs-directory "lisp/local/cfg-custom-variables.el")))
+(unless (file-exists-p (concat user-emacs-directory "lisp/local/init-local.el"))
+  (write-region "" nil (concat user-emacs-directory "lisp/local/init-local.el")))
 
+;;; Configuration flags use to toggle functionality
 (require 'cfg-custom-variables)
 
 ;;; General configuration, provides dependencies to alot of the
@@ -64,9 +67,10 @@
 ;; Standalone
 (require 'plugin-eval-replace)
 
+;; Load local configuration found in lisp/local/init-local
+(load-file (concat user-emacs-directory "lisp/local/init-local.el"))
 ;; Custom variables in separate files
 (setq custom-file "~/.emacs.d/emacs-custom.el")
 (unless (file-exists-p custom-file) (write-region "" nil custom-file))
 (load custom-file)
 ;;; init.el ends here
-(put 'upcase-region 'disabled nil)
