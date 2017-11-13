@@ -8,9 +8,9 @@ elpa
 auto-saves
 eshell
 emacs-custom.el
+tmp/
 semanticdb
 session*
-smex-items
 irony
 desktops
 projectile.cache
