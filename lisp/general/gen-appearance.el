@@ -19,8 +19,16 @@
 (set-face-attribute 'default nil :height 100);
 
 ;; Theme and modeline
-(use-package zenburn-theme
-  :ensure t)
+;; (use-package zenburn-theme
+;;   :ensure t)
+
+(use-package spacemacs-theme
+  :ensure t
+  :config
+  ;; (setq custom-safe-themes t)
+  ;; (load-theme 'spacemacs-dark t)
+  )
+(load-theme 'spacemacs-dark t)
 
 (use-package powerline
   :ensure t)

@@ -28,7 +28,6 @@
 	(copy-file (concat user-emacs-directory "resources/cfg-custom-variables.el")
 		   (concat user-emacs-directory "lisp/local/cfg-custom-variables.el")))
 
-
 (require 'cfg-custom-variables)
 
 ;;; General configuration, provides dependencies to alot of the
@@ -67,6 +66,7 @@
 
 ;; Custom variables in separate files
 (setq custom-file "~/.emacs.d/emacs-custom.el")
+(unless (file-exists-p custom-file) (write-region "" nil custom-file))
 (load custom-file)
 ;;; init.el ends here
 (put 'upcase-region 'disabled nil)
