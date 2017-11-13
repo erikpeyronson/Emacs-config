@@ -8,7 +8,6 @@ elpa
 auto-saves
 eshell
 emacs-custom.el
-tmp/
 semanticdb
 session*
 irony
@@ -16,6 +15,5 @@ desktops
 projectile.cache
 .python-environments
 init-local
-lisp/local
 anaconda-mode
 url

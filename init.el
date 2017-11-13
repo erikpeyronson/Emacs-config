@@ -24,6 +24,11 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 ;;; Configuration flags use to toggle functionality
+(unless (file-exists-p (concat user-emacs-directory "lisp/local/cfg-custom-variables.el"))
+	(copy-file (concat user-emacs-directory "resources/cfg-custom-variables.el")
+		   (concat user-emacs-directory "lisp/local/cfg-custom-variables.el")))
+
+
 (require 'cfg-custom-variables)
 
 ;;; General configuration, provides dependencies to alot of the
@@ -56,9 +61,6 @@
 (require 'plugin-god-mode)
 (require 'plugin-neotree)
 (require 'plugin-cmake-ide)
-
-;; machine independent configuration
-(load "~/.emacs.d/init-local.el")
 
 ;; Standalone
 (require 'plugin-eval-replace)
