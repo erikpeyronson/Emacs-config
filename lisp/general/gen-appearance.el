@@ -20,10 +20,9 @@
 
 ;; Theme and modeline
 
-(use-package zenburn-theme
+(use-package atom-one-dark-theme
   :ensure t
-  :config
-  )
+  :config)
 
 (use-package powerline
   :ensure t)
