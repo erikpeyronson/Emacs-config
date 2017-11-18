@@ -11,7 +11,6 @@
 (require 'gen-key-bindings)
 
 (use-package flycheck
-  :if window-system
   :config
   ;; Toggle key
   (define-key toggle-mode-map (kbd "f") 'flycheck-mode)

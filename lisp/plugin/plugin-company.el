@@ -14,7 +14,6 @@
 (require 'gen-key-bindings)
 
 (use-package company
-  :if window-system
   :config
   ;; Toggle key
   (define-key toggle-mode-map (kbd "c") 'company-mode)

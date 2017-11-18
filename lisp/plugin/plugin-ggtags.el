@@ -15,7 +15,9 @@
   ;; c++ configuration
   (when cfg-cpp-enable
     (when cfg-cpp-ggtags-hook
-      (add-hook 'c++mode-hook 'ggtags-mode)))
+      (add-hook 'c++-mode-hook
+                (lambda () (ggtags-mode 1)))))
+
 
   ;; python configuration
   (when cfg-python-enable

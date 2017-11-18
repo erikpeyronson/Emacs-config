@@ -8,8 +8,7 @@
 ;;; Code:
 
 (setq-default indent-tabs-mode nil)
-(setq compilation-scroll-output t)
-(setq set-mark-command-repeat-pop t) 
+(setq set-mark-command-repeat-pop t)
 
 ;; Keep backups and auto-saves out of source directory
 (defvar tramp-backup-directory-alist)
