@@ -22,6 +22,8 @@
 
   ;; Python configuration
   (when cfg-python-enable
+    (use-package flycheck-pycheckers
+      :ensure t)
     (when cfg-python-flycheck-hook
       (add-hook 'python-mode-hook 'flycheck-mode)))
 

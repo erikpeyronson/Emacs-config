@@ -20,5 +20,8 @@
   (setq module-name (buffer-name))
   (print module-name))
 
+(use-package pydoc
+  :ensure t)
+
 (provide 'lang-python)
 ;;; lang-python.el ends here

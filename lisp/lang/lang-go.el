@@ -25,6 +25,8 @@
 
 (use-package go-mode
   :config
+  (use-package go-eldoc
+    :ensure t)
   (add-hook 'go-mode-hook 'my-go-mode-setup)
   :ensure t)
 
