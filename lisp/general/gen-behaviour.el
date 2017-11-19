@@ -42,7 +42,16 @@
   (setq highlight-indent-guides-method 'character)
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 
+(use-package idle-highlight-mode
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'idle-highlight-mode))
+
 (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+(require 'paren)
+(set-face-background 'show-paren-match "gray40")
+(add-hook 'prog-mode-hook 'show-paren-mode)
 
 (provide 'gen-behaviour)
 ;;; gen-behaviour.el ends here

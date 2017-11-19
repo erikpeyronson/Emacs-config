@@ -7,6 +7,7 @@
 
 (use-package magit
   :ensure t
+  :bind (("C-x g" . magit-status))
   :config
   (global-set-key (kbd "C-x g") 'magit-status))
 

@@ -21,7 +21,8 @@
   (define-key go-mode-map (kbd "M-,") 'pop-tag-mark)
   (define-key go-mode-map (kbd "C-c RET") 'recompile)
   (define-key go-mode-map (kbd "C-c M-m") 'compile)
-  (my-generate-go-compile-command))
+  (my-generate-go-compile-command)
+  (setq tab-width 2))
 
 (use-package go-mode
   :config

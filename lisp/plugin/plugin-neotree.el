@@ -9,9 +9,10 @@
 (require 'gen-key-bindings)
 (use-package neotree
   :ensure t
-  :if window-system
   :config
-  (define-key toggle-mode-map (kbd "n") 'neotree-toggle))
+  (define-key toggle-mode-map (kbd "n") 'neotree-mode))
 
-(provide 'plugin-neotree)
+
+
+  (provide 'plugin-neotree)
 ;;; plugin-neotree.el ends here

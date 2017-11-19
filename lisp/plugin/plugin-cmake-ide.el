@@ -14,9 +14,10 @@
 (require 'gen-package)
 
 (use-package cmake-ide
+  :ensure t
   :config
-  (cmake-ide-setup)
-  :ensure t)
+  (cmake-ide-setup))
+
 
 (provide 'plugin-cmake-ide)
 ;;; plugin-cmake-ide.el ends here

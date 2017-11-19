@@ -11,6 +11,7 @@
 (require 'gen-key-bindings)
 
 (use-package flycheck
+  :ensure t
   :config
   ;; Toggle key
   (define-key toggle-mode-map (kbd "f") 'flycheck-mode)
@@ -40,12 +41,10 @@
   ;; Go configuration
   (when cfg-go-enable
     (use-package flycheck-gometalinter
+      :ensure t
       :config
       (when cfg-go-flycheck-hook
-        (add-hook 'go-mode-hook 'flycheck-mode)
-        :ensure t)))
-
-  :ensure t)
+        (add-hook 'go-mode-hook 'flycheck-mode)))))
 
 (provide 'plugin-flycheck)
 ;;; plugin-flycheck.el ends here

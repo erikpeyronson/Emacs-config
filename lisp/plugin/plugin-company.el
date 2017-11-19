@@ -12,21 +12,19 @@
 ;;; Code:
 (require 'gen-package)
 (require 'gen-key-bindings)
-
 (use-package company
+  :ensure t
   :config
-  ;; Toggle key
   (define-key toggle-mode-map (kbd "c") 'company-mode)
-
   ;; c++ configuration
   (when cfg-cpp-enable
     (when cfg-cpp-company-hook
-      (add-hook 'c++-mode-hook 'company-mode))
+      (add-hook 'c++-mode-hook 'company-mode)))
 
     (use-package company-c-headers
+      :ensure t
       :config
-      (add-to-list 'company-backends 'company-c-headers)
-      :ensure t))
+      (add-to-list 'company-backends 'company-c-headers))
 
   ;; Python configuration
   (when cfg-python-enable
@@ -35,19 +33,19 @@
     (use-package jedi-core
       :ensure t)
     (use-package company-jedi
+      :ensure t
       :config
-      (add-hook 'python-mode-hook (lambda () (add-to-list 'company-backends 'company-jedi)))
-      :ensure t))
+      (add-hook 'python-mode-hook (lambda () (add-to-list 'company-backends 'company-jedi)))))
 
   ;; Erlang configuration
   (when cfg-erlang-enable
     (use-package company-erlang
+      :ensure t
       :config
       (add-hook 'erlang-mode-hook (lambda () (add-to-list 'company-backends 'company-erlang)))
 
       (when cfg-erlang-company-hook
-        (add-hook 'erlang-mode-hook 'company-mode))
-      :ensure t))
+        (add-hook 'erlang-mode-hook 'company-mode))))
 
   ;; Emacs lisp configuration
   (when cfg-emacs-lisp-enable
@@ -57,14 +55,14 @@
   ;; Go configuration
   (when cfg-go-enable
     (use-package company-go
+      :ensure t
       :config
-      (add-hook 'go-mode-hook (lambda () (add-to-list 'company-backends 'company-go)))
-      (when cfg-go-company-hook
-        (add-hook 'go-mode-hook 'company-mode))
-      :ensure t))
+      (defun my-company-go-setup ()
+        (set (make-local-variable 'company-backend) '(company-go))
+        (when cfg-go-company-hook
+          (company-mode)))
+      (add-hook 'go-mode-hook 'my-company-go-setup))))
 
-  :ensure t)
-
-(provide 'plugin-company)
+  (provide 'plugin-company)
 ;;; plugin-company.el ends here
 

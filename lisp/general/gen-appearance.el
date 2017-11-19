@@ -15,6 +15,7 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (global-hl-line-mode)
+(set-face-background 'hl-line "gray25")
 (transient-mark-mode 0)
 (set-face-attribute 'default nil :height 100);
 

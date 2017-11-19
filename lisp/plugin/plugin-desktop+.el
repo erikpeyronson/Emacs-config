@@ -9,11 +9,12 @@
 (require 'use-package)
 
 (use-package desktop+
-  :if window-system
+  :ensure t
+  :bind (:map desktop+-map
+              ("C-c d c" . desktop+-create)
+              ("C-c d l" . desktop+-load))
   :config
   (defvar desktop+-map (make-sparse-keymap))
-  (define-key desktop+-map (kbd "C-c d l") 'desktop+-load)
-  (define-key desktop+-map (kbd "C-c d c") 'desktop+-create)
 
   (defun desktop+-load-git-branch(&optional args)
     (interactive)
@@ -22,9 +23,7 @@
         (progn
           (desktop+-load "template")
           (desktop+-create current-branch))
-      (desktop+-load current-branch)))
-
-  :ensure t)
+      (desktop+-load current-branch))))
 
 (provide 'plugin-desktop+)
 

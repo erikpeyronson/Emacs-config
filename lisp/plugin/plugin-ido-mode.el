@@ -37,8 +37,6 @@
          ("C-c C-c M-x" . execute-extended-command))
   :config
   (smex-initialize)
-  ;; (global-set-key (kbd "M-x") 'smex)
-  ;; (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
   (setq smex-save-file (concat cfg-tmp-directory ".smex-items")))
 
 (use-package flx

@@ -9,7 +9,7 @@
 
 ;;; Code:
 (require 'gen-package)
-(print "initializing yasnippet")
+
 (defun my-yas-setup()
      (yas-reload-all)
      (yas-minor-mode))

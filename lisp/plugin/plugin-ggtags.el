@@ -9,15 +9,14 @@
 (require 'gen-key-bindings)
 
 (use-package ggtags
+  :ensure t
   :config
   (define-key toggle-mode-map (kbd "g") 'ggtags-mode)
-
   ;; c++ configuration
   (when cfg-cpp-enable
     (when cfg-cpp-ggtags-hook
       (add-hook 'c++-mode-hook
                 (lambda () (ggtags-mode 1)))))
-
 
   ;; python configuration
   (when cfg-python-enable
@@ -37,8 +36,7 @@
   ;; Go configuration
   (when cfg-go-enable
     (when cfg-go-ggtags-hook
-      (add-hook 'go-mode-hook 'ggtags-mode)))
+      (add-hook 'go-mode-hook 'ggtags-mode))))
 
-  :ensure t)
 (provide 'plugin-ggtags)
 ;;; plugin-ggtags.el ends here
