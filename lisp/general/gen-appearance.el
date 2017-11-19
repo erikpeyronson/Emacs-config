@@ -9,32 +9,23 @@
 ;; Interface
 (require 'gen-package)
 
-(setq-default frame-title-format '("emacs: %f"))
-(setq-default cursor-type 'bar)
-(setq inhibit-startup-screen t)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(global-hl-line-mode)
-(set-face-background 'hl-line "gray25")
-(transient-mark-mode 0)
-(set-face-attribute 'default nil :height 100);
-
-;; Theme and modeline
-
+;; Theme
 (use-package atom-one-dark-theme
   :ensure t
   :config)
 
-(use-package powerline
-  :ensure t)
-
-(use-package smart-mode-line
-  :config
-  (setq sml/no-confirm-load-theme t)
-  (setq sml/theme 'dark)
-  (smart-mode-line-enable)
-  (powerline-default-theme)
-  :ensure t)
+;; Etc
+(setq-default frame-title-format '("emacs: %f"))
+(setq-default cursor-type 'bar)
+(setq inhibit-startup-screen t)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(require 'hl-line)
+;; (set-face-background 'hl-line "gray25")
+(global-hl-line-mode)
+(transient-mark-mode 0)
+(set-face-attribute 'default nil :height 100);
 
 (use-package nlinum
   :config
