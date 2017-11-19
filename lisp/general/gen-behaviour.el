@@ -30,5 +30,19 @@
       kept-new-versions 5    ; keep some new versions
       kept-old-versions 2)   ; and some old ones, too
 
+(use-package fill-column-indicator
+  :ensure t
+  :config
+  ;; (add-hook 'prog-mode-hook 'fci-mode)
+  (use-package fill-column-indicator))
+
+(use-package highlight-indent-guides
+  :ensure t
+  :config
+  (setq highlight-indent-guides-method 'character)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+
+(add-hook 'prog-mode-hook 'electric-pair-mode)
+
 (provide 'gen-behaviour)
 ;;; gen-behaviour.el ends here
