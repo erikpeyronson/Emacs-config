@@ -7,13 +7,12 @@
 ;;; Code:
 
 ;; Interface
-(require 'gen-package)
 
 ;; Theme
-(use-package atom-one-dark-theme
-  :ensure t
-  :config)
-
+;; (use-package atom-one-dark-theme
+;;   :ensure t
+;;   :config)
+;; (load-theme 'atom-one-dark t)
 ;; Etc
 (setq-default frame-title-format '("emacs: %f"))
 (setq-default cursor-type 'bar)
@@ -26,11 +25,6 @@
 (global-hl-line-mode)
 (transient-mark-mode 0)
 (set-face-attribute 'default nil :height 100);
-
-(use-package nlinum
-  :config
-  (global-nlinum-mode)
-  :ensure t)
 
 (provide 'gen-appearance)
 ;;; gen-appearance.el ends here

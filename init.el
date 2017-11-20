@@ -19,7 +19,7 @@
 ;;; Code:
 (setq gc-cons-threshold 1000000000)
 
-(package-initialize)
+;; (package-initialize)
 (let ((default-directory  "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
 
@@ -34,38 +34,43 @@
 (require 'cfg-custom-variables)
 
 ;;; General configuration, provides dependencies to alot of the
-(require 'gen-package)
+
 (require 'gen-utils)
 (require 'gen-appearance)
 (require 'gen-behaviour)
 (require 'gen-key-bindings)
 (require 'gen-org)
 
-;; Language initialization
-(when cfg-cpp-enable (require 'lang-c++))
-(when cfg-python-enable (require 'lang-python))
-(when cfg-erlang-enable (require 'lang-erlang))
-(when cfg-emacs-lisp-enable (require 'lang-emacs-lisp))
-(when cfg-go-enable (require 'lang-go))
-(when cfg-markdown-enable(require 'lang-markdown))
-(when cfg-yaml-enable(require 'lang-yaml))
-(when cfg-protobuf-enable(require 'lang-protobuf))
+(when (>= emacs-major-version 25)
+  (require 'gen-package)
+  ;; Language initialization
+  (when cfg-cpp-enable (require 'lang-c++))
+  (when cfg-python-enable (require 'lang-python))
+  (when cfg-erlang-enable (require 'lang-erlang))
+  (when cfg-emacs-lisp-enable (require 'lang-emacs-lisp))
+  (when cfg-go-enable (require 'lang-go))
+  (when cfg-markdown-enable(require 'lang-markdown))
+  (when cfg-yaml-enable(require 'lang-yaml))
+  (when cfg-protobuf-enable(require 'lang-protobuf))
 
-;; Plugin configurations
-(require 'plugin-desktop+)
-(require 'plugin-magit)
-(require 'plugin-yasnippet)
-(require 'plugin-ido-mode)
-(require 'plugin-company)
-(require 'plugin-flycheck)
-(require 'plugin-projectile)
-(require 'plugin-ggtags)
-(require 'plugin-god-mode)
-(require 'plugin-neotree)
-(require 'plugin-cmake-ide)
+  ;; Plugin configurations
+  (require 'plugin-fill-column-indicator)
+  (require 'plugin-highlight-indent-guides)
+  (require 'plugin-idle-highlight-mode)
+  (require 'plugin-desktop+)
+  (require 'plugin-magit)
+  (require 'plugin-yasnippet)
+  (require 'plugin-ido-mode)
+  (require 'plugin-company)
+  (require 'plugin-flycheck)
+  (require 'plugin-projectile)
+  (require 'plugin-ggtags)
+  (require 'plugin-god-mode)
+  (require 'plugin-neotree)
+  (require 'plugin-cmake-ide)
 
-;; Standalone
-(require 'plugin-eval-replace)
+  ;; Standalone
+  (require 'plugin-eval-replace))
 
 ;; Load local configuration found in lisp/local/init-local
 (load-file (concat user-emacs-directory "lisp/local/init-local.el"))

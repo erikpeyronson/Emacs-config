@@ -16,5 +16,11 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+(use-package atom-one-dark-theme
+     :ensure t)
+(unless (package-installed-p 'atom-one-dark-theme)
+  (package-refresh-contents)
+  (package-install 'atom-one-dark-theme))
+
 (provide 'gen-package)
 ;;; gen-package.el ends here

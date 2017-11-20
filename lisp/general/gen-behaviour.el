@@ -30,24 +30,6 @@
       kept-new-versions 5    ; keep some new versions
       kept-old-versions 2)   ; and some old ones, too
 
-(use-package fill-column-indicator
-  :ensure t
-  :config
-  ;; (add-hook 'prog-mode-hook 'fci-mode)
-  (use-package fill-column-indicator))
-
-(use-package highlight-indent-guides
-  :ensure t
-  :config
-  (setq highlight-indent-guides-method 'character)
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
-
-(use-package idle-highlight-mode
-  :ensure t
-  :config
-  (setq idle-highlight-idle-time 2.0)
-  (add-hook 'prog-mode-hook 'idle-highlight-mode))
-
 (require 'paren)
 (set-face-background 'show-paren-match "gray40")
 (add-hook 'prog-mode-hook 'show-paren-mode)
