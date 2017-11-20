@@ -45,9 +45,8 @@
 (use-package idle-highlight-mode
   :ensure t
   :config
+  (setq idle-highlight-idle-time 2.0)
   (add-hook 'prog-mode-hook 'idle-highlight-mode))
-
-(add-hook 'prog-mode-hook 'electric-pair-mode)
 
 (require 'paren)
 (set-face-background 'show-paren-match "gray40")
