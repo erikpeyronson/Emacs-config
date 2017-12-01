@@ -16,17 +16,13 @@
 
 (use-package yasnippet
   :ensure t
-  :bind (:map yas-minor-mode-map
-              ("TAB" . nil)
-              ("<tab>" . nil)
-              ("<backtab>" . yas-expand))
   :config
+  (define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
   (when cfg-go-enable
     ;; Go snippets
     (use-package go-snippets
       :ensure t))
-  (print "adding hook")
-  (add-hook 'prog-mode-hook 'my-yas-setup))
+  (yas-global-mode))
 
   (provide 'plugin-yasnippet)
 ;;; plugin-yasnippet.el ends here
