@@ -66,8 +66,6 @@
   (require 'plugin-projectile)
   (require 'plugin-ggtags)
   (require 'plugin-god-mode)
-  (require 'plugin-neotree)
-  (require 'plugin-cmake-ide)
 
   ;; Standalone
   (require 'plugin-eval-replace))
@@ -79,3 +77,4 @@
 (unless (file-exists-p custom-file) (write-region "" nil custom-file))
 (load custom-file)
 ;;; init.el ends here
+(put 'upcase-region 'disabled nil)
