@@ -1,5 +1,5 @@
-* Packages
-** Initialize
+* Initialize
+ Set up package repositories and load paths
  #+BEGIN_SRC emacs-lisp :tangle yes
    (require 'package)
    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
@@ -15,12 +15,7 @@
    (require 'spacemacs-functions)
    (require 'use-package)
  #+END_SRC
-** bind-map
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package bind-map
-    :ensure t)
-#+END_SRC
-** evil
+* Evil
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package evil
     :ensure t
@@ -45,7 +40,6 @@
       :ensure t
       :requires evil
       :config
-      (message "evil-escape-mode")
       (evil-escape-mode 1))
 #+END_SRC
 ** evil-nerd-commenter
@@ -64,7 +58,9 @@
   #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package evil-exchange
       :ensure t
-      :requires evil)
+      :requires evil
+      :config
+      (evil-exchange-cx-install))
  #+END_SRC
 ** evil-magit
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -85,30 +81,33 @@
   (use-package evil-rsi
     :ensure t
     :requires evil)
-
  #+END_SRC
-** ivy  counsel
+* Ivy
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ivy
     :config
     (add-hook 'after-init-hook 'ivy-mode)
     :ensure t)
 #+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ivy-yasnippet
-    :ensure t
-    :requires (ivy yasnippet))
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package counsel
-    :ensure t
-    :requires ivy)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package counsel-projectile
-      :ensure t
-      :requires (counsel projectile))
-#+END_SRC
+** ivy-yasnippet
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package ivy-yasnippet
+     :ensure t
+     :requires (ivy yasnippet))
+ #+END_SRC
+** counsel
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package counsel
+     :ensure t
+     :requires ivy)
+ #+END_SRC
+** counsel-projectile
+ #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package counsel-projectile
+       :ensure t
+       :requires (counsel projectile))
+ #+END_SRC
+* Editing
 ** which-key
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package which-key
@@ -122,6 +121,17 @@
     :ensure t
     :init
     (add-hook 'after-init-hook 'which-key-mode))
+#+END_SRC
+** undo-tree
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package undo-tree
+    :ensure t)
+#+END_SRC
+* Other packages
+** bind-map
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package bind-map
+    :ensure t)
 #+END_SRC
 ** magit
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -170,11 +180,6 @@
   (use-package wgrep-ag
     :ensure t)
 #+END_SRC
-** undo-tree
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package undo-tree
-    :ensure t)
-#+END_SRC
 ** company
   #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package company
@@ -185,6 +190,7 @@
      (use-package flycheck
      :ensure t)
    #+END_SRC
+
 * General
 ** theme
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -348,7 +354,7 @@
          "c" 'projectile-compile-project
          "d" 'counsel-projectile-find-dir
          "e" 'projectile-edit-dir-locals
-         "f" 'projectile-find-file
+         "f" 'counsel-projectile-find-file
          "g" 'projectile-find-tag
          "k" 'projectile-kill-buffers
          "l" 'spacemacs/ivy-persp-switch-project
@@ -378,11 +384,41 @@
  #+END_SRC
 *** Git
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-git-map
-         :keys ((core-keys-make-prefix "g"))
-         :evil-keys ((core-keys-make-evil-prefix "g"))
-         :evil-states (normal motion visual)
-         :prefix-cmd git)
+          (bind-map core-git-map
+          :keys ((core-keys-make-prefix "g"))
+          :evil-keys ((core-keys-make-evil-prefix "g"))
+          :evil-states (normal motion visual)
+          :prefix-cmd magit
+          :bindings
+          ("A" 'magit-cherry-pick-popup
+          "b" 'magit-branch-popup
+          "b" 'magit-bisect-popup
+          "c" 'magit-commit-popup
+          "d" 'magit-diff-popup
+          "f" 'magit-fetch-popup
+          "F" 'magit-pull-popup
+          "l" 'magit-log-popup
+          "P" 'magit-pushing-popup
+          "r" 'magit-rebase-popup
+          "t" magit-tag-popup
+          "T" magit-notes-popup
+          "_" 'magit-revert-popup
+          "O" 'magit-revert-popup
+          "z" 'magit-stash-popup
+          "!" 'magit-run-popup))
+    #+END_SRC
+**** git file
+    #+BEGIN_SRC emacs-lisp :tangle yes
+  (bind-map core-magit-file-map
+    :keys ((concat core-emacs-leader-key " g f"))
+    :evil-keys ((concat core-evil-leader-key " g f"))
+    :evil-states (normal motion visual)
+    :prefix-cmd git-file
+    :bindings
+    ("f" 'magit-find-file
+    "d" 'magit-diff-buffer-file-popup
+    "f" 'magit-find-file
+    "l" 'magit-log-buffer-file))
     #+END_SRC
 *** Jump/join
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -403,8 +439,12 @@
        "v" 'find-variablef))
    #+END_SRC
 ** evil normal state-map
-    From move-text
-#+begin_src emacs-lisp :tangle yes
-  (define-key evil-normal-state-map (kbd "[ e") 'move-text-up)
-  (define-key evil-normal-state-map (kbd "] e") 'move-text-down)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (bind-map evil-normal-state-map
+    :bindings
+#+END_SRC
+From move-text
+#+BEGIN_SRC emacs-lisp :tangle yes
+  ("[ e" 'move-text-up
+  "] e" 'move-text-down))
+#+END_SRC
