@@ -1,0 +1,3 @@
+[submodule "submodules/evil-unimpaired"]
+	path = submodules/evil-unimpaired
+	url = git@github.com:zmaas/evil-unimpaired.git

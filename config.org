@@ -1,0 +1,410 @@
+* Packages
+** Initialize
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (require 'package)
+   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+   (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+   (let ((default-directory (concat user-emacs-directory "submodules/")))
+     (normal-top-level-add-subdirs-to-load-path))
+   (add-to-list 'load-path (concat user-emacs-directory "local/"))
+   (package-initialize)
+   (unless (package-installed-p 'use-package)
+     (package-refresh-contents)
+     (package-install 'use-package))
+   (require 'spacemacs-functions)
+   (require 'use-package)
+ #+END_SRC
+** bind-map
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package bind-map
+    :ensure t)
+#+END_SRC
+** evil
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package evil
+    :ensure t
+    :init
+    (add-hook 'after-init-hook 'evil-mode))
+#+END_SRC
+** evil-rsi
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package evil-rsi
+    :ensure t
+    :requires evil)
+ #+END_SRC
+** evil-iedit-state
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-iedit-state
+      :ensure t
+      :requires evil)
+ #+END_SRC
+** evil-escape
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-escape
+      :ensure t
+      :requires evil
+      :config
+      (message "evil-escape-mode")
+      (evil-escape-mode 1))
+#+END_SRC
+** evil-nerd-commenter
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-nerd-commenter
+      :ensure t
+      :requires evil)
+ #+END_SRC
+** evil-surround
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-surround
+      :ensure t
+      :requires evil)
+ #+END_SRC
+** evil-exchange
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-exchange
+      :ensure t
+      :requires evil)
+ #+END_SRC
+** evil-magit
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-magit
+      :ensure t
+      :requires evil magit)
+ #+END_SRC
+** evil-unimpaired
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package evil-unimpaired
+      :load-path "sumodules/evil-unimpaired"
+      :requires evil
+      :init
+      (add-hook 'evil-mode-hook 'evil-unimpaired-mode))
+ #+END_SRC
+** evil-rsi
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package evil-rsi
+    :ensure t
+    :requires evil)
+
+ #+END_SRC
+** ivy  counsel
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ivy
+    :config
+    (add-hook 'after-init-hook 'ivy-mode)
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ivy-yasnippet
+    :ensure t
+    :requires (ivy yasnippet))
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package counsel
+    :ensure t
+    :requires ivy)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package counsel-projectile
+      :ensure t
+      :requires (counsel projectile))
+#+END_SRC
+** which-key
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package which-key
+    :ensure t
+    :init
+    (add-hook 'after-init-hook 'which-key-mode))
+#+END_SRC
+** move-text
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package move-text
+    :ensure t
+    :init
+    (add-hook 'after-init-hook 'which-key-mode))
+#+END_SRC
+** magit
+#+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package magit
+   :ensure t)
+#+END_SRC
+** projectile
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package projectile
+    :config
+    (add-hook 'after-init-hook 'projectile-mode)
+    :ensure t)
+#+END_SRC
+** yasnippet
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package yasnippet
+      :ensure t
+      :defer t
+      :init
+      (add-hook 'prog-mode-hook 'yas-minor-mode)
+      :config
+      (message "yas-loaded")
+      (yas-reload-all))
+  (use-package yasnippet-snippets
+      :ensure t
+      :requires yasnippet)
+#+END_SRC
+** grep/ack/wgrep
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ag
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ack
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep-ack
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep-ag
+    :ensure t)
+#+END_SRC
+** undo-tree
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package undo-tree
+    :ensure t)
+#+END_SRC
+** company
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package company
+    :ensure t)
+  #+END_SRC
+** flycheck
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package flycheck
+     :ensure t)
+   #+END_SRC
+* General
+** theme
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package solarized-theme
+    :config
+    (load-theme 'solarized-dark t)
+    :ensure t)
+#+END_SRC
+** interface
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (menu-bar-mode 0)
+  (tool-bar-mode 0)
+  (scroll-bar-mode 0)
+  (global-hl-line-mode)
+  (setq initial-major-mode 'text-mode)
+#+END_SRC
+* Languages
+* Leader keybindings
+* Keybindings
+** Helper functions and variables
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (defvar core-evil-leader-key "SPC")
+  (defvar core-emacs-leader-key "C-c l")
+  (defun core-keys-make-prefix (key)
+    (concat core-emacs-leader-key " " key))
+  (defun core-keys-make-evil-prefix (key)
+    (concat core-evil-leader-key " " key))
+#+END_SRC
+** leader base map
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (bind-map core-base-map
+      :keys (core-emacs-leader-key)
+      :evil-keys (core-evil-leader-key)
+      :evil-states (normal motion visual)
+      :override-minor-modes t
+      :override-mode-name base-keys
+      :bindings
+      ("!" 'shell-command
+       "SPC" 'counsel-M-x
+       "TAB" 'spacemacs/alternate-buffer
+       "u" 'universal-argument
+       "d" 'dired))
+  #+END_SRC
+*** Buffers
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (bind-map core-buffers-map
+       :keys ((core-keys-make-prefix "b"))
+       :evil-keys ((core-keys-make-evil-prefix "b"))
+       :evil-states (normal motion visual)
+       :override-minor-modes t
+       :override-mode-name buffer-keys
+       :prefix-cmd buffers
+       :bindings
+       ("." 'spacemacs/buffer-transient-state/body
+       "1" 'buffer-to-window-1
+       "2" 'buffer-to-window-2
+       "3" 'buffer-to-window-3
+       "4" 'buffer-to-window-4
+       "5" 'buffer-to-window-5
+       "6" 'buffer-to-window-6
+       "7" 'buffer-to-window-7
+       "8" 'buffer-to-window-8
+       "9" 'buffer-to-window-9
+       "B" 'ibuffer
+       "N" 'spacemacs/new-empty-buffer
+       "P" 'spacemacs/copy-clipboard-to-whole-buffer
+       "R" 'spacemacs/safe-revert-buffer
+       "Y" 'spacemacs/copy-whole-buffer-to-clipboard
+       "b" 'switch-to-buffer
+       "d" 'spacemacs/kill-this-buffer
+       "e" 'spacemacs/safe-erase-buffer
+       "I" 'ibuffer
+       "m" 'spacemacs/kill-other-buffers
+       "n" 'next-buffer
+       "p" 'previous-buffer
+       "s" 'spacemacs/switch-to-scratch-buffer
+       "w" 'read-only-mode))
+   #+END_SRC
+*** Windows
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (bind-map core-windows-map
+       :keys ((core-keys-make-prefix "w"))
+       :evil-keys ((core-keys-make-evil-prefix "w"))
+       :evil-states (normal motion visual)
+       :prefix-cmd windows
+       :bindings
+       ("w" 'other-window
+        "o" 'other-frame
+        "s" 'split-window-below
+        "S" 'split-window-below-and-focus
+        "v" 'split-window-right
+        "V" 'split-window-right-and-focus
+        "w" 'balance-windows
+        "S" 'split-window-below-and-focus
+        "V" 'split-window-right-and-focus
+        "2" 'spacemacs/layout-double-columns
+        "3" 'spacemacs/layout-triple-columns
+        "_" 'spacemacs/maximize-horizontally
+        "b" 'spacemacs/switch-to-minibuffer-window
+        "d" 'spacemacs/delete-window
+        "D" 'delete-frame
+        "m" 'spacemacs/toggle-maximize-buffer
+        "r" 'spacemacs/rotate-windows-forward
+        "=" 'balance-windows
+        "F" 'make-frame))
+   #+END_SRC
+*** Files
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (bind-map core-files-map
+       :keys ((core-keys-make-prefix "f"))
+       :evil-keys ((core-keys-make-evil-prefix "f"))
+       :evil-states (normal motion visual)
+       :prefix-cmd file
+       :bindings
+       ("S" 'save-some-buffers
+        "b" 'counsel-bookmark
+        "g" 'rgrep
+        "j" 'dired-jump
+        "f" 'find-file
+        "l" 'find-file-literally
+        "r" 'counsel-recentf
+        "s" 'save-buffer
+        "y" 'spacemacs/show-and-copy-buffer-filename
+        "vd" 'add-dir-local-variable
+        "vf" 'add-file-local-variable
+        "vp" 'add-file-local-variable-prop-line))
+   #+END_SRC
+*** Compile/comment
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (bind-map core-compile-comment-map
+       :keys ((core-keys-make-prefix "c"))
+       :evil-keys ((core-keys-make-evil-prefix "c"))
+       :evil-states (normal motion visual)
+       :prefix-cmd compile-comment
+       :bindins
+ (      "c" 'compile
+       "r" 'recompile
+       "k" 'kill-compilation
+       "l" 'my-comment-or-uncomment-region-or-line))
+   #+END_SRC
+*** Project
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-projectile-map
+        :keys ((core-keys-make-prefix "p"))
+        :evil-keys ((core-keys-make-evil-prefix "p"))
+        :evil-states (normal motion visual)
+        :prefix-cmd projectile
+        :bindings
+        ("SPC" 'counsel-projectile
+         "!" 'projectile-run-shell-command-in-root
+         "%" 'projectile-replace-regexp
+         "&" 'projectile-run-async-shell-command-in-root
+         "D" 'projectile-dired
+         "F" 'projectile-find-file-dwim
+         "G" 'projectile-regenerate-tags
+         "I" 'projectile-invalidate-cache
+         "R" 'projectile-replace
+         "T" 'projectile-test-project
+         "a" 'projectile-toggle-between-implementation-and-test
+         "b" 'counsel-projectile-switch-to-buffer
+         "c" 'projectile-compile-project
+         "d" 'counsel-projectile-find-dir
+         "e" 'projectile-edit-dir-locals
+         "f" 'projectile-find-file
+         "g" 'projectile-find-tag
+         "k" 'projectile-kill-buffers
+         "l" 'spacemacs/ivy-persp-switch-project
+         "o" 'org-projectile/goto-todos
+         "p" 'counsel-projectile-switch-project
+         "r" 'projectile-recentf
+         "v" 'projectile-vc))
+    #+END_SRC
+*** search
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (bind-map core-search-map
+     :keys ((core-keys-make-prefix "s"))
+     :evil-keys ((core-keys-make-evil-prefix "s"))
+     :evil-states (normal motion visual)
+     :override-minor-modes t
+     :override-mode-name search-keys
+     :prefix-cmd search
+     :bindings
+     ("s" 'swiper
+     "K" 'ack'
+     "k" 'counsel-ack
+     "g" 'counsel-git-grep
+     "G" 'vc-git-grep
+     "a" 'counsel-ag
+     "A" 'ag
+     "e" 'evil-iedit-state))
+ #+END_SRC
+*** Git
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-git-map
+         :keys ((core-keys-make-prefix "g"))
+         :evil-keys ((core-keys-make-evil-prefix "g"))
+         :evil-states (normal motion visual)
+         :prefix-cmd git)
+    #+END_SRC
+*** Jump/join
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (bind-map core-jump-join-map
+       :keys ((core-keys-make-prefix "j"))
+       :evil-keys ((core-keys-make-evil-prefix "j"))
+       :evil-states (normal motion visual)
+       :prefix-cmd jump-join
+       :bindings
+       ("D" 'dired-jump-other-window
+       "S" 'spacemacs/split-and-new-line
+       "d" 'dired-jump
+       "f" 'find-function
+       "i" 'imenu
+       "o" 'open-line
+       "q" 'dumb-jump-quick-look
+       "s" 'sp-split-sexp
+       "v" 'find-variablef))
+   #+END_SRC
+** evil normal state-map
+    From move-text
+#+begin_src emacs-lisp :tangle yes
+  (define-key evil-normal-state-map (kbd "[ e") 'move-text-up)
+  (define-key evil-normal-state-map (kbd "] e") 'move-text-down)
+ #+END_SRC

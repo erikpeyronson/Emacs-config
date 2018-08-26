@@ -1,19 +1,13 @@
-backups
-.smex-items
-projectile-bookmarks.eld
-ede-projects.el
-layouts/
-elpa
-.ido.last
-auto-saves
-eshell
-emacs-custom.el
-semanticdb
-session*
-irony
-desktops
-projectile.cache
-.python-environments
-init-local
-anaconda-mode
-url
+# First, ignore everything
+*
+# Now, whitelist anything that's a directory
+!config.org
+!local
+!local/*
+!submodules
+!submodules/*
+!snippets
+!snippets/*
+!.gitmodules
+!LICENCE
+!README.md
