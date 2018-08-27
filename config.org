@@ -1,11 +1,25 @@
-* Todos
-** TODO ivy resume bindings 
-** TODO bindings for evil nerd commenter
-** TODO fix ivy-occur
+* Emacs config
+This is my emcas configuration written in ORG which is tangled by org
+babel during startup.
+
+Its evil/ivy based and keybindings, package selection and setup is
+heavily inspired by spacemacs but rather than making it ultra modular
+I've tried to keep it as simple as possible focusing on making it easy
+to debug and quick to navigate when adding or disabling stuff on the fly
+
+The initial sections contain global configuration, package
+configuration and my own set of custom commands.
+
+The later sections are structured around mode and keymap hierarchies
+so that configuration defined in a section also applies for all
+subsection. The sections are further divided into smaller blocks to
+make it possible to disable packages or configuration while still
+keeping it bundled with the mode it appleies to.
+
 * Initialize
 ** package
 Set up package repositories and load paths
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (require 'package)
    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
    (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
@@ -19,18 +33,18 @@ Set up package repositories and load paths
      (package-install 'use-package))
    (require 'spacemacs-functions)
    (require 'use-package)
-#+end_src
+#+END_SRC
 
 ** variables
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defvar core-evil-leader-key "SPC")
   (defvar core-emacs-leader-key "C-c s")
   (defvar core-evil-mode-leader-key ",")
   (defvar core-emacs-mode-leader-key "C-c ,")
-#+end_src
+#+END_SRC
 
 ** Helper functions
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defun core-keys-make-prefix (key)
     (concat core-emacs-leader-key " " key))
   (defun core-keys-make-evil-prefix (key)
@@ -39,13 +53,13 @@ Set up package repositories and load paths
     (concat core-emacs-mode-leader-key " " key))
   (defun core-keys-make-evil-mode-prefix (key)
     (concat core-evil-mode-leader-key " " key))
-#+end_src
+#+END_SRC
 
 * Commands
 ** search
 * Evil
 ** evil
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (use-package evil
       :ensure t
       :init
@@ -54,94 +68,94 @@ Set up package repositories and load paths
       (add-hook 'after-init-hook 'evil-mode)
       :config
   (evil-magit-init))
-#+end_src
+#+END_SRC
    
 ** evil-collection
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package evil-collection
     :ensure t
     :init
     :requires evil
     :config
     (evil-collection-init))
-#+end_src
+#+END_SRC
    
 ** evil-rsi
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package evil-rsi
     :ensure t
     :requires evil)
- #+end_src
+ #+END_SRC
    
 ** evil-iedit-state
- #+begin_src emacs-lisp :tangle yes
+ #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package evil-iedit-state
      :ensure t
      :requires evil)
-#+end_src
+#+END_SRC
    
 ** evil-escape
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package evil-escape
       :ensure t
       :requires evil
       :config
       (evil-escape-mode 1))
-#+end_src
+#+END_SRC
    
 ** evil-nerd-commenter
- #+begin_src emacs-lisp :tangle yes
+ #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package evil-nerd-commenter
      :ensure t
      :requires evil)
-#+end_src
+#+END_SRC
    
 ** evil-surround
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (use-package evil-surround
       :ensure t
       :init
       (add-hook 'after-init-hook 'global-evil-surround-mode)
       :requires evil)
-#+end_src
+#+END_SRC
    
 ** evil-exchange
- #+begin_src emacs-lisp :tangle yes
+ #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package evil-exchange
      :ensure t
      :requires evil
      :config
      (evil-exchange-cx-install))
-#+end_src
+#+END_SRC
    
 ** evil-magit
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package evil-magit
        :ensure t
         :requires (evil magit)
         :init
         (add-hook 'evil-mode-hook 'evil-magit-init))
- #+end_src
+ #+END_SRC
    
 ** evil-unimpaired
-#+begin_src emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
     (use-package evil-unimpaired
       :load-path "sumodules/evil-unimpaired"
       :requires evil
       :init
       (add-hook 'evil-mode-hook 'evil-unimpaired-mode))
- #+end_src
+ #+END_SRC
    
 ** evil-rsi
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package evil-rsi
     :ensure t
     :requires evil)
- #+end_src
+ #+END_SRC
    
 * Ivy
 ** ivy
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
  (use-package ivy
      :ensure t
      :bind (:map ivy-minibuffer-map        ; bind in the ivy buffer
@@ -154,101 +168,101 @@ Set up package repositories and load paths
      :config
      (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
      (evil-make-overriding-map ivy-occur-mode-map 'normal))
-#+end_src
+#+END_SRC
    
 ** ivy-yasnippet
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
    (use-package ivy-yasnippet
      :ensure t)
- #+end_src
+ #+END_SRC
    
 ** ivy-hydra
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ivy-hydra
     :ensure t
     :requires (ivy))
-#+end_src
+#+END_SRC
    
 ** counsel
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package counsel
     :ensure t
     :requires ivy)
-#+end_src
+#+END_SRC
    
 ** counsel-projectile
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (use-package counsel-projectile
       :ensure t
       :requires (counsel projectile))
-#+end_src
+#+END_SRC
    
 * Editing
 ** which-key
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package which-key
     :ensure t
     :init
     (add-hook 'after-init-hook 'which-key-mode))
-#+end_src
+#+END_SRC
    
 ** move-text
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package move-text
     :ensure t
     :init
     (add-hook 'after-init-hook 'which-key-mode))
-#+end_src
+#+END_SRC
    
 ** undo-tree
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package undo-tree
     :ensure t)
-#+end_src
+#+END_SRC
    
 ** expand-region
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package expand-region
     :ensure t)
-#+end_src
+#+END_SRC
    
 * Completion
 ** rtags
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package rtags
     :ensure t
     :config
     (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
     (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map)))
-#+end_src
+#+END_SRC
  
 
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company-rtags
     :ensure t
     :requires (company-mode rtags))
-#+end_src
+#+END_SRC
  
 
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package flycheck-rtags
     :ensure t
     :requires (flycheck-mode rtags))
-#+end_src
+#+END_SRC
  
 
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ivy-rtags
     :ensure t
     :requires (ivy rtags))
-#+end_src
+#+END_SRC
  
 
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defun my-rtags-keybindings (major-mode)
    "Set up keybindings for rtags for MAJOR-MODE"
     (eval
@@ -278,12 +292,12 @@ Set up package repositories and load paths
        "g e r"  'rtags-rename-symbol
        "g e i"  'rtags-get-include-file-for-symbol
        "g e m"  'rtags-make-member))))
-#+end_src 
+#+END_SRC 
    
 
 
 ** yasnippet
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (use-package yasnippet
         :ensure t
         :defer t
@@ -296,125 +310,125 @@ Set up package repositories and load paths
     (use-package yasnippet-snippets
         :ensure t
         :requires yasnippet)
-#+end_src
+#+END_SRC
    
 ** flycheck
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
        (use-package flycheck
        :ensure t)
-#+end_src
+#+END_SRC
    
 * Navigation
 ** avy
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package avy
     :ensure t)
-#+end_src
+#+END_SRC
    
 ** grep/ack/wgrep
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ag
     :ensure t)
-#+end_src
+#+END_SRC
    
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ack
     :ensure t)
-#+end_src
+#+END_SRC
    
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package wgrep
     :ensure t)
-#+end_src
+#+END_SRC
    
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package wgrep-ack
     :ensure t)
-#+end_src
+#+END_SRC
    
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package wgrep-ag
     :ensure t)
-#+end_src
+#+END_SRC
    
 * Other packages
 ** bind-map
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package bind-map
     :ensure t)
-#+end_src
+#+END_SRC
    
 ** magit
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
    (use-package magit
    :ensure t)
-#+end_src
+#+END_SRC
    
 ** projectile
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package projectile
     :config
     (add-hook 'after-init-hook 'projectile-mode)
     :ensure t)
-#+end_src
+#+END_SRC
    
 ** company
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company
     :ensure t
     :config
     (setq company-backends '((company-dabbrev-code company-gtags company-etags company-keywords)
     company-files company-dabbrev)))
 
-#+end_src
+#+END_SRC
    
 ** google-c-style
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
       (use-package google-c-style
         :ensure t
         :after c++-mode)
-#+end_src 
+#+END_SRC 
 
 ** clang-format
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
        (use-package clang-format
          :ensure t
          :defer t)
-#+end_src
+#+END_SRC
    
 *** functions
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defun my-clang-format-if-file-exists ()
     (when (eq major-mode 'c++-mode)
       (when (locate-dominating-file (buffer-file-name) ".clang-format")
         (clang-format-buffer))))
 
-#+end_src
+#+END_SRC
 * General
 ** theme
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (use-package solarized-theme
     :config
     (load-theme 'solarized-dark t)
     :ensure t)
-#+end_src
+#+END_SRC
    
 ** interface
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (menu-bar-mode 0)
   (tool-bar-mode 0)
   (scroll-bar-mode 0)
   (global-hl-line-mode)
   (setq initial-major-mode 'text-mode)
-#+end_src
+#+END_SRC
    
 ** behaviour
 Keep temporary files to a backup-directory in emacs directory
-#+begin_src emacs-lisp :tangle no
+#+BEGIN_SRC emacs-lisp :tangle no
   (defvar tramp-backup-directory-alist)
   (defvar tramp-auto-save-directory)
   (let ((backup-dir "~/.emacs.d/.backups")
@@ -432,36 +446,36 @@ Keep temporary files to a backup-directory in emacs directory
         version-control t      ; Use version numbers on backups,
         kept-new-versions 5    ; keep some new versions
         kept-old-versions 2)   ; and some old ones, too)
-#+end_src
+#+END_SRC
 
 Keep custom variables in a separate gitignored file to allow local customizations
 using customize
 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (let ((path (concat user-emacs-directory "custom.el")))
     (unless (file-exists-p path) (write-region "" nil path))
     (setq custom-file path))
-#+end_src
+#+END_SRC
 
 * Org
 ** todos
 *** TODO eshell toggle
 ** variables
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (setq org-src-fontify-natively t)
 (setq org-src-tab-acts-natively t)
 (setq org-adapt-indentation nil)
-#+end_src
+#+END_SRC
    
 ** org-evil
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (use-package org-evil
    :ensure t
    :requires evil org)
-#+end_src
+#+END_SRC
    
 ** keybindings
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map-for-major-mode org-mode
     :keys (core-emacs-mode-leader-key)
     :evil-keys (core-evil-mode-leader-key)
@@ -592,11 +606,11 @@ using customize
      "t d c" 'org-table-delete-column
      "t d r" 'org-table-kill-row))
 
-#+end_src
+#+END_SRC
    
 * Shell
 ** Variables 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (defcustom my-shell-program
   "/bin/bash"
   "Path to shell binary for shell opened by `my-shell-toggle-shell'"
@@ -606,10 +620,10 @@ using customize
   "^\\*term-.*\\*$"
   "Regexp used to identify if the current window is a term buffer"
   :group 'my-shell)
-#+end_src
+#+END_SRC
    
 ** Functions
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (defun my-shell-bindings()
   "Setup keybindings for my-shell"
   (bind-map-set-keys
@@ -628,10 +642,10 @@ If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
           (switch-to-buffer buffer)
         (term my-shell-program)
         (rename-buffer shell-buffer-name)))))
-#+end_src
+#+END_SRC
    
 ** Commands
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (defun my-shell-toggle-main-shell ()
   "Toggle the main shell"
   (interactive)
@@ -644,70 +658,70 @@ If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
 
 (provide 'my-shell)
 ;;; my-shell.el ends here
-#+end_src
+#+END_SRC
    
 * prog mode
 ** emacs-lisp-mode
 Function to setup emacs lisp executed with emacs-lisp-mode-hook
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (defun my-emacs-lisp-mode-hooks()
-#+end_src
-#+begin_src emacs-lisp :tangle yes
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
       (company-mode 1)
       (add-to-list 'company-backends 'company-elisp)
-#+end_src
-#+begin_src emacs-lisp :tangle yes
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
       (flycheck-mode)
       (flycheck-disable-checker #'emacs-lisp-checkdoc))
-#+end_src 
-#+begin_src emacs-lisp :tangle yes
+#+END_SRC 
+#+BEGIN_SRC emacs-lisp :tangle yes
 (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hooks)
-#+end_src
+#+END_SRC
  
 ** c++-mode
 Load the following expressions after loading c++
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (with-eval-after-load 'c++-mode
-#+end_src
+#+END_SRC
 
 *** Flycheck configuration
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (setq flycheck-idle-change-delay 5)
-#+end_src
+#+END_SRC
 
 *** Clang format configuration
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (add-hook 'before-save-hook 'my-clang-format-if-file-exists)
-#+end_src
+#+END_SRC
 
 *** Rtags configuration
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (my-rtags-keybindings 'c++-mode)
     (setq rtags-display-result-backend 'ivy)
     (setq rtags-imenu-syntax-highlighting t)
     (setq rtags-autostart-diagnostics t)
     (setq rtags-completions-enabled t)
-    (setq rtags-enable-unsaved-reparsing t))
-#+end_src
+    (setq rtags-enable-unsaved-reparsing t)
+#+END_SRC
 *** Hooks
 Last expression in with-eval-after load is adding the hook
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
     (add-hook 'c++-mode-hook 'my-c++-mode-hooks))
-#+end_src
+#+END_SRC
 
 Which is defined below
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   ;;;###autoload
   (defun my-c++-mode-hooks ()
     (google-set-c-style)
     (flycheck-mode)
     (company-mode)
     (add-to-list 'company-backends 'company-rtags))
-#+end_src
+#+END_SRC
 
 * Keybindings
 ** Leader map
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map core-base-map
     :keys (core-emacs-leader-key)
     :evil-keys (core-evil-leader-key)
@@ -722,10 +736,10 @@ Which is defined below
      "v" 'er/expand-region
      "'" 'my-shell-toggle-main-shell
      "/" 'my-shell-toggle-buffer-local-shell))
-#+end_src
+#+END_SRC
 
 **** Errors
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
        (bind-map core-errors-map
          :keys ((core-keys-make-prefix "e"))
          :evil-keys ((core-keys-make-evil-prefix "e"))
@@ -736,10 +750,10 @@ Which is defined below
          :bindings
          ("n" 'next-error
           "p" 'previous-error))
-  #+end_src
+  #+END_SRC
 
 **** Buffers
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
      (bind-map core-buffers-map
        :keys ((core-keys-make-prefix "b"))
        :evil-keys ((core-keys-make-evil-prefix "b"))
@@ -772,10 +786,10 @@ Which is defined below
        "p" 'previous-buffer
        "s" 'spacemacs/switch-to-scratch-buffer
        "w" 'read-only-mode))
-   #+end_src
+   #+END_SRC
     
 **** Windows
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map core-windows-map
     :keys ((core-keys-make-prefix "w"))
     :evil-keys ((core-keys-make-evil-prefix "w"))
@@ -818,10 +832,10 @@ Which is defined below
      "<left>" 'evil-window-left
      "<right>" 'evil-window-right
      "<up>" 'evil-window-up))
-   #+end_src
+   #+END_SRC
     
 **** Files
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map core-files-map
     :keys ((core-keys-make-prefix "f"))
     :evil-keys ((core-keys-make-evil-prefix "f"))
@@ -841,10 +855,10 @@ Which is defined below
      "vd" 'add-dir-local-variable
      "vf" 'add-file-local-variable
      "vp" 'add-file-local-variable-prop-line))
-#+end_src
+#+END_SRC
     
 **** Compile/comment
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp :tangle yes
     (bind-map core-compile-comment-map
       :keys ((core-keys-make-prefix "c"))
       :evil-keys ((core-keys-make-evil-prefix "c"))
@@ -856,10 +870,10 @@ Which is defined below
       "r" 'recompile
       "k" 'kill-compilation
       "l" 'my-comment-or-uncomment-region-or-line))
-  #+end_src
+  #+END_SRC
     
 **** Project
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map core-projectile-map
     :keys ((core-keys-make-prefix "p"))
     :evil-keys ((core-keys-make-evil-prefix "p"))
@@ -890,10 +904,10 @@ Which is defined below
      "p" 'counsel-projectile-switch-project
      "r" 'projectile-recentf
      "v" 'projectile-vc))
-#+end_src
+#+END_SRC
     
 **** search
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map core-search-map
     :keys ((core-keys-make-prefix "s"))
     :evil-keys ((core-keys-make-evil-prefix "s"))
@@ -909,10 +923,10 @@ Which is defined below
     "a" 'counsel-ag
     "A" 'ag
     "e" 'evil-iedit-state))
-#+end_src
+#+END_SRC
     
 **** Git
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map core-git-map
       :keys ((core-keys-make-prefix "g"))
       :evil-keys ((core-keys-make-evil-prefix "g"))
@@ -937,10 +951,10 @@ Which is defined below
       "O" 'magit-revert-popup
       "z" 'magit-stash-popup
       "!" 'magit-run-popup))
-#+end_src
+#+END_SRC
     
 ***** git file
-  #+begin_src emacs-lisp :tangle yes
+  #+BEGIN_SRC emacs-lisp :tangle yes
 (bind-map core-magit-file-map
   :keys ((concat core-emacs-leader-key " g f"))
   :evil-keys ((concat core-evil-leader-key " g f"))
@@ -951,10 +965,10 @@ Which is defined below
   "d" 'magit-diff-buffer-file-popup
   "f" 'magit-find-file
   "l" 'magit-log-buffer-file))
-  #+end_src
+  #+END_SRC
      
 **** Jump/join
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map core-jump-join-map
     :keys ((core-keys-make-prefix "j"))
     :evil-keys ((core-keys-make-evil-prefix "j"))
@@ -976,10 +990,10 @@ Which is defined below
      "l" 'evil-avy-goto-line
      "u" 'spacemacs/avy-goto-url
      "w" 'evil-avy-goto-word-or-subword-1))
-#+end_src
+#+END_SRC
     
 **** insert
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
      (bind-map core-insert-map
        :keys ((core-keys-make-prefix "i"))
        :evil-keys ((core-keys-make-evil-prefix "i"))
@@ -989,14 +1003,19 @@ Which is defined below
        :bindings
        ("y" 'ivy-yasnippet))
 
-#+end_src
+#+END_SRC
     
 ** Prog-mode 
-#+begin_src emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
 (evil-define-key '(normal visual) 'prog-mode-map
   (kbd "TAB") 'indent-for-tab-command 
     "] e" 'move-text-down
     "[ e" 'move-text-up
     "M-/" 'hippie-expand)
-#+end_src
+#+END_SRC
 
+
+* Todos
+** TODO ivy resume bindings 
+** TODO bindings for evil nerd commenter
+** TODO fix ivy-occur
