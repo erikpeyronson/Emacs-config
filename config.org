@@ -1,4 +1,5 @@
 * Initialize
+** package
  Set up package repositories and load paths
  #+BEGIN_SRC emacs-lisp :tangle yes
    (require 'package)
@@ -15,6 +16,10 @@
    (require 'spacemacs-functions)
    (require 'use-package)
  #+END_SRC
+
+ #+RESULTS:
+ : use-package
+
 ** variables
 #+BEGIN_SRC emacs-lisp :tangle yes
   (defvar core-evil-leader-key "SPC")
@@ -22,7 +27,7 @@
   (defvar core-evil-mode-leader-key ",")
   (defvar core-emacs-mode-leader-key "C-c ,")
 #+END_SRC
-** Helper functions and variables
+** Helper functions
 #+BEGIN_SRC emacs-lisp :tangle yes
   (defun core-keys-make-prefix (key)
     (concat core-emacs-leader-key " " key))
@@ -181,6 +186,90 @@
   (use-package expand-region
     :ensure t)
 #+END_SRC
+* shell
+** Variables 
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defcustom my-shell-program
+  "/bin/bash"
+  "Path to shell binary for shell opened by `my-shell-toggle-shell'"
+  :group 'my-shell)
+
+(defcustom my-shell-buffer-name-regex
+  "^\\*term-.*\\*$"
+  "Regexp used to identify if the current window is a term buffer"
+  :group 'my-shell)
+#+end_src
+
+#+RESULTS:
+: my-shell-buffer-name-regex
+
+** Functions
+#+begin_src emacs-lisp :tangle yes
+(defun my-shell-bindings()
+  "Setup keybindings for my-shell"
+  (bind-map-set-keys
+    core-base-map
+    "'" 'my-shell-toggle-main-shell
+    "\"" 'my-shell-toggle-buffer-local-shell))
+
+(defun my-shell-toggle-shell(shell-buffer-name)
+  "Toggle a window and run program defined in `my-shell-program' 
+If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
+  (if (string-match "^\\*term-.*\\*$" (buffer-name))
+      (delete-window)
+    (select-window (split-window-below))
+    (let ((buffer (get-buffer shell-buffer-name)))
+      (if buffer 
+	  (switch-to-buffer buffer)
+	(term my-shell-program)
+	(rename-buffer shell-buffer-name)))))
+#+end_src
+** Commands
+#+begin_src emacs-lisp :tangle yes
+(defun my-shell-toggle-main-shell ()
+  "Toggle the main shell"
+  (interactive)
+  (my-shell-toggle-shell "*term-main*"))
+
+(defun my-shell-toggle-buffer-local-shell ()
+  "Toggle a buffer local shell"
+  (interactive)
+  (my-shell-toggle-shell (concat "*term-" (buffer-name) "*")))
+
+(provide 'my-shell)
+;;; my-shell.el ends here
+#+END_SRC
+
+#+RESULTS:
+: my-shell
+
+* Navigation
+** grep/ack/wgrep
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ag
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ack
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep-ack
+    :ensure t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep-ag
+    :ensure t)
+#+END_SRC
+** avy
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package avy
+    :ensure t)
+#+END_SRC
 * Other packages
 ** bind-map
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -214,27 +303,6 @@
         :ensure t
         :requires yasnippet)
 #+END_SRC
-** grep/ack/wgrep
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ag
-    :ensure t)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ack
-    :ensure t)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package wgrep
-    :ensure t)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package wgrep-ack
-    :ensure t)
-#+END_SRC
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package wgrep-ag
-    :ensure t)
-#+END_SRC
 ** company
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package company
@@ -253,6 +321,8 @@
    #+END_SRC
 
 * Org
+** todos
+*** TODO eshell toggle
 ** variables
 #+BEGIN_SRC emacs-lisp :tangle yes
 (customize-set-variable 'org-src-fontify-natively t)
@@ -312,7 +382,8 @@
      "b I" 'org-babel-view-src-block-info
      "b Z" 'org-babel-switch-to-session-with-code
      "b a" 'org-babel-sha1-hash
-     "b b" 'org-babel-execute-buffer
+     "b b" 'org-babel-execute-src-block
+     "b B" 'org-babel-execute-buffer
      "b c" 'org-babel-check-src-block
      "b d" 'org-babel-demarcate-block
      "b e" 'org-babel-execute-maybe
@@ -395,6 +466,10 @@
      "t d r" 'org-table-kill-row))
 
 #+END_SRC
+
+#+RESULTS:
+: org-mode-bm-map
+
 * General
 ** theme
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -433,20 +508,26 @@
 )
 * Global keybindings
 ** leader base map
-*** Base map
   #+BEGIN_SRC emacs-lisp :tangle yes
-    (bind-map core-base-map
-      :keys (core-emacs-leader-key)
-      :evil-keys (core-evil-leader-key)
-      :evil-states (normal motion visual)
-      :bindings
-      ("!" 'shell-command
-       "SPC" 'counsel-M-x
-       "TAB" 'spacemacs/alternate-buffer
-       "u" 'universal-argument
-       "d" 'dired
-       "v" 'er/expand-region))
+       (bind-map core-base-map
+         :keys (core-emacs-leader-key)
+         :evil-keys (core-evil-leader-key)
+         :evil-states (normal motion visual)
+         :overwrite-minor-modes t
+         :bindings
+         ("!" 'shell-command
+          "SPC" 'counsel-M-x
+          "TAB" 'spacemacs/alternate-buffer
+          "u" 'universal-argument
+          "d" 'dired
+          "v" 'er/expand-region
+          "'" 'my-shell-toggle-main-shell
+          "/" 'my-shell-toggle-buffer-local-shell))
   #+END_SRC
+
+  #+RESULTS:
+  : core-base-map
+
 *** Buffers
 #+BEGIN_SRC emacs-lisp :tangle yes
      (bind-map core-buffers-map
@@ -656,22 +737,27 @@
     #+END_SRC
 *** Jump/join
 #+BEGIN_SRC emacs-lisp :tangle yes
-     (bind-map core-jump-join-map
-       :keys ((core-keys-make-prefix "j"))
-       :evil-keys ((core-keys-make-evil-prefix "j"))
-       :evil-states (normal motion visual)
-       :prefix-cmd jump-join
-       :override-minor-modes t
-       :bindings
-       ("D" 'dired-jump-other-window
-       "S" 'spacemacs/split-and-new-line
-       "d" 'dired-jump
-       "f" 'find-function
-       "i" 'imenu
-       "o" 'open-line
-       "q" 'dumb-jump-quick-look
-       "s" 'sp-split-sexp
-       "v" 'find-variablef))
+  (bind-map core-jump-join-map
+    :keys ((core-keys-make-prefix "j"))
+    :evil-keys ((core-keys-make-evil-prefix "j"))
+    :evil-states (normal motion visual)
+    :prefix-cmd jump-join
+    :override-minor-modes t
+    :bindings
+    ("D" 'dired-jump-other-window
+     "S" 'spacemacs/split-and-new-line
+     "d" 'dired-jump
+     "f" 'find-function
+     "i" 'imenu
+     "o" 'open-line
+     "q" 'dumb-jump-quick-look
+     "s" 'sp-split-sexp
+     "v" 'find-variablef
+     "b" 'avy-pop-mark
+     "j" 'evil-avy-goto-char-timer
+     "l" 'evil-avy-goto-line
+     "u" 'spacemacs/avy-goto-url
+     "w" 'evil-avy-goto-word-or-subword-1))
 #+END_SRC
 *** insert
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -689,9 +775,6 @@
 #+BEGIN_SRC emacs-lisp :tangle yes
   (bind-map evil-normal-state-map
     :bindings
-#+END_SRC
-From move-text
-#+BEGIN_SRC emacs-lisp :tangle yes
   ("[ e" 'move-text-up
   "] e" 'move-text-down))
 #+END_SRC
