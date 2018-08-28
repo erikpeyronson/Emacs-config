@@ -1091,6 +1091,10 @@ Which is defined below
 
 * Keybindings
 ** global
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (evil-define-key '(insert normal visual) 'global-map
+         (kbd "M-/") 'hippie-expand)
+   #+END_SRC
 ** Leader map
 *** base map
    #+BEGIN_SRC emacs-lisp :tangle yes
