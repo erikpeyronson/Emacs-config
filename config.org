@@ -595,6 +595,14 @@
     :ensure t)
 #+END_SRC
 
+** evil-multiple-cursors
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package evil-mc
+       :ensure t
+       :requires evil
+       :config
+       (evil-mc-mode))
+   #+END_SRC
 * Completion
 ** rtags
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1392,9 +1400,30 @@ Which is defined below
          :prefix-cmd inserting
          :bindings
          ("y" 'ivy-yasnippet))
-
      #+END_SRC
 
+***  registers/rings/resume
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (bind-map core-insert-map
+         :keys ((core-keys-make-prefix "i"))
+         :evil-keys ((core-keys-make-evil-prefix "i"))
+         :evil-states (normal motion visual)
+         :prefix-cmd inserting
+         :bindings
+B 'switch-buffer-without-purpose
+D 'purpose-delete-non-dedicated-windows
+P 'purpose-set-window-purpose
+b 'purpose-switch-buffer-with-purpose
+d 'purpose-toggle-window-purpose-dedicated
+e 'spacemacs/ivy-evil-registers
+l 'ivy-resume
+m 'counsel-mark-ring
+p 'purpose-switch-buffer-with-some-purpose
+y 'counsel-yank-pop
+
+         ("y" 'ivy-yasnippet))
+
+     #+END_SRC
 ** Prog-mode
    #+BEGIN_SRC emacs-lisp :tangle yes
      (evil-define-key '(normal visual) 'text-mode-map
