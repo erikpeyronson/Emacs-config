@@ -524,8 +524,7 @@
 *** evil-iedit-state
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-iedit-state
-       	:ensure t
-       	:requires (evil iedit))
+        :ensure t)
     #+END_SRC
 *** evil-escape
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -681,34 +680,41 @@
     #+END_SRC
 ** visual
  #+BEGIN_SRC emacs-lisp :tangle yes
-   (use-package idle-highlight-mode
+   (use-package highlight-symbol
      :ensure t
      :config
-     ;; (add-hook 'prog-mode-hook 'idle-highlight-mode)
-     )
+     (setq highlight-symbol-color "white")
 
-     (use-package hl-anything 
-       :ensure t
-       :config
-       )
-     (use-package hl-indent          
-       :ensure t
-       :config
-       (add-hook 'prog-mode-hook 'hl-indent)
-       )
-     (use-package hl-sentence        
-       :ensure t
-       )
-     (use-package hl-todo            
-       :ensure t
-       :config
-       (global-hl-todo-mode)
-       )
-     (use-package rainbow-delimiters
-       :ensure t
-       :config
-       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-       )
+     (face-spec-set
+      'highlight-symbol-face
+      '((t :foreground "#eee8d5"))
+      'face-override-spec))
+ #+end_src
+ 
+ #+begin_src emacs-lisp :tangle no
+
+   (use-package hl-anything 
+     :ensure t
+     :config
+     )
+   (use-package hl-indent          
+     :ensure t
+     :config
+     (add-hook 'prog-mode-hook 'hl-indent)
+     )
+   (use-package hl-sentence        
+     :ensure t
+     )
+   (use-package hl-todo            
+     :ensure t
+     :config
+     (global-hl-todo-mode)
+     )
+   (use-package rainbow-delimiters
+     :ensure t
+     :config
+     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+     )
  #+END_SRC  
 ** completion
 *** yasnippet
@@ -1102,11 +1108,11 @@ using customize
 
 *** search
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-search-map
+      (bind-map my/search-map
         :keys ((core-keys-make-prefix "s"))
         :evil-keys ((core-keys-make-evil-prefix "s"))
         :evil-states (normal motion visual)
-        :prefix-cmd searching
+        :prefix-cmd search/symbol
         :bindings
         ("s" 'swiper
         "K" 'ack'
