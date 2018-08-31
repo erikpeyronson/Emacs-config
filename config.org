@@ -38,536 +38,563 @@
       (package-refresh-contents)
       (package-install package)))
    #+END_SRC
-* functions
-** from spacemacs
-   This is a set of functions and commands copied from spacemacs
-   mainly used for window and buffer management that i found it hard
-   to live .
+* global
+** funcs
+*** from spacemacs
+    This is a set of functions and commands copied from spacemacs
+    mainly used for window and buffer management that i found it hard
+    to live .
 
-   this is the original copyright notice
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     ;;; spacemacs-functions.el --- Library of selected functions taken from spacemacs
-     ;;
-     ;; Copyright (c) 2012-2017 Sylvain Benner & Contributors
-     ;;
-     ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
-     ;; URL: https://github.com/syl20bnr/spacemacs
-     ;;
-     ;; This file is not part of GNU Emacs.
-     ;;
-     ;;; License: GPLv3
+    this is the original copyright notice
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      ;;; spacemacs-functions.el --- Library of selected functions taken from spacemacs
+      ;;
+      ;; Copyright (c) 2012-2017 Sylvain Benner & Contributors
+      ;;
+      ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
+      ;; URL: https://github.com/syl20bnr/spacemacs
+      ;;
+      ;; This file is not part of GNU Emacs.
+      ;;
+      ;;; License: GPLv3
 
-     ;; our own implementation of kill-this-buffer from menu-bar.el
-   #+END_SRC
-   
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun spacemacs/kill-this-buffer (&optional arg)
-       "Kill the current buffer.
-     If the universal prefix argument is used then kill also the window."
-       (interactive "P")
-       (if (window-minibuffer-p)
-           (abort-recursive-edit)
-         (if (equal '(4) arg)
-             (kill-buffer-and-window)
-           (kill-buffer))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/ace-kill-this-buffer (&optional arg)
-       "Ace kill visible buffer in a window.
-     If the universal prefix argument is used then kill also the window."
-       (interactive "P")
-       (require 'ace-window)
-       (let (golden-ratio-mode)
-         (aw-select
-          " Ace - Kill buffer in Window"
-          (lambda (window)
-            (with-selected-window window
-              (spacemacs/kill-this-buffer arg))))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     ;; found at http://emacswiki.org/emacs/KillingBuffers
-     (defun spacemacs/kill-other-buffers (&optional arg)
-       "Kill all other buffers.
-     If the universal prefix argument is used then will the windows too."
-       (interactive "P")
-       (when (yes-or-no-p (format "Killing all buffers except \"%s\"? "
-                                  (buffer-name)))
-         (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))
-         (when (equal '(4) arg) (delete-other-windows))
-         (message "Buffers deleted!")))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     ;; http://camdez.com/blog/2013/11/14/emacs-show-buffer-file-name/
-     (defun spacemacs/show-and-copy-buffer-filename ()
-       "Show and copy the full path to the current file in the minibuffer."
-       (interactive)
-       ;; list-buffers-directory is the variable set in dired buffers
-       (let ((file-name (or (buffer-file-name) list-buffers-directory)))
-         (if file-name
-             (message (kill-new file-name))
-           (error "Buffer not visiting a file"))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/new-empty-buffer ()
-       "Create a new buffer called untitled(<n>)"
-       (interactive)
-       (let ((newbuf (generate-new-buffer-name "untitled")))
-         (switch-to-buffer newbuf)))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/safe-revert-buffer ()
-       "Prompt before reverting the file."
-       (interactive)
-       (revert-buffer nil nil))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/safe-erase-buffer ()
-       "Prompt before erasing the content of the file."
-       (interactive)
-       (if (y-or-n-p (format "Erase content of buffer %s ? " (current-buffer)))
-           (erase-buffer)))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     ;; http://stackoverflow.com/a/10216338/4869
-     (defun spacemacs/copy-whole-buffer-to-clipboard ()
-       "Copy entire buffer to clipboard"
-       (interactive)
-       (clipboard-kill-ring-save (point-min) (point-max)))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/copy-clipboard-to-whole-buffer ()
-       "Copy clipboard and replace buffer"
-       (interactive)
-       (delete-region (point-min) (point-max))
-       (clipboard-yank)
-       (deactivate-mark))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/switch-to-scratch-buffer ()
-       "Switch to the `*scratch*' buffer. Create it first if needed."
-       (interactive)
-       (let ((exists (get-buffer "*scratch*")))
-         (switch-to-buffer (get-buffer-create "*scratch*"))
-         (when (and (not exists)
-                    (not (eq major-mode dotspacemacs-scratch-mode))
-                    (fboundp dotspacemacs-scratch-mode))
-           (funcall dotspacemacs-scratch-mode))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
-       "Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
-        controls whether focus moves to new window (with buffer), or stays on
-        current"
-       (interactive)
-       (let ((b (current-buffer))
-             (w1 (selected-window))
-             (w2 (winum-get-window-by-number windownum)))
-         (unless (eq w1 w2)
-           (set-window-buffer w2 b)
-           (switch-to-prev-buffer)
-           (unrecord-window-buffer w1 b)))
-       (when follow-focus-p (select-window (winum-get-window-by-number windownum))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
-       "Swaps visible buffers between active window and selected window.
-        follow-focus-p controls whether focus moves to new window (with buffer), or
-        stays on current"
-       (interactive)
-       (let* ((b1 (current-buffer))
+      ;; our own implementation of kill-this-buffer from menu-bar.el
+    #+END_SRC
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun spacemacs/kill-this-buffer (&optional arg)
+       	"Kill the current buffer.
+      If the universal prefix argument is used then kill also the window."
+       	(interactive "P")
+       	(if (window-minibuffer-p)
+            (abort-recursive-edit)
+          (if (equal '(4) arg)
+              (kill-buffer-and-window)
+            (kill-buffer))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/ace-kill-this-buffer (&optional arg)
+       	"Ace kill visible buffer in a window.
+      If the universal prefix argument is used then kill also the window."
+       	(interactive "P")
+       	(require 'ace-window)
+       	(let (golden-ratio-mode)
+          (aw-select
+           " Ace - Kill buffer in Window"
+           (lambda (window)
+             (with-selected-window window
+               (spacemacs/kill-this-buffer arg))))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; found at http://emacswiki.org/emacs/KillingBuffers
+      (defun spacemacs/kill-other-buffers (&optional arg)
+       	"Kill all other buffers.
+      If the universal prefix argument is used then will the windows too."
+       	(interactive "P")
+       	(when (yes-or-no-p (format "Killing all buffers except \"%s\"? "
+                                   (buffer-name)))
+          (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))
+          (when (equal '(4) arg) (delete-other-windows))
+          (message "Buffers deleted!")))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; http://camdez.com/blog/2013/11/14/emacs-show-buffer-file-name/
+      (defun spacemacs/show-and-copy-buffer-filename ()
+       	"Show and copy the full path to the current file in the minibuffer."
+       	(interactive)
+       	;; list-buffers-directory is the variable set in dired buffers
+       	(let ((file-name (or (buffer-file-name) list-buffers-directory)))
+          (if file-name
+              (message (kill-new file-name))
+            (error "Buffer not visiting a file"))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/new-empty-buffer ()
+       	"Create a new buffer called untitled(<n>)"
+       	(interactive)
+       	(let ((newbuf (generate-new-buffer-name "untitled")))
+          (switch-to-buffer newbuf)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/safe-revert-buffer ()
+       	"Prompt before reverting the file."
+       	(interactive)
+       	(revert-buffer nil nil))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/safe-erase-buffer ()
+       	"Prompt before erasing the content of the file."
+       	(interactive)
+       	(if (y-or-n-p (format "Erase content of buffer %s ? " (current-buffer)))
+            (erase-buffer)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; http://stackoverflow.com/a/10216338/4869
+      (defun spacemacs/copy-whole-buffer-to-clipboard ()
+       	"Copy entire buffer to clipboard"
+       	(interactive)
+       	(clipboard-kill-ring-save (point-min) (point-max)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/copy-clipboard-to-whole-buffer ()
+       	"Copy clipboard and replace buffer"
+       	(interactive)
+       	(delete-region (point-min) (point-max))
+       	(clipboard-yank)
+       	(deactivate-mark))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/switch-to-scratch-buffer ()
+       	"Switch to the `*scratch*' buffer. Create it first if needed."
+       	(interactive)
+       	(let ((exists (get-buffer "*scratch*")))
+          (switch-to-buffer (get-buffer-create "*scratch*"))
+          (when (and (not exists)
+                     (not (eq major-mode dotspacemacs-scratch-mode))
+                     (fboundp dotspacemacs-scratch-mode))
+            (funcall dotspacemacs-scratch-mode))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
+       	"Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
+         controls whether focus moves to new window (with buffer), or stays on
+         current"
+       	(interactive)
+       	(let ((b (current-buffer))
               (w1 (selected-window))
-              (w2 (winum-get-window-by-number windownum))
-              (b2 (window-buffer w2)))
-         (unless (eq w1 w2)
-           (set-window-buffer w1 b2)
-           (set-window-buffer w2 b1)
-           (unrecord-window-buffer w1 b1)
-           (unrecord-window-buffer w2 b2)))
-       (when follow-focus-p (select-window-by-number windownum)))
+              (w2 (winum-get-window-by-number windownum)))
+          (unless (eq w1 w2)
+            (set-window-buffer w2 b)
+            (switch-to-prev-buffer)
+            (unrecord-window-buffer w1 b)))
+       	(when follow-focus-p (select-window (winum-get-window-by-number windownum))))
+    #+end_src
 
-     (dotimes (i 9)
-       (let ((n (+ i 1)))
-         (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
-                  ,(format "Move buffer to the window with number %i." n)
-                  (interactive "P")
-                  (if arg
-                      (spacemacs/swap-buffers-to-window ,n t)
-                    (spacemacs/move-buffer-to-window ,n t))))
-         (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
-                  (interactive)
-                  (spacemacs/move-buffer-to-window ,n nil)))
-         (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
-                  (interactive)
-                  (spacemacs/swap-buffers-to-window ,n nil)))
-         ))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/rotate-windows-backward (count)
-       "Rotate each window backwards.
-     Dedicated (locked) windows are left untouched."
-       (interactive "p")
-       (spacemacs/rotate-windows-forward (* -1 count)))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
-       "Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
-        controls whether focus moves to new window (with buffer), or stays on
-        current"
-       (interactive)
-       (let ((b (current-buffer))
-             (w1 (selected-window))
-             (w2 (winum-get-window-by-number windownum)))
-         (unless (eq w1 w2)
-           (set-window-buffer w2 b)
-           (switch-to-prev-buffer)
-           (unrecord-window-buffer w1 b)))
-       (when follow-focus-p (select-window (winum-get-window-by-number windownum))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
-       "Swaps visible buffers between active window and selected window.
-        follow-focus-p controls whether focus moves to new window (with buffer), or
-        stays on current"
-       (interactive)
-       (let* ((b1 (current-buffer))
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
+       	"Swaps visible buffers between active window and selected window.
+         follow-focus-p controls whether focus moves to new window (with buffer), or
+         stays on current"
+       	(interactive)
+       	(let* ((b1 (current-buffer))
+               (w1 (selected-window))
+               (w2 (winum-get-window-by-number windownum))
+               (b2 (window-buffer w2)))
+          (unless (eq w1 w2)
+            (set-window-buffer w1 b2)
+            (set-window-buffer w2 b1)
+            (unrecord-window-buffer w1 b1)
+            (unrecord-window-buffer w2 b2)))
+       	(when follow-focus-p (select-window-by-number windownum)))
+
+      (dotimes (i 9)
+       	(let ((n (+ i 1)))
+          (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
+                   ,(format "Move buffer to the window with number %i." n)
+                   (interactive "P")
+                   (if arg
+                       (spacemacs/swap-buffers-to-window ,n t)
+                     (spacemacs/move-buffer-to-window ,n t))))
+          (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
+                   (interactive)
+                   (spacemacs/move-buffer-to-window ,n nil)))
+          (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
+                   (interactive)
+                   (spacemacs/swap-buffers-to-window ,n nil)))
+          ))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/rotate-windows-backward (count)
+       	"Rotate each window backwards.
+      Dedicated (locked) windows are left untouched."
+       	(interactive "p")
+       	(spacemacs/rotate-windows-forward (* -1 count)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
+       	"Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
+         controls whether focus moves to new window (with buffer), or stays on
+         current"
+       	(interactive)
+       	(let ((b (current-buffer))
               (w1 (selected-window))
-              (w2 (winum-get-window-by-number windownum))
-              (b2 (window-buffer w2)))
-         (unless (eq w1 w2)
-           (set-window-buffer w1 b2)
-           (set-window-buffer w2 b1)
-           (unrecord-window-buffer w1 b1)
-           (unrecord-window-buffer w2 b2)))
-       (when follow-focus-p (select-window-by-number windownum)))
+              (w2 (winum-get-window-by-number windownum)))
+          (unless (eq w1 w2)
+            (set-window-buffer w2 b)
+            (switch-to-prev-buffer)
+            (unrecord-window-buffer w1 b)))
+       	(when follow-focus-p (select-window (winum-get-window-by-number windownum))))
+    #+end_src
 
-     (dotimes (i 9)
-       (let ((n (+ i 1)))
-         (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
-                  ,(format "Move buffer to the window with number %i." n)
-                  (interactive "P")
-                  (if arg
-                      (spacemacs/swap-buffers-to-window ,n t)
-                    (spacemacs/move-buffer-to-window ,n t))))
-         (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
-                  (interactive)
-                  (spacemacs/move-buffer-to-window ,n nil)))
-         (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
-                  (interactive)
-                  (spacemacs/swap-buffers-to-window ,n nil)))
-         ))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/delete-window (&optional arg)
-       "Delete the current window.
-     If the universal prefix argument is used then kill the buffer too."
-       (interactive "P")
-       (if (equal '(4) arg)
-           (kill-buffer-and-window)
-         (delete-window)))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     ;; from http://dfan.org/blog/2009/02/19/emacs-dedicated-windows/
-     (defun spacemacs/toggle-current-window-dedication ()
-       "Toggle dedication state of a window."
-       (interactive)
-       (let* ((window    (selected-window))
-              (dedicated (window-dedicated-p window)))
-         (set-window-dedicated-p window (not dedicated))
-         (message "Window %sdedicated to %s"
-                  (if dedicated "no longer " "")
-                  (buffer-name))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     ;; from https://gist.github.com/timcharper/493269
-     (defun spacemacs/split-window-vertically-and-switch ()
-       (interactive)
-       (split-window-vertically)
-       (other-window 1))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/split-window-horizontally-and-switch ()
-       (interactive)
-       (split-window-horizontally)
-       (other-window 1))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/layout-triple-columns ()
-       " Set the layout to triple columns. "
-       (interactive)
-       (delete-other-windows)
-       (dotimes (i 2) (split-window-right))
-       (balance-windows))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/layout-double-columns ()
-       " Set the layout to double columns. "
-       (interactive)
-       (delete-other-windows)
-       (split-window-right))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/toggle-frame-fullscreen ()
-       "Respect the `dotspacemacs-fullscreen-use-non-native' variable when
-     toggling fullscreen."
-       (interactive)
-       (if dotspacemacs-fullscreen-use-non-native
-           (spacemacs/toggle-frame-fullscreen-non-native)
-         (toggle-frame-fullscreen)))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/toggle-fullscreen ()
-       "Toggle full screen on X11 and Carbon"
-       (interactive)
-       (cond
-        ((eq window-system 'x)
-         (set-frame-parameter nil 'fullscreen
-                              (when (not (frame-parameter nil 'fullscreen))
-                                'fullboth)))
-        ((eq window-system 'mac)
-         (set-frame-parameter
-          nil 'fullscreen
-          (when (not (frame-parameter nil 'fullscreen)) 'fullscreen)))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/toggle-frame-fullscreen-non-native ()
-       "Toggle full screen non-natively. Uses the `fullboth' frame paramerter
-        rather than `fullscreen'. Useful to fullscreen on OSX w/o animations."
-       (interactive)
-       (modify-frame-parameters
-        nil
-        `((maximized
-           . ,(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-                (frame-parameter nil 'fullscreen)))
-          (fullscreen
-           . ,(if (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-                  (if (eq (frame-parameter nil 'maximized) 'maximized)
-                      'maximized)
-                'fullboth)))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/switch-to-minibuffer-window ()
-       "switch to minibuffer window (if active)"
-       (interactive)
-       (when (active-minibuffer-window)
-         (select-window (active-minibuffer-window))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/alternate-buffer (&optional window)
-       "Switch back and forth between current and last buffer in the
-     current window."
-       (interactive)
-       (let ((current-buffer (window-buffer window)))
-         ;; if no window is found in the windows history, `switch-to-buffer' will
-         ;; default to calling `other-buffer'.
-         (switch-to-buffer
-          (cl-find-if (lambda (buffer)
-                        (not (eq buffer current-buffer)))
-                      (mapcar #'car (window-prev-buffers window))))))
-   #+end_src
-   
-   #+begin_src emacs-lisp :tangle yes
-     ;; from https://gist.github.com/3402786
-     (defun spacemacs/toggle-maximize-buffer ()
-       "Maximize buffer"
-       (interactive)
-       (if (and (= 1 (length (window-list)))
-                (assoc ?_ register-alist))
-           (jump-to-register ?_)
-         (progn
-           (window-configuration-to-register ?_)
-           (delete-other-windows))))
-   #+END_SRC
-** utility functions
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
+       	"Swaps visible buffers between active window and selected window.
+         follow-focus-p controls whether focus moves to new window (with buffer), or
+         stays on current"
+       	(interactive)
+       	(let* ((b1 (current-buffer))
+               (w1 (selected-window))
+               (w2 (winum-get-window-by-number windownum))
+               (b2 (window-buffer w2)))
+          (unless (eq w1 w2)
+            (set-window-buffer w1 b2)
+            (set-window-buffer w2 b1)
+            (unrecord-window-buffer w1 b1)
+            (unrecord-window-buffer w2 b2)))
+       	(when follow-focus-p (select-window-by-number windownum)))
+
+      (dotimes (i 9)
+       	(let ((n (+ i 1)))
+          (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
+                   ,(format "Move buffer to the window with number %i." n)
+                   (interactive "P")
+                   (if arg
+                       (spacemacs/swap-buffers-to-window ,n t)
+                     (spacemacs/move-buffer-to-window ,n t))))
+          (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
+                   (interactive)
+                   (spacemacs/move-buffer-to-window ,n nil)))
+          (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
+                   (interactive)
+                   (spacemacs/swap-buffers-to-window ,n nil)))
+          ))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/delete-window (&optional arg)
+       	"Delete the current window.
+      If the universal prefix argument is used then kill the buffer too."
+       	(interactive "P")
+       	(if (equal '(4) arg)
+            (kill-buffer-and-window)
+          (delete-window)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; from http://dfan.org/blog/2009/02/19/emacs-dedicated-windows/
+      (defun spacemacs/toggle-current-window-dedication ()
+       	"Toggle dedication state of a window."
+       	(interactive)
+       	(let* ((window    (selected-window))
+               (dedicated (window-dedicated-p window)))
+          (set-window-dedicated-p window (not dedicated))
+          (message "Window %sdedicated to %s"
+                   (if dedicated "no longer " "")
+                   (buffer-name))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; from https://gist.github.com/timcharper/493269
+      (defun spacemacs/split-window-vertically-and-switch ()
+       	(interactive)
+       	(split-window-vertically)
+       	(other-window 1))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/split-window-horizontally-and-switch ()
+       	(interactive)
+       	(split-window-horizontally)
+       	(other-window 1))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/layout-triple-columns ()
+       	" Set the layout to triple columns. "
+       	(interactive)
+       	(delete-other-windows)
+       	(dotimes (i 2) (split-window-right))
+       	(balance-windows))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/layout-double-columns ()
+       	" Set the layout to double columns. "
+       	(interactive)
+       	(delete-other-windows)
+       	(split-window-right))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/toggle-frame-fullscreen ()
+       	"Respect the `dotspacemacs-fullscreen-use-non-native' variable when
+      toggling fullscreen."
+       	(interactive)
+       	(if dotspacemacs-fullscreen-use-non-native
+            (spacemacs/toggle-frame-fullscreen-non-native)
+          (toggle-frame-fullscreen)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/toggle-fullscreen ()
+       	"Toggle full screen on X11 and Carbon"
+       	(interactive)
+       	(cond
+         ((eq window-system 'x)
+          (set-frame-parameter nil 'fullscreen
+                               (when (not (frame-parameter nil 'fullscreen))
+                                 'fullboth)))
+         ((eq window-system 'mac)
+          (set-frame-parameter
+           nil 'fullscreen
+           (when (not (frame-parameter nil 'fullscreen)) 'fullscreen)))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/toggle-frame-fullscreen-non-native ()
+       	"Toggle full screen non-natively. Uses the `fullboth' frame paramerter
+         rather than `fullscreen'. Useful to fullscreen on OSX w/o animations."
+       	(interactive)
+       	(modify-frame-parameters
+         nil
+         `((maximized
+            . ,(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
+                 (frame-parameter nil 'fullscreen)))
+           (fullscreen
+            . ,(if (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
+                   (if (eq (frame-parameter nil 'maximized) 'maximized)
+                       'maximized)
+                 'fullboth)))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/switch-to-minibuffer-window ()
+       	"switch to minibuffer window (if active)"
+       	(interactive)
+       	(when (active-minibuffer-window)
+          (select-window (active-minibuffer-window))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/alternate-buffer (&optional window)
+       	"Switch back and forth between current and last buffer in the
+      current window."
+       	(interactive)
+       	(let ((current-buffer (window-buffer window)))
+          ;; if no window is found in the windows history, `switch-to-buffer' will
+          ;; default to calling `other-buffer'.
+          (switch-to-buffer
+           (cl-find-if (lambda (buffer)
+                         (not (eq buffer current-buffer)))
+                       (mapcar #'car (window-prev-buffers window))))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; from https://gist.github.com/3402786
+      (defun spacemacs/toggle-maximize-buffer ()
+       	"Maximize buffer"
+       	(interactive)
+       	(if (and (= 1 (length (window-list)))
+                 (assoc ?_ register-alist))
+            (jump-to-register ?_)
+          (progn
+            (window-configuration-to-register ?_)
+            (delete-other-windows))))
+    #+END_SRC
+*** utility functions
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-read-expanded-filename ()
-       "Read a directory with completion and return the expanded filename"
-       (expand-file-name
-        (read-file-name "dir:" )))
+      (defun my-read-expanded-filename ()
+       	"Read a directory with completion and return the expanded filename"
+       	(expand-file-name
+         (read-file-name "dir:" )))
    #+END_SRC
-** search
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defun my-counsel-ack-in-dir (arg)
-     "Read directory with completion and call counsel-ack"
-       (interactive "P")
-       (let ((default-directory (my-read-expanded-filename))
-             (initial-input ""))
-             (when arg
-               (setq initial-input (word-at-point)))
-             (counsel-ack "test")))
-   #+END_SRC
-   
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defun my-counesl-grep-in-dir (arg)
-       "Read directory with completion and call counsel-grep"
-       (interactive"P")
-       (let ((default-directory (my-read-expanded-filename)))
-         (counsel-grep)))
-   #+END_SRC
-   
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defun my-counsel-ag-in-dir (arg)
-     "Read directory with completion and call counsel-grep"
-     (let ((default-directory (my-read-expanded-filename)))
-       (let ((default-directory (expand-file-name
-                               (read-file-name "Starting directory: "))))
-       (counsel-grep)))
-   #+end_src
-
-   #+begin_src emacs-lisp :tangle no
-     (defvar my-imenu-function #'imenu
-       "Function called interctively by `my-imenu-or-similar'
-       automatically buffer local when set ")
-
-     (defun my-imenu-or-similar ()
-       "Call the function defined in `my-imenu-function'"
-       (interactive)
-       (call-interactively my-imenu-function))
-
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp :tangle no
-  (defun my-counsel-git-grep-in-dir ()
-
-    
-   #+END_SRC
-** command wrappers
-   These commands will be bound to global keybindings but 
-   will be given other implementations in some modes.
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defvar-local my/imenu-function 'imenu 
-       "Function called interactively by `my/imenu'")
+     (defun core-keys-make-prefix (key)
+       (concat core-emacs-leader-key " " key))
+     (defun core-keys-make-evil-prefix (key)
+       (concat core-evil-leader-key " " key))
+     (defun core-keys-make-mode-prefix (key)
+       (concat core-emacs-mode-leader-key " " key))
+     (defun core-keys-make-evil-mode-prefix (key)
+       (concat core-evil-mode-leader-key " " key))
+   #+END_SRC
+*** search
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun my-counsel-ack-in-dir (arg)
+      "Read directory with completion and call counsel-ack"
+       	(interactive "P")
+       	(let ((default-directory (my-read-expanded-filename))
+              (initial-input ""))
+              (when arg
+               	(setq initial-input (word-at-point)))
+              (counsel-ack "test")))
+    #+END_SRC
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun my-counesl-grep-in-dir (arg)
+       	"Read directory with completion and call counsel-grep"
+       	(interactive"P")
+       	(let ((default-directory (my-read-expanded-filename)))
+          (counsel-grep)))
+    #+END_SRC
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun my-counsel-ag-in-dir (arg)
+      "Read directory with completion and call counsel-grep"
+      (let ((default-directory (my-read-expanded-filename)))
+       	(let ((default-directory (expand-file-name
+                               	(read-file-name "Starting directory: "))))
+       	(counsel-grep)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle no
+      (defvar my-imenu-function #'imenu
+       	"Function called interctively by `my-imenu-or-similar'
+       	automatically buffer local when set ")
+
+      (defun my-imenu-or-similar ()
+       	"Call the function defined in `my-imenu-function'"
+       	(interactive)
+       	(call-interactively my-imenu-function))
+
+    #+END_SRC
+    #+BEGIN_SRC emacs-lisp :tangle no
+   (defun my-counsel-git-grep-in-dir ()
+
+
+    #+END_SRC
+*** editing
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/remove-trailing-whitespace ()
+        (interactive)
+        (save-excursion
+          (goto-char (point-min))
+          (while (re-search-forward "[ \t]+$" nil t)
+            (replace-match "" nil nil)))
+        nil)
+    #+END_SRC
+*** command wrappers
+   #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my/imenu ()
        "Call the function `my/imenu-function' interactively"
        (interactive)
        (call-interactively my/imenu-function))
    #+END_SRC
-* evil
+** vars
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defvar core-evil-leader-key "SPC")
+     (defvar core-emacs-leader-key "C-c s")
+     (defvar core-evil-mode-leader-key ",")
+     (defvar core-emacs-mode-leader-key "C-c ,")
+     (defvar-local my/imenu-function 'imenu
+       "Function called interactively by `my/imenu'")
+   #+END_SRC
+
 ** evil
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil
-       :ensure t
-       :init
-       (setq evil-want-integration nil)
-       :config
-       (evil-mode 1)
-       ;; (evil-magit-init)
-       )
-   #+END_SRC
+*** evil
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil
+       	:ensure t
+       	:init
+       	(setq evil-want-integration nil)
+       	:config
+       	(evil-mode 1)
+       	;; (evil-magit-init)
+       	)
+    #+END_SRC
 
-** evil-collection
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-collection
-       :ensure t
-       :after evil
-       :config
-       (evil-collection-init))
-   #+END_SRC
+*** evil-collection
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-collection
+       	:ensure t
+       	:after evil
+       	:config
+       	(evil-collection-init))
+    #+END_SRC
 
-** evil-rsi
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-rsi
-       :ensure t
-       :requires evil)
-   #+END_SRC
+*** evil-rsi
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-rsi
+       	:ensure t
+       	:requires evil)
+    #+END_SRC
 
-** evil-iedit-state
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-iedit-state
-       :ensure t
-       :requires evil iedit)
-   #+END_SRC
-** evil-escape
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-escape
-       :ensure t
-       :requires evil
-       :config
-       (evil-escape-mode 1))
-   #+END_SRC
+*** evil-iedit-state
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-iedit-state
+       	:ensure t
+       	:requires evil iedit)
+    #+END_SRC
+*** evil-escape
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-escape
+       	:ensure t
+       	:requires evil
+       	:config
+       	(evil-escape-mode 1))
+    #+END_SRC
 
-** evil-nerd-commenter
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-nerd-commenter
-       :ensure t
-       :requires evil)
-   #+END_SRC
+*** evil-nerd-commenter
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-nerd-commenter
+       	:ensure t
+       	:requires evil)
+    #+END_SRC
 
-** evil-surround
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-surround
-       :ensure t
-           :init
-           (add-hook 'after-init-hook 'global-evil-surround-mode)
-           :requires evil)
-   #+END_SRC
+*** evil-surround
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-surround
+       	:ensure t
+            :init
+            (add-hook 'after-init-hook 'global-evil-surround-mode)
+            :requires evil)
+    #+END_SRC
 
-** evil-exchange
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-exchange
-       :ensure t
-       :requires evil
-       :config
-       (evil-exchange-cx-install))
-   #+END_SRC
+*** evil-exchange
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-exchange
+       	:ensure t
+       	:requires evil
+       	:config
+       	(evil-exchange-cx-install))
+    #+END_SRC
 
-** evil-magit
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-magit
-       :ensure t
-       :init
-       :config
-       (evil-magit-init))
-   #+END_SRC
+*** evil-magit
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-magit
+       	:ensure t
+       	:init
+       	:config
+       	(evil-magit-init))
+    #+END_SRC
 
-** evil-unimpaired
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (use-package evil-unimpaired
-       :load-path "sumodules/evil-unimpaired"
-       :requires evil
-       :init
-       (add-hook 'evil-mode-hook 'evil-unimpaired-mode))
-   #+END_SRC
+*** evil-unimpaired
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package evil-unimpaired
+       	:load-path "sumodules/evil-unimpaired"
+       	:requires evil
+       	:init
+       	(add-hook 'evil-mode-hook 'evil-unimpaired-mode))
+    #+END_SRC
 
-** evil-rsi
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-rsi
-       :ensure t
-       :requires evil
-       :config (evil-rsi-mode 1))
-   #+END_SRC
+*** evil-rsi
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-rsi
+       	:ensure t
+       	:requires evil
+       	:config (evil-rsi-mode 1))
+    #+END_SRC
 
-** org-evil
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package org-evil
-        :ensure t
-        :requires evil)
-   #+END_SRC
-* ivy / counsel
-** ivy
+*** org-evil
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package org-evil
+         :ensure t
+         :requires evil)
+    #+END_SRC
+** ivy / counsel
+*** ivy
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ivy
     :ensure t
@@ -583,145 +610,77 @@
       (evil-make-overriding-map ivy-occur-mode-map 'normal))
 #+END_SRC
 
-** ivy-yasnippet
+*** ivy-yasnippet
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package ivy-yasnippet
+       	:ensure t)
+    #+END_SRC
+
+*** ivy-hydra
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package ivy-yasnippet
+     (use-package ivy-hydra
+       :ensure t
+       :requires (ivy))
+   #+END_SRC
+
+*** counsel
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package counsel
+       :ensure t
+       :requires ivy)
+   #+END_SRC
+
+*** counsel-projectile
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package counsel-projectile
+       :ensure t
+       :requires (counsel projectile))
+   #+END_SRC
+
+** editing
+*** iedit
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package iedit
        :ensure t)
    #+END_SRC
-
-** ivy-hydra
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package ivy-hydra
-      :ensure t
-      :requires (ivy))
-  #+END_SRC
-
-** counsel
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package counsel
-      :ensure t
-      :requires ivy)
-  #+END_SRC
-
-** counsel-projectile
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package counsel-projectile
-      :ensure t
-      :requires (counsel projectile))
-  #+END_SRC
-
-* editing
-** iedit
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package iedit 
-      :ensure t)
-  #+END_SRC
-** which-key
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package which-key
-      :ensure t
-      :init
-      (add-hook 'after-init-hook 'which-key-mode))
-  #+END_SRC
-
-** move-text
+*** which-key
    #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package move-text
-    :ensure t
-    :init
-    (add-hook 'after-init-hook 'which-key-mode))
+     (use-package which-key
+       :ensure t
+       :init
+       (add-hook 'after-init-hook 'which-key-mode))
    #+END_SRC
 
-** undo-tree
+*** move-text
+    #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package move-text
+     :ensure t
+     :init
+     (add-hook 'after-init-hook 'which-key-mode))
+    #+END_SRC
+
+*** undo-tree
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package undo-tree
     :ensure t)
 #+END_SRC
 
-** expand-region
+*** expand-region
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package expand-region
     :ensure t)
 #+END_SRC
 
-** evil-multiple-cursors
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package evil-mc
-       :ensure t
-       :requires evil
-       :config
-       (evil-mc-mode))
-   #+END_SRC
-* completion
-** rtags
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package rtags
-    :ensure t
-    :config
-    (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
-    (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map)))
-#+END_SRC
-
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package company-rtags
-    :ensure t
-    :requires (company-mode rtags))
-#+END_SRC
-
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package flycheck-rtags
-    :ensure t
-    :requires (flycheck-mode rtags))
-#+END_SRC
-
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ivy-rtags
-    :ensure t
-    :requires (ivy rtags))
-#+END_SRC
-
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun my-rtags-keybindings (major-mode)
-   "Set up keybindings for rtags for MAJOR-MODE"
-    (eval
-     `(bind-map-for-major-mode ,major-mode
-     :keys (core-emacs-mode-leader-key)
-     :evil-keys (core-evil-mode-leader-key)
-     :evil-states (normal motion visual)
-     :prefix rtags
-     :bindings
-      ("g g"  'rtags-find-symbol-at-point
-       "g G"  'rtags-find-symbol
-       "g r"  'rtags-find-references-at-point
-       "g R"  'rtags-find-references
-       "g F"  'rtags-find-file
-       "g v"  'rtags-find-virtuals-at-point
-       "g m"  'rtags-find-member-function
-       "g l"  'rtags-list-results
-       "g c"  'rtags-close-taglist
-       "g h"  'rtags-print-class-hierarchy
-       "g n"  'rtags-next-match
-       "g p"  'rtags-previous-match
-       "g f"  'rtags-location-stack-forward
-       "g b"    'rtags-location-stack-back
-       "g i"    'rtags-symbol-info
-       "g e f"  'rtags-fix-fixit-at-point
-       "g e F"  'rtags-fixit
-       "g e r"  'rtags-rename-symbol
-       "g e i"  'rtags-get-include-file-for-symbol
-       "g e m"  'rtags-make-member))))
-#+END_SRC
-
-
-** yasnippet
+*** evil-multiple-cursors
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-mc
+       	:ensure t
+       	:requires evil
+       	:config
+       	(evil-mc-mode))
+    #+END_SRC
+** completion
+*** yasnippet
 #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package yasnippet
         :ensure t
@@ -737,34 +696,34 @@
         :requires yasnippet)
 #+END_SRC
 
-** flycheck
+*** flycheck
 #+BEGIN_SRC emacs-lisp :tangle yes
        (use-package flycheck
        :ensure t)
 #+END_SRC
 
-** company
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package company
-       :ensure t
-       :config
-       (setq company-backends
-             '((company-dabbrev-code
-                company-gtags
-                company-etags
-                company-keywords)
-               company-files
-               company-dabbrev)))
-    #+END_SRC
+*** company
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package company
+       	:ensure t
+       	:config
+       	(setq company-backends
+              '((company-dabbrev-code
+                 company-gtags
+                 company-etags
+                 company-keywords)
+               	company-files
+               	company-dabbrev)))
+     #+END_SRC
 
-* navigation
-** avy
+** navigation
+*** avy
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package avy
     :ensure t)
 #+END_SRC
 
-** grep/ack/wgrep
+*** grep/ack/wgrep
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ag
     :ensure t)
@@ -794,32 +753,32 @@
     :ensure t)
 #+END_SRC
 
-* windows and buffers
-** winum-mode
+** windows and buffers
+*** winum-mode
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package winum
     :ensure t
     :config
     (winum-mode))
 #+END_SRC
-* other packages
-** hydra
+** other packages
+*** hydra
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hydra
     :ensure t)
 #+END_SRC
-** bind-map
+*** bind-map
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package bind-map
     :ensure t)
 #+END_SRC
 
-** magit
+*** magit
 #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package magit
    :ensure t)
 #+END_SRC
-** projectile
+*** projectile
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package projectile
     :config
@@ -827,35 +786,34 @@
     :ensure t)
 #+END_SRC
 
-** company
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package company
-       :ensure t
-       :config
-       (setq company-backends
-             '((company-dabbrev-code
-                company-gtags
-                company-etags
-                company-keywords)
-               company-files
-               company-dabbrev)))
-    #+END_SRC
+*** company
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package company
+       	:ensure t
+       	:config
+       	(setq company-backends
+              '((company-dabbrev-code
+                 company-gtags
+                 company-etags
+                 company-keywords)
+               	company-files
+               	company-dabbrev)))
+     #+END_SRC
 
-** google-c-style
+*** google-c-style
 #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package google-c-style
         :ensure t
         :after c++-mode)
 #+END_SRC
 
-** clang-format
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package clang-format
-       :ensure t
-       :defer t)
-   #+END_SRC
+*** clang-format
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package clang-format
+       	:ensure t
+       	:defer t)
+    #+END_SRC
 
-* general
 ** theme
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package solarized-theme
@@ -864,7 +822,8 @@
        :ensure t)
    #+END_SRC
 
-** global-minor-modes
+** configuration
+*** minor modes
    #+BEGIN_SRC emacs-lisp :tangle yes
      (menu-bar-mode 0)
      (tool-bar-mode 0)
@@ -873,8 +832,7 @@
      (setq initial-major-mode 'text-mode)
      (winner-mode 1)
    #+END_SRC
-
-** behaviour
+*** backup files
    Keep temporary files to a backup-directory in emacs directory
    #+BEGIN_SRC emacs-lisp :tangle no
      (defvar tramp-backup-directory-alist)
@@ -898,36 +856,17 @@
 
 Keep custom variables in a separate gitignored file to allow local customizations
 using customize
-
+*** custom-vars
 #+BEGIN_SRC emacs-lisp :tangle yes
   (let ((path (concat user-emacs-directory "custom.el")))
     (unless (file-exists-p path) (write-region "" nil path))
     (setq custom-file path))
 #+END_SRC
 
-* global
-** vars
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defvar core-evil-leader-key "SPC")
-     (defvar core-emacs-leader-key "C-c s")
-     (defvar core-evil-mode-leader-key ",")
-     (defvar core-emacs-mode-leader-key "C-c ,")
-   #+END_SRC
 
 ** funcs
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun core-keys-make-prefix (key)
-       (concat core-emacs-leader-key " " key))
-     (defun core-keys-make-evil-prefix (key)
-       (concat core-evil-leader-key " " key))
-     (defun core-keys-make-mode-prefix (key)
-       (concat core-emacs-mode-leader-key " " key))
-     (defun core-keys-make-evil-mode-prefix (key)
-       (concat core-evil-mode-leader-key " " key))
-   #+END_SRC
-
-** leader keys 
-*** evil 
+** keys
+*** evil
    #+BEGIN_SRC emacs-lisp :tangle yes
      (evil-define-key '(insert normal visual) 'global-map
        (kbd "M-/") 'hippie-expand)
@@ -958,8 +897,8 @@ using customize
         "TAB" 'spacemacs/alternate-buffer
         "u" 'universal-argument
         "d" 'dired
-        "'" 'my-shell-toggle-main-shell
-        "/" 'my-shell-toggle-buffer-local-shell))
+        "'" 'my/main-shell
+        "/" 'my/buffer-shell))
      (bind-map my/mode-leader-map
        :evil-keys (core-evil-mode-leader-key)
        :evil-keys (core-emacs-mode-leader-key)
@@ -1248,15 +1187,16 @@ y 'counsel-yank-pop
 * org
 ** config
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (setq org-src-fontify-natively t) 
+     (setq org-src-fontify-natively t)
    #+END_SRC
-
+** hooks
    #+BEGIN_SRC emacs-lisp :tangle yes
-          (defun my/org-mode-hooks ()
-            (setq my/imenu-function #'counsel-org-goto))
+     (defun my/org-mode-hooks ()
+       (setq my/imenu-function #'counsel-org-goto)
+       (linum-mode))
      (add-hook 'org-mode-hook 'my/org-mode-hooks)
    #+END_SRC
-** keybindings
+** keys
    #+BEGIN_SRC emacs-lisp :tangle yes
      (bind-map-for-major-mode org-mode
        :keys (core-emacs-mode-leader-key)
@@ -1392,7 +1332,7 @@ y 'counsel-yank-pop
    #+END_SRC
 
 * shell
-** Variables
+** vars
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defcustom my-shell-program
        "/bin/bash"
@@ -1405,30 +1345,28 @@ y 'counsel-yank-pop
        :group 'my-shell)
    #+END_SRC
 
-** Functions
+** funcs
    #+BEGIN_SRC emacs-lisp :tangle yes
-
-   (defun my-shell-toggle-shell(shell-buffer-name)
-   "Toggle a window and run program defined in `my-shell-program'
-   If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
-   (if (string-match "^\\*term-.*\\*$" (buffer-name))
-   (delete-window)
-   (select-window (split-window-below))
-   (let ((buffer (get-buffer shell-buffer-name)))
-   (if buffer
-   (switch-to-buffer buffer)
-   (term my-shell-program)
-   (rename-buffer shell-buffer-name)))))
+     (defun my-shell-toggle-shell(shell-buffer-name)
+       "Toggle a window and run program defined in `my-shell-program'
+     If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
+       (if (string-match "^\\*term-.*\\*$" (buffer-name))
+           (delete-window)
+         (select-window (split-window-below))
+         (let ((buffer (get-buffer shell-buffer-name)))
+           (if buffer
+               (switch-to-buffer buffer)
+             (term my-shell-program)
+             (rename-buffer shell-buffer-name)))))
    #+END_SRC
 
-** Commands
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-shell-toggle-main-shell ()
+     (defun my/main-shell ()
        "Toggle the main shell"
        (interactive)
        (my-shell-toggle-shell "*term-main*"))
 
-     (defun my-shell-toggle-buffer-local-shell ()
+     (defun my/buffer-shell ()
        "Toggle a buffer local shell"
        (interactive)
        (my-shell-toggle-shell (concat "*term-" (buffer-name) "*")))
@@ -1438,7 +1376,7 @@ y 'counsel-yank-pop
    #+END_SRC
 
 * prog-mode
-** keybindings
+** keys
    #+BEGIN_SRC emacs-lisp :tangle yes
      (evil-define-key '(insert normal visual movement) 'global-map
        (kbd "TAB") 'indent-for-tab-command
@@ -1447,6 +1385,13 @@ y 'counsel-yank-pop
        (kbd "] e") 'move-text-down
        (kbd "[ e") 'move-text-up)
    #+END_SRC
+** hooks
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (defun my-prog-mode-hooks ()
+      (add-hook 'local-write-file-hook 'my/remove-trailing-whitespace)
+      (linum-mode))
+    (add-hook 'prog-mode-hook 'my/prog-mode-hooks)
+  #+END_SRC
 ** emacs-lisp-mode
 *** macrostep
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1455,24 +1400,22 @@ y 'counsel-yank-pop
     #+END_SRC
 *** flycheck
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (with-eval-after-load 'emacs-lisp-mode
-       (defun my/emacs-lisp-flycheck-mode-setup()
-         (add-to-list 'flycheck-disabled-checkers 'emacs-lisp-checkdoc)
-         (flycheck-mode 1))
-       (add-hook 'emacs-lisp-mode-hook 'my/emacs-lisp-flycheck-mode-setup))
-
+     (defun my/emacs-lisp-flycheck-setup()
+       (add-to-list 'flycheck-disabled-checkers 'emacs-lisp-checkdoc)
+       (flycheck-mode))
+     (add-hook 'emacs-lisp-mode-hook 'my/emacs-lisp-flycheck-setup)
    #+END_SRC
 *** company
    #+BEGIN_SRC emacs-lisp :tangle yes
      (with-eval-after-load 'emacs-lisp-mode
       (add-to-list 'company-backends 'company-elisp))
    #+END_SRC
-
-     (defun my-emacs-lisp-mode-hooks()
-      (company-mode 1)
-     (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hooks)
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defun my-emacs-lisp-company-setup()
+      (company-mode 1))
+     (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-company-setup)
    #+END_SRC
-*** keybindings 
+*** keys
 **** Hydras
    #+BEGIN_SRC emacs-lisp :tangle yes
    #+END_SRC
@@ -1484,7 +1427,7 @@ y 'counsel-yank-pop
         :major-modes (emacs-lisp-mode)
         :evil-state (normal motion visual)
         :prefix-cmd evaling
-        :bindings 
+        :bindings
         ("f" 'eval-defun
          "$" 'lisp-state-eval-sexp-end-of-line
          "b" 'eval-buffer
@@ -1493,7 +1436,7 @@ y 'counsel-yank-pop
          "r" 'eval-region
          ))
     #+end_src
-**** Debugging 
+**** Debugging
     #+begin_src emacs-lisp :tangle yes
       (bind-map elisp-debug-map
         :keys ((core-keys-make-mode-prefix "d"))
@@ -1501,7 +1444,7 @@ y 'counsel-yank-pop
         :major-modes (emacs-lisp-mode)
         :evil-state (normal motion visual)
         :prefix-cmd debugging
-        :bindings 
+        :bindings
         ("F" 'spacemacs/edebug-instrument-defun-off
          "f" 'edebug-defun
          "t" 'spacemacs/elisp-toggle-debug-expr-and-eval-func
@@ -1509,6 +1452,62 @@ y 'counsel-yank-pop
   #+END_SRC
 ** c++-mode
 *** rtags
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package rtags
+        :ensure t
+        :config
+        (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
+        (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map)))
+    #+END_SRC
+**** company-rtags
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package company-rtags
+        :ensure t
+        :requires (company-mode rtags))
+    #+END_SRC
+**** flycheck-rtags
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package flycheck-rtags
+        :ensure t
+        :requires (flycheck-mode rtags))
+    #+END_SRC
+**** ivy-rtags
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package ivy-rtags
+        :ensure t
+        :requires (ivy rtags))
+    #+END_SRC
+**** keys
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map-for-major-mode c++-mode
+      :keys (core-emacs-mode-leader-key)
+      :evil-keys (core-evil-mode-leader-key)
+      :evil-states (normal motion visual)
+      :prefix rtags
+      :bindings
+       ("g g"  'rtags-find-symbol-at-point
+        "g G"  'rtags-find-symbol
+        "g r"  'rtags-find-references-at-point
+        "g R"  'rtags-find-references
+        "g F"  'rtags-find-file
+        "g v"  'rtags-find-virtuals-at-point
+        "g m"  'rtags-find-member-function
+        "g l"  'rtags-list-results
+        "g c"  'rtags-close-taglist
+        "g h"  'rtags-print-class-hierarchy
+        "g n"  'rtags-next-match
+        "g p"  'rtags-previous-match
+        "g f"  'rtags-location-stack-forward
+        "g b"    'rtags-location-stack-back
+        "g i"    'rtags-symbol-info
+        "g e f"  'rtags-fix-fixit-at-point
+        "g e F"  'rtags-fixit
+        "g e r"  'rtags-rename-symbol
+        "g e i"  'rtags-get-include-file-for-symbol
+        "g e m"  'rtags-make-member))
+    #+END_SRC
+
+
    #+BEGIN_SRC emacs-lisp :tangle yes
      (with-eval-after-load 'c++-mode
        (setq rtags-display-result-backend 'ivy)
@@ -1520,15 +1519,18 @@ y 'counsel-yank-pop
    #+END_SRC
 *** flycheck
     #+BEGIN_SRC emacs-lisp :tangle yes
-     (with-eval-after-load 'c++-mode
-       (setq flycheck-idle-change-delay 5)
-       (add-hook 'c++-mode-hook 'flycheck-mode))
+      (defun my/c++-flycheck-setup ()
+        (setq flycheck-idle-change-delay 5)
+        (flycheck-mode))
+
+      (add-hook 'c++-mode-hook 'my/c++-flycheck-setup)
    #+END_SRC
 *** company
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (with-eval-after-load 'c++-mode
-       (add-hook 'c++-mode-hook 'company-mode)
-       (add-to-list 'company-backends 'company-rtags))
+     (defun my/c++-company-setup ()
+       (add-to-list 'company-backends 'company-rtags)
+       (company-mode))
+     (add-hook 'c++-mode-hook 'my/c++-company-setup)
    #+END_SRC
 *** clang-format
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1544,10 +1546,13 @@ y 'counsel-yank-pop
       (with-eval-after-load 'c++-mode
         (add-hook 'c++-mode-hook 'google-set-c-style))
     #+END_SRC
+*** funcs
+    #+BEGIN_SRC emacs-lisp :tangle yes
 
+    #+END_SRC
 * Todos
 ** TODO ivy resume bindings
 ** TODO bindings for evil nerd commenter
 ** TODO fix ivy-occur
 ** TODO cursor color for state
-** TODO modeline   
+** TODO modeline
