@@ -32,11 +32,12 @@
     Ensure some dependencies are installed. The packages use-package and bind-map are installed, these will be used to
     manage packages and keybindings throughout the config.
 #+BEGIN_SRC emacs-lisp :tangle yes
-  (require 'use-package)
   (dolist (package '(dash use-package bind-map)) nil
     (unless (package-installed-p package)
       (package-refresh-contents)
       (package-install package)))
+  (require 'use-package)
+(require 'bind-map)
    #+END_SRC
 * global
 ** funcs
@@ -688,7 +689,7 @@
 
 *** search
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map my/search-map
+      (bind-map core-search-map
         :keys ((core-keys-make-prefix "s"))
         :evil-keys ((core-keys-make-evil-prefix "s"))
         :evil-states (normal motion visual)
@@ -714,7 +715,6 @@
         :prefix-cmd git-file)
     #+END_SRC
 
-     
 *** Jump/join
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map core-jump-join-map
@@ -843,7 +843,6 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-collection
         :ensure t
-        :after evil
         :bind
         (:map
          jump-join
@@ -904,7 +903,7 @@
     #+END_SRC
 
 *** evil-unimpaired
-    #+BEGIN_SRC emacs-lisp :tangle no
+    #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-unimpaired
        	:load-path "sumodules/evil-unimpaired"
        	:requires evil
@@ -973,11 +972,9 @@
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package counsel
        :ensure t
-       :requires ivy
        :bind 
        (:map
         core-search-map
-        ("s" .  swiper)
         ("k" . counsel-ack)
         ("g" . counsel-git-grep)
         ("s" . swiper)
@@ -986,7 +983,9 @@
         ("g" . counsel-git-grep)
         ("G" . vc-git-grep)
         ("a" . counsel-ag)
-        ("A" . ag)))
+        ("A" . ag))
+        :config
+        (counsel-mode))
    #+END_SRC
 
 ** editing
@@ -1028,9 +1027,7 @@
       (use-package evil-mc
        	:ensure t
        	:requires evil
-       	:config
-
-       	)
+       	:config)
     #+END_SRC
 ** visual
  #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1114,7 +1111,6 @@
              (quit-window nil window)
            (flycheck-list-errors)))
      #+END_SRC
-
 
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1382,7 +1378,18 @@ using customize
         (evil-mode 1)
         (evil-define-key '(insert normal visual) 'global-map
           (kbd "M-/") 'hippie-expand))* org-mode
-*** org-projectile
+* org
+** org
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package org
+    :pin org
+    :config
+       (setq org-src-fontify-natively t)
+    (setq my/imenu-function 'counsel-org-goto)
+
+    :ensure t)
+#+END_SRC
+** org-projectile
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package org-projectile
         :ensure t
@@ -1391,24 +1398,20 @@ using customize
          core-projectile-map
          ("o" . org-projectile/goto-todos)))
     #+END_SRC
-*** config
-    #+BEGIN_SRC emacs-lisp :tangle yes
-       (setq org-src-fontify-natively t)
-    #+END_SRC
-*** company
+** company
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my/org-company-setup ()
              (add-to-list 'company-backends 'company-capf)
              (company-mode))
            (add-hook 'org-mode-hook 'my/org-company-setup)
     #+END_SRC
-*** hooks
+** hooks
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my/org-mode-hooks ()
        	(setq my/imenu-function #'counsel-org-goto))
       (add-hook 'org-mode-hook 'my/org-mode-hooks)
     #+END_SRC
-*** keys
+** keys
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map-for-major-mode org-mode
        	:keys (core-emacs-mode-leader-key)
