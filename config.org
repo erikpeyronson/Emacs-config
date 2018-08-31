@@ -493,7 +493,7 @@
    #+END_SRC
 
 ** keys
-*** base maps
+*** leader
    #+BEGIN_SRC emacs-lisp :tangle yes
      (bind-map core-base-map
        :keys (core-emacs-leader-key)
@@ -529,15 +529,15 @@
    #+END_SRC
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
-    (bind-map core-errors-map
-	  :keys ((core-keys-make-prefix "e"))
-	  :evil-keys ((core-keys-make-evil-prefix "e"))
-	  :evil-states (normal motion visual)
-	  :override-mode-name buffer-keys
-	  :prefix-cmd errors
-	  :bindings
-	  ("n" 'next-error
-	  "p" 'previous-error))
+      (bind-map core-errors-map
+            :keys ((core-keys-make-prefix "e"))
+            :evil-keys ((core-keys-make-evil-prefix "e"))
+            :evil-states (normal motion visual)
+            :override-mode-name buffer-keys
+            :prefix-cmd errors
+            :bindings
+            ("n" 'next-error
+            "p" 'previous-error))
  #+END_SRC
 
 *** buffers
@@ -744,13 +744,88 @@
         :prefix-cmd inserting)
     #+END_SRC
 
-***  registers/rings/resume
+*** text 
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map core-reg-ring-resume-map
-         :keys ((core-keys-make-prefix "r"))
-         :evil-keys ((core-keys-make-evil-prefix "r"))
+       (bind-map core-text-map
+         :keys ((core-keys-make-prefix "x"))
+         :evil-keys ((core-keys-make-evil-prefix "x"))
          :evil-states (normal motion visual)
-         :prefix-cmd regs-rings-resume)
+         :prefix-cmd text
+         :bindings
+         ("TAB" 'indent-rigidly
+          "c" 'transpose-chars
+          "e" 'transpose-sexps
+          "l" 'transpose-lines
+          "p" 'transpose-paragraphs
+          "s" 'transpose-sentences
+          "w" 'transpose-words))
+     #+end_src
+**** TODO more from spacemacs to implement 
+     #+begin_src emacs-lisp :tangle no
+       SPC x j c       set-justification-center
+       SPC x j f       set-justification-full
+       SPC x j l       set-justification-left
+       SPC x j n       set-justification-none
+       SPC x j r       set-justification-right
+       (use-package string-inflection
+       SPC x i -       string-inflection-kebab-case
+       SPC x i C       string-inflection-camelcase
+       SPC x i U       string-inflection-upcase
+       SPC x i _       string-inflection-underscore
+       SPC x i c       string-inflection-lower-camelcase
+       SPC x i k       string-inflection-kebab-case
+       SPC x i u       string-inflection-underscore)
+         :ensure t)
+       (use-package google-translare
+       SPC x g Q       google-translate-query-translate-reverse
+       SPC x g T       google-translate-at-point-reverse
+       SPC x g l       spacemacs/set-google-translate-languages
+       SPC x g q       google-translate-query-translate
+       SPC x g t       google-translate-at-point
+         :ensure t)
+
+       SPC x a %       spacemacs/align-repeat-percent
+       SPC x a &       spacemacs/align-repeat-ampersand
+       SPC x a (       spacemacs/align-repeat-left-paren
+       SPC x a )       spacemacs/align-repeat-right-paren
+       SPC x a ,       spacemacs/align-repeat-comma
+       SPC x a .       spacemacs/align-repeat-decimal
+       SPC x a :       spacemacs/align-repeat-colon
+       SPC x a ;       spacemacs/align-repeat-semicolon
+       SPC x a =       spacemacs/align-repeat-equal
+       SPC x a L       evil-lion-right
+       SPC x a [       spacemacs/align-repeat-left-square-brace
+       SPC x a \       spacemacs/align-repeat-backslash
+       SPC x a ]       spacemacs/align-repeat-right-square-brace
+       SPC x a a       align
+       SPC x a c       align-current
+       SPC x a l       evil-lion-left
+       SPC x a m       spacemacs/align-repeat-math-oper
+       SPC x a r       spacemacs/align-repeat
+       SPC x a {       spacemacs/align-repeat-left-curly-brace
+       SPC x a |       spacemacs/align-repeat-bar
+       SPC x a }       spacemacs/align-repeat-right-curly-brace
+       SPC x r '       rxt-convert-to-strings
+       SPC x r /       rxt-explain
+       SPC x r c       rxt-convert-syntax
+       SPC x r e       Prefix Command
+       SPC x r p       Prefix Command
+       SPC x r t       rxt-toggle-elisp-rx
+       SPC x r x       rxt-convert-to-rx
+
+       SPC x r p '     rxt-pcre-to-strings
+       SPC x r p /     rxt-explain-pcre
+       SPC x r p e     rxt-pcre-to-elisp
+       SPC x r p x     rxt-pcre-to-rx
+
+       SPC x r e '     rxt-elisp-to-strings
+       SPC x r e /     rxt-explain-elisp
+       SPC x r e p     rxt-elisp-to-pcre
+       SPC x r e t     rxt-toggle-elisp-rx
+       SPC x r e x     rxt-elisp-to-rx
+
+
+
      #+END_SRC
 ** evil
 *** evil
@@ -858,7 +933,7 @@
   #+END_SRC  
 ** ivy
 *** ivy
-   #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package ivy
        :ensure t
        :bind 
@@ -954,7 +1029,8 @@
        	:ensure t
        	:requires evil
        	:config
-       	(evil-mc-mode))
+
+       	)
     #+END_SRC
 ** visual
  #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1013,9 +1089,32 @@
 
 *** flycheck
 #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package flycheck
-       :ensure t)
+  (use-package flycheck
+    :ensure t
+    :bind
+    (:map
+     core-errors-map
+     ("." . spacemacs/error-transient-state/body)
+     ("S" . flycheck-set-checker-executable)
+     ("b" . flycheck-buffer)
+     ("c" . flycheck-clear)
+     ("h" . flycheck-describe-checker)
+     ("l" . my/flycheck-toggle-error-list)
+     ("s" . flycheck-select-checker)
+     ("v" . flycheck-verify-setup)
+     ("x" . flycheck-explain-error-at-point)
+     ("y" . flycheck-copy-errors-as-kill)))
 #+END_SRC
+**** funcs
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun my/flycheck-toggle-error-list ()
+         "Toggle flycheck's error list window"
+         (interactive)
+         (-if-let (window (flycheck-get-error-list-window))
+             (quit-window nil window)
+           (flycheck-list-errors)))
+     #+END_SRC
+
 
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1162,26 +1261,11 @@
 
    #+end_src
 
-** other packages
-*** hydra
+** hydra
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hydra
     :ensure t)
 #+END_SRC
-*** google-c-style
-#+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package google-c-style
-        :ensure t
-        :after c++-mode)
-#+END_SRC
-
-*** clang-format
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package clang-format
-       	:ensure t
-       	:defer t)
-    #+END_SRC
-
 ** theme
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package solarized-theme
@@ -1191,7 +1275,7 @@
    #+END_SRC
 
 ** configuration
-*** minor modes
+*** minor-modes
    #+BEGIN_SRC emacs-lisp :tangle yes
      (menu-bar-mode 0)
      (tool-bar-mode 0)
@@ -1231,208 +1315,233 @@ using customize
     (setq custom-file path))
 #+END_SRC
 
+** shell
+*** vars
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defcustom my-shell-program
+       	 "/bin/bash"
+       	 "Path to shell binary for shell opened by `my-shell-toggle-shell'"
+       	 :group 'my-shell)
 
-** funcs
-** keys
-*** evil
-* org
-** org-projectile
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package org-projectile
-    :ensure t
-    :bind
-    (:map
-     core-projectile-map
-     ("o" . org-projectile/goto-todos)))
-#+END_SRC
-** config
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (setq org-src-fontify-natively t)
-   #+END_SRC
-** hooks
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my/org-mode-hooks ()
-       (setq my/imenu-function #'counsel-org-goto))
-     (add-hook 'org-mode-hook 'my/org-mode-hooks)
-   #+END_SRC
-** keys
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (bind-map-for-major-mode org-mode
-       :keys (core-emacs-mode-leader-key)
-       :evil-keys (core-evil-mode-leader-key)
-       :evil-states (normal motion visual)
-       :override-minor-modes t
-       :bindings
-       ("<tab>" 'org-indent-block
-        " RET" 'org-ctrl-c-ret
-        "#" 'org-update-statistics-cookies
-        "'" 'org-edit-special
-        "g" 'org-ctrl-c-star
-        "," 'org-ctrl-c-ctrl-c
-        "-" 'org-ctrl-c-minus
-        "A" 'org-attach
-        "H" 'org-shiftleft
-        "J" 'org-shiftdown
-        "K" 'org-shiftup
-        "L" 'org-shiftright
-        "a" 'org-agenda
-        "c" 'org-capture
-        "C-S-h" 'org-shiftcontrolleft
-        "C-S-j" 'org-shiftcontroldown
-        "C-S-k" 'org-shiftcontrolup
-        "C-S-l" 'org-shiftcontrolright
-        "x b" 'spacemacs/org-bold
-        "x c" 'spacemacs/org-code
-        "x i" 'spacemacs/org-italic
-        "x o" 'org-open-at-point
-        "x r" 'spacemacs/org-clear
-        "x s" 'spacemacs/org-strike-through
-        "x u" 'spacemacs/org-underline
-        "x v" 'spacemacs/org-verbatim
-        "i H" 'org-insert-heading-after-current
-        "i K" 'spacemacs/insert-keybinding-org
-        "i d" 'org-insert-drawer
-        "i e" 'org-set-effort
-        "i f" 'org-footnote-new
-        "i h" 'org-insert-heading
-        "i l" 'org-insert-link
-        "i n" 'org-add-note
-        "i p" 'org-set-property
-        "i s" 'org-insert-subheading
-        "i t" 'org-set-tags
-        "M-RET" 'org-meta-return
-        "b ." 'spacemacs/org-babel-transient-state/body
-        "b I" 'org-babel-view-src-block-info
-        "b Z" 'org-babel-switch-to-session-with-code
-        "b a" 'org-babel-sha1-hash
-        "b b" 'org-babel-execute-src-block
-        "b B" 'org-babel-execute-buffer
-        "b c" 'org-babel-check-src-block
-        "b d" 'org-babel-demarcate-block
-        "b e" 'org-babel-execute-maybe
-        "b f" 'org-babel-tangle-file
-        "b g" 'org-babel-goto-named-src-block
-        "b i" 'org-babel-lob-ingest
-        "b j" 'org-babel-insert-header-arg
-        "b l" 'org-babel-load-in-session
-        "b n" 'org-babel-next-src-block
-        "b o" 'org-babel-open-src-block-result
-        "b p" 'org-babel-previous-src-block
-        "b r" 'org-babel-goto-named-result
-        "b s" 'org-babel-execute-subtree
-        "b t" 'org-babel-tangle
-        "b u" 'org-babel-goto-src-block-head
-        "b v" 'org-babel-expand-src-block
-        "b x" 'org-babel-do-key-sequence-in-edit-buffer
-        "b z" 'org-babel-switch-to-session
-        "s A" 'org-archive-subtree
-        "s N" 'widen
-        "s S" 'org-sort
-        "s a" 'org-toggle-archive-tag
-        "s b" 'org-tree-to-indirect-buffer
-        "s h" 'org-promote-subtree
-        "s j" 'org-move-subtree-down
-        "s k" 'org-move-subtree-up
-        "s l" 'org-demote-subtree
-        "s n" 'org-narrow-to-subtree
-        "s r" 'org-refile
-        "s s" 'org-sparse-tree
-        "T T" 'org-todo
-        "T V" 'space-doc-mode
-        "T c" 'org-toggle-checkbox
-        "T e" 'org-toggle-pretty-entities
-        "T i" 'org-toggle-inline-images
-        "T l" 'org-toggle-link-display
-        "T t" 'org-show-todo-tree
-        "T x" 'org-toggle-latex-fragment
-        "f i" 'org-feed-goto-inbox
-        "f u" 'org-feed-update-all
-        "e e" 'org-export-dispatch
-        "e m" 'org-mime-org-buffer-htmlize
-        "d T" 'org-time-stamp-inactive
-        "d d" 'org-deadline
-        "d s" 'org-schedule
-        "d t" 'org-time-stamp
-        "C c" 'org-clock-cancel
-        "C i" 'org-clock-in
-        "C o" 'org-clock-out
-        "C p" 'org-pomodoro
-        "C r" 'org-resolve-clocks
-        "t E" 'org-table-export
-        "t H" 'org-table-move-column-left
-        "t I" 'org-table-import
-        "t J" 'org-table-move-row-down
-        "t K" 'org-table-move-row-up
-        "t L" 'org-table-move-column-right
-        "t N" 'org-table-create-with-table.el
-        "t a" 'org-table-align
-        "t b" 'org-table-blank-field
-        "t c" 'org-table-convert
-        "t e" 'org-table-eval-formula
-        "t h" 'org-table-previous-field
-        "t j" 'org-table-next-row
-        "t l" 'org-table-next-field
-        "t n" 'org-table-create
-        "t p" 'org-plot/gnuplot
-        "t r" 'org-table-recalculate
-        "t s" 'org-table-sort-lines
-        "t w" 'org-table-wrap-region
-        "i D s" 'org-download-screenshot
-        "i D y" 'org-download-yank
-        "t t f" 'org-table-toggle-formula-debugger
-        "t t o" 'org-table-toggle-coordinate-overlays
-        "t i H" 'org-table-hline-and-move
-        "t i c" 'org-table-insert-column
-        "t i h" 'org-table-insert-hline
-        "t i r" 'org-table-insert-row
-        "t d c" 'org-table-delete-column
-        "t d r" 'org-table-kill-row))
+       (defcustom my-shell-buffer-name-regex
+       	 "^\\*term-.*\\*$"
+       	 "Regexp used to identify if the current window is a term buffer"
+       	 :group 'my-shell)
+     #+END_SRC
 
-   #+END_SRC
+*** funcs
+      #+BEGIN_SRC emacs-lisp :tangle yes
+       	(defun my-shell-toggle-shell(shell-buffer-name)
+       	  "Toggle a window and run program defined in `my-shell-program'
+       	If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
+       	  (if (string-match "^\\*term-.*\\*$" (buffer-name))
+              (delete-window)
+            (select-window (split-window-below))
+            (let ((buffer (get-buffer shell-buffer-name)))
+              (if buffer
+               	  (switch-to-buffer buffer)
+               	(term my-shell-program)
+               	(rename-buffer shell-buffer-name)))))
+      #+END_SRC
 
-* shell
-** vars
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defcustom my-shell-program
-       "/bin/bash"
-       "Path to shell binary for shell opened by `my-shell-toggle-shell'"
-       :group 'my-shell)
+      #+BEGIN_SRC emacs-lisp :tangle yes
+       	(defun my/main-shell ()
+       	  "Toggle the main shell"
+       	  (interactive)
+       	  (my-shell-toggle-shell "*term-main*"))
 
-     (defcustom my-shell-buffer-name-regex
-       "^\\*term-.*\\*$"
-       "Regexp used to identify if the current window is a term buffer"
-       :group 'my-shell)
-   #+END_SRC
+       	(defun my/buffer-shell ()
+       	  "Toggle a buffer local shell"
+       	  (interactive)
+       	  (my-shell-toggle-shell (concat "*term-" (buffer-name) "*")))
 
-** funcs
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-shell-toggle-shell(shell-buffer-name)
-       "Toggle a window and run program defined in `my-shell-program'
-     If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
-       (if (string-match "^\\*term-.*\\*$" (buffer-name))
-           (delete-window)
-         (select-window (split-window-below))
-         (let ((buffer (get-buffer shell-buffer-name)))
-           (if buffer
-               (switch-to-buffer buffer)
-             (term my-shell-program)
-             (rename-buffer shell-buffer-name)))))
-   #+END_SRC
+       	(provide 'my-shell)
+       	;;; my-shell.el ends here
+      #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my/main-shell ()
-       "Toggle the main shell"
-       (interactive)
-       (my-shell-toggle-shell "*term-main*"))
+*** keys
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map-set-keys core-base-map
+        "'" 'my/main-shell
+        "/" 'my/buffer-shell)
+    #+END_SRC
+***  registers/rings/resume
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map core-reg-ring-resume-map
+         :keys ((core-keys-make-prefix "r"))
+         :evil-keys ((core-keys-make-evil-prefix "r"))
+         :evil-states (normal motion visual)
+         :prefix-cmd regs-rings-resume)
+     #+END_SRC
+     
+      (use-package evil
+        :ensure t
+        :init
+        (setq evil-want-integration nil)
+        :config
+        (evil-mode 1)
+        (evil-define-key '(insert normal visual) 'global-map
+          (kbd "M-/") 'hippie-expand))* org-mode
+*** org-projectile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package org-projectile
+        :ensure t
+        :bind
+        (:map
+         core-projectile-map
+         ("o" . org-projectile/goto-todos)))
+    #+END_SRC
+*** config
+    #+BEGIN_SRC emacs-lisp :tangle yes
+       (setq org-src-fontify-natively t)
+    #+END_SRC
+*** company
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/org-company-setup ()
+             (add-to-list 'company-backends 'company-capf)
+             (company-mode))
+           (add-hook 'org-mode-hook 'my/org-company-setup)
+    #+END_SRC
+*** hooks
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/org-mode-hooks ()
+       	(setq my/imenu-function #'counsel-org-goto))
+      (add-hook 'org-mode-hook 'my/org-mode-hooks)
+    #+END_SRC
+*** keys
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map-for-major-mode org-mode
+       	:keys (core-emacs-mode-leader-key)
+       	:evil-keys (core-evil-mode-leader-key)
+       	:evil-states (normal motion visual)
+       	:override-minor-modes t
+       	:bindings
+       	("<tab>" 'org-indent-block
+         " RET" 'org-ctrl-c-ret
+         "#" 'org-update-statistics-cookies
+         "'" 'org-edit-special
+         "g" 'org-ctrl-c-star
+         "," 'org-ctrl-c-ctrl-c
+         "-" 'org-ctrl-c-minus
+         "A" 'org-attach
+         "H" 'org-shiftleft
+         "J" 'org-shiftdown
+         "K" 'org-shiftup
+         "L" 'org-shiftright
+         "a" 'org-agenda
+         "c" 'org-capture
+         "C-S-h" 'org-shiftcontrolleft
+         "C-S-j" 'org-shiftcontroldown
+         "C-S-k" 'org-shiftcontrolup
+         "C-S-l" 'org-shiftcontrolright
+         "x b" 'spacemacs/org-bold
+         "x c" 'spacemacs/org-code
+         "x i" 'spacemacs/org-italic
+         "x o" 'org-open-at-point
+         "x r" 'spacemacs/org-clear
+         "x s" 'spacemacs/org-strike-through
+         "x u" 'spacemacs/org-underline
+         "x v" 'spacemacs/org-verbatim
+         "i H" 'org-insert-heading-after-current
+         "i K" 'spacemacs/insert-keybinding-org
+         "i d" 'org-insert-drawer
+         "i e" 'org-set-effort
+         "i f" 'org-footnote-new
+         "i h" 'org-insert-heading
+         "i l" 'org-insert-link
+         "i n" 'org-add-note
+         "i p" 'org-set-property
+         "i s" 'org-insert-subheading
+         "i t" 'org-set-tags
+         "M-RET" 'org-meta-return
+         "b ." 'spacemacs/org-babel-transient-state/body
+         "b I" 'org-babel-view-src-block-info
+         "b Z" 'org-babel-switch-to-session-with-code
+         "b a" 'org-babel-sha1-hash
+         "b b" 'org-babel-execute-src-block
+         "b B" 'org-babel-execute-buffer
+         "b c" 'org-babel-check-src-block
+         "b d" 'org-babel-demarcate-block
+         "b e" 'org-babel-execute-maybe
+         "b f" 'org-babel-tangle-file
+         "b g" 'org-babel-goto-named-src-block
+         "b i" 'org-babel-lob-ingest
+         "b j" 'org-babel-insert-header-arg
+         "b l" 'org-babel-load-in-session
+         "b n" 'org-babel-next-src-block
+         "b o" 'org-babel-open-src-block-result
+         "b p" 'org-babel-previous-src-block
+         "b r" 'org-babel-goto-named-result
+         "b s" 'org-babel-execute-subtree
+         "b t" 'org-babel-tangle
+         "b u" 'org-babel-goto-src-block-head
+         "b v" 'org-babel-expand-src-block
+         "b x" 'org-babel-do-key-sequence-in-edit-buffer
+         "b z" 'org-babel-switch-to-session
+         "s A" 'org-archive-subtree
+         "s N" 'widen
+         "s S" 'org-sort
+         "s a" 'org-toggle-archive-tag
+         "s b" 'org-tree-to-indirect-buffer
+         "s h" 'org-promote-subtree
+         "s j" 'org-move-subtree-down
+         "s k" 'org-move-subtree-up
+         "s l" 'org-demote-subtree
+         "s n" 'org-narrow-to-subtree
+         "s r" 'org-refile
+         "s s" 'org-sparse-tree
+         "T T" 'org-todo
+         "T V" 'space-doc-mode
+         "T c" 'org-toggle-checkbox
+         "T e" 'org-toggle-pretty-entities
+         "T i" 'org-toggle-inline-images
+         "T l" 'org-toggle-link-display
+         "T t" 'org-show-todo-tree
+         "T x" 'org-toggle-latex-fragment
+         "f i" 'org-feed-goto-inbox
+         "f u" 'org-feed-update-all
+         "e e" 'org-export-dispatch
+         "e m" 'org-mime-org-buffer-htmlize
+         "d T" 'org-time-stamp-inactive
+         "d d" 'org-deadline
+         "d s" 'org-schedule
+         "d t" 'org-time-stamp
+         "C c" 'org-clock-cancel
+         "C i" 'org-clock-in
+         "C o" 'org-clock-out
+         "C p" 'org-pomodoro
+         "C r" 'org-resolve-clocks
+         "t E" 'org-table-export
+         "t H" 'org-table-move-column-left
+         "t I" 'org-table-import
+         "t J" 'org-table-move-row-down
+         "t K" 'org-table-move-row-up
+         "t L" 'org-table-move-column-right
+         "t N" 'org-table-create-with-table.el
+         "t a" 'org-table-align
+         "t b" 'org-table-blank-field
+         "t c" 'org-table-convert
+         "t e" 'org-table-eval-formula
+         "t h" 'org-table-previous-field
+         "t j" 'org-table-next-row
+         "t l" 'org-table-next-field
+         "t n" 'org-table-create
+         "t p" 'org-plot/gnuplot
+         "t r" 'org-table-recalculate
+         "t s" 'org-table-sort-lines
+         "t w" 'org-table-wrap-region
+         "i D s" 'org-download-screenshot
+         "i D y" 'org-download-yank
+         "t t f" 'org-table-toggle-formula-debugger
+         "t t o" 'org-table-toggle-coordinate-overlays
+         "t i H" 'org-table-hline-and-move
+         "t i c" 'org-table-insert-column
+         "t i h" 'org-table-insert-hline
+         "t i r" 'org-table-insert-row
+         "t d c" 'org-table-delete-column
+         "t d r" 'org-table-kill-row))
 
-     (defun my/buffer-shell ()
-       "Toggle a buffer local shell"
-       (interactive)
-       (my-shell-toggle-shell (concat "*term-" (buffer-name) "*")))
-
-     (provide 'my-shell)
-     ;;; my-shell.el ends here
-   #+END_SRC
+    #+END_SRC
 
 * prog-mode
 ** keys
@@ -1591,24 +1700,42 @@ using customize
        (company-mode))
      (add-hook 'c++-mode-hook 'my/c++-company-setup)
    #+END_SRC
-*** clang-format
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (with-eval-after-load 'c++-mode
-       (defun my-clang-format-if-file-exists ()
-         (when (eq major-mode 'c++-mode)
-           (when (locate-dominating-file (buffer-file-name) ".clang-format")
-             (clang-format-buffer))))
-       (add-hook 'before-save-hook 'my-clang-format-if-file-exists))
-   #+END_SRC
-*** google-c-style
+** google-c-style
+  #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package google-c-style
+        :ensure t
+        :config
+       (add-hook 'c++-mode-hook 'google-set-c-style))
+#+END_SRC
+
+** clang-format
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (with-eval-after-load 'c++-mode
-        (add-hook 'c++-mode-hook 'google-set-c-style))
-    #+END_SRC
+      (use-package clang-format
+       	:ensure t
+       	:defer t
+        :init
+       (add-hook 'c++-mode-hook 'my-clang-format-if-file-exists))
+    #+end_src
 *** funcs
-    #+BEGIN_SRC emacs-lisp :tangle yes
+**** my-set-clang-format-hook
+    #+begin_src emacs-lisp :tangle yes
+      (defun my-set-clang-format-hook () 
+        (add-hook 'local-write-file-hooks 'my-clang-format-if-file-exists))
+    #+end_src
+**** my-remove-clang-format-hook 
+    #+begin_src emacs-lisp :tangle yes
+      (defun my-remove-clang-format-hook () 
+        (remove-hook 'local-write-file-hooks 'my-clang-format-if-file-exists))
+    #+end_src
+****  my-clang-format-if-file-exists  
+    #+begin_src emacs-lisp :tangle yes
+      (defun my-clang-format-if-file-exists ()
+        (when (eq major-mode 'c++-mode)
+          (when (locate-dominating-file (buffer-file-name) ".clang-format")
+            (clang-format-buffer))))
 
     #+END_SRC
+
 * Todos
 ** TODO ivy resume bindings
 ** TODO bindings for evil nerd commenter
