@@ -510,7 +510,7 @@
         :ensure t
         :requires evil)
    #+END_SRC
-* Ivy
+* Ivy / counsel
 ** ivy
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ivy
@@ -682,6 +682,20 @@
        :ensure t)
 #+END_SRC
 
+** company
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package company
+       :ensure t
+       :config
+       (setq company-backends
+             '((company-dabbrev-code
+                company-gtags
+                company-etags
+                company-keywords)
+               company-files
+               company-dabbrev)))
+    #+END_SRC
+
 * Navigation
 ** avy
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -748,14 +762,18 @@
 #+END_SRC
 
 ** company
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package company
-    :ensure t
-    :config
-    (setq company-backends '((company-dabbrev-code company-gtags company-etags company-keywords)
-    company-files company-dabbrev)))
-
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package company
+       :ensure t
+       :config
+       (setq company-backends
+             '((company-dabbrev-code
+                company-gtags
+                company-etags
+                company-keywords)
+               company-files
+               company-dabbrev)))
+    #+END_SRC
 
 ** google-c-style
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -765,20 +783,12 @@
 #+END_SRC
 
 ** clang-format
-#+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package clang-format
-         :ensure t
-         :defer t)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package clang-format
+       :ensure t
+       :defer t)
+   #+END_SRC
 
-*** functions
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun my-clang-format-if-file-exists ()
-    (when (eq major-mode 'c++-mode)
-      (when (locate-dominating-file (buffer-file-name) ".clang-format")
-        (clang-format-buffer))))
-
-#+END_SRC
 * General
 ** theme
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1362,63 +1372,70 @@ y 'counsel-yank-pop
    #+END_SRC
 
 * prog-mode
+** keybindings
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (evil-define-key '(insert normal visual movement) 'global-map
+       (kbd "TAB") 'indent-for-tab-command
+       (kbd "M-/") 'hippie-expand)
+   #+END_SRC
 ** emacs-lisp-mode
-   Function to setup emacs lisp executed with emacs-lisp-mode-hook
+*** flycheck
    #+BEGIN_SRC emacs-lisp :tangle yes
+     (with-eval-after-load 'emacs-lisp-mode
+       (defun my/emacs-lisp-flycheck-mode-setup()
+         (add-to-list 'flycheck-disabled-checkers 'emacs-lisp-checkdoc)
+         (flycheck-mode 1))
+       (add-hook 'emacs-lisp-mode-hook 'my/emacs-lisp-flycheck-mode-setup))
+
+   #+END_SRC
+*** company
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (with-eval-after-load 'emacs-lisp-mode
+      (add-to-list 'company-backends 'company-elisp))
+   #+END_SRC
+
      (defun my-emacs-lisp-mode-hooks()
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp :tangle yes
       (company-mode 1)
-      (add-to-list 'company-backends 'company-elisp)
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp :tangle yes
-      (flycheck-mode)
-      (flycheck-disable-checker #'emacs-lisp-checkdoc))
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp :tangle yes
      (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hooks)
    #+END_SRC
 
 ** c++-mode
-   Load the following expressions after loading c++
+*** rtags
    #+BEGIN_SRC emacs-lisp :tangle yes
      (with-eval-after-load 'c++-mode
+       (setq rtags-display-result-backend 'ivy)
+       (setq rtags-imenu-syntax-highlighting t)
+       (setq rtags-autostart-diagnostics t)
+       (setq rtags-completions-enabled t)
+       (setq rtags-enable-unsaved-reparsing t)
+       (my-rtags-keybindings 'c++-mode))
    #+END_SRC
-
-*** Flycheck configuration
-#+BEGIN_SRC emacs-lisp :tangle yes
-    (setq flycheck-idle-change-delay 5)
-#+END_SRC
-
-*** Clang format configuration
-#+BEGIN_SRC emacs-lisp :tangle yes
-    (add-hook 'before-save-hook 'my-clang-format-if-file-exists)
-#+END_SRC
-
-*** Rtags configuration
-#+BEGIN_SRC emacs-lisp :tangle yes
-    (my-rtags-keybindings 'c++-mode)
-    (setq rtags-display-result-backend 'ivy)
-    (setq rtags-imenu-syntax-highlighting t)
-    (setq rtags-autostart-diagnostics t)
-    (setq rtags-completions-enabled t)
-    (setq rtags-enable-unsaved-reparsing t)
-#+END_SRC
-*** Hooks
-Last expression in with-eval-after load is adding the hook
-#+BEGIN_SRC emacs-lisp :tangle yes
-    (add-hook 'c++-mode-hook 'my-c++-mode-hooks))
-#+END_SRC
-
-Which is defined below
-#+BEGIN_SRC emacs-lisp :tangle yes
-  ;;;###autoload
-  (defun my-c++-mode-hooks ()
-    (google-set-c-style)
-    (flycheck-mode)
-    (company-mode)
-    (add-to-list 'company-backends 'company-rtags))
-#+END_SRC
+*** flycheck
+    #+BEGIN_SRC emacs-lisp :tangle yes
+     (with-eval-after-load 'c++-mode
+       (setq flycheck-idle-change-delay 5)
+       (add-hook 'c++-mode-hook 'flycheck-mode))
+   #+END_SRC
+*** company
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (with-eval-after-load 'c++-mode
+       (add-hook 'c++-mode-hook 'company-mode)
+       (add-to-list 'company-backends 'company-rtags))
+   #+END_SRC
+*** clang-format
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (with-eval-after-load 'c++-mode
+       (defun my-clang-format-if-file-exists ()
+         (when (eq major-mode 'c++-mode)
+           (when (locate-dominating-file (buffer-file-name) ".clang-format")
+             (clang-format-buffer))))
+       (add-hook 'before-save-hook 'my-clang-format-if-file-exists))
+   #+END_SRC
+*** google-c-style
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (with-eval-after-load 'c++-mode
+        (add-hook 'c++-mode-hook 'google-set-c-style))
+    #+END_SRC
 
 * Todos
 ** TODO ivy resume bindings
