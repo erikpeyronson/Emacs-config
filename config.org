@@ -1549,3 +1549,5 @@ y 'counsel-yank-pop
 ** TODO ivy resume bindings
 ** TODO bindings for evil nerd commenter
 ** TODO fix ivy-occur
+** TODO cursor color for state
+** TODO modeline   
