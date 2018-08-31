@@ -402,7 +402,63 @@
            (window-configuration-to-register ?_)
            (delete-other-windows))))
    #+END_SRC
+** utility functions
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defun my-read-expanded-filename ()
+       "Read a directory with completion and return the expanded filename"
+       (expand-file-name
+        (read-file-name "dir:" )))
+   #+END_SRC
+   
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (defun my/command-wrapper (command)
+       "Defines a buffer-local variable named my/COMMAND that calls COMMAND interactively making it possible
+       ovverride COMMAND locally by changing the function of my/COMMAND"
+(let wrapper ((intern (concat "my" (symbol-name command)) #'command))
+       (defvar )
+       (interactive)
+       (call-interactively my-imenu-function))
+   #+END_SRC
 ** search
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (defun my-counsel-ack-in-dir (arg)
+     "Read directory with completion and call counsel-ack"
+       (interactive "P")
+       (let ((default-directory (my-read-expanded-filename))
+             (initial-input ""))
+             (when arg
+               (setq initial-input (word-at-point)))
+             (counsel-ack "test")))
+   #+END_SRC
+   
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (defun my-counesl-grep-in-dir (arg)
+       "Read directory with completion and call counsel-grep"
+       (interactive"P")
+       (let ((default-directory (my-read-expanded-filename)))
+         (counsel-grep)))
+   #+END_SRC
+   
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (defun my-counsel-ag-in-dir (arg)
+     "Read directory with completion and call counsel-grep"
+     (let ((default-directory (my-read-expanded-filename)))
+       (let ((default-directory (expand-file-name
+                               (read-file-name "Starting directory: "))))
+       (counsel-grep)))
+   #+end_src
+
+   #+begin_src emacs-lisp :tangle no
+     (defvar my-imenu-function #'imenu
+       "Function called interctively by `my-imenu-or-similar'
+       automatically buffer local when set ")
+
+     (defun my-imenu-or-similar ()
+       "Call the function defined in `my-imenu-function'"
+       (interactive)
+       (call-interactively my-imenu-function))
+
+   #+END_SRC
    #+BEGIN_SRC emacs-lisp :tangle no
   (defun my-counsel-git-grep-in-dir ()
 
@@ -441,9 +497,8 @@
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil-iedit-state
        :ensure t
-       :requires evil)
+       :requires evil iedit)
    #+END_SRC
-
 ** evil-escape
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil-escape
@@ -555,6 +610,11 @@
   #+END_SRC
 
 * Editing
+** iedit
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package iedit 
+      :ensure t)
+  #+END_SRC
 ** which-key
   #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package which-key
@@ -742,6 +802,11 @@
     (winum-mode))
 #+END_SRC
 * Other packages
+** hydra
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package hydra
+    :ensure t)
+#+END_SRC
 ** bind-map
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package bind-map
@@ -866,7 +931,7 @@ using customize
        (kbd "M-/") 'hippie-expand)
    #+END_SRC
 ** Leader map
-*** base map
+*** base maps
    #+BEGIN_SRC emacs-lisp :tangle yes
      (bind-map core-base-map
        :keys (core-emacs-leader-key)
@@ -894,8 +959,12 @@ using customize
         "d" 'dired
         "'" 'my-shell-toggle-main-shell
         "/" 'my-shell-toggle-buffer-local-shell))
+     (bind-map my/mode-leader-map
+       :evil-keys (core-evil-mode-leader-key)
+       :evil-keys (core-emacs-mode-leader-key)
+       :evil-states (normal motion visual)
+       :override-minor-modes t)
    #+END_SRC
-
 **** Errors
     #+BEGIN_SRC emacs-lisp :tangle yes
     (bind-map core-errors-map
@@ -1074,7 +1143,7 @@ using customize
          "G" 'vc-git-grep
          "a" 'counsel-ag
          "A" 'ag
-         "e" 'evil-iedit-state))
+         "e" 'evil-iedit-state/iedit-mode))
      #+END_SRC
 
 **** Git
@@ -1379,6 +1448,11 @@ y 'counsel-yank-pop
        (kbd "M-/") 'hippie-expand)
    #+END_SRC
 ** emacs-lisp-mode
+*** macrostep
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package macrostep
+        :ensure t)
+    #+END_SRC
 *** flycheck
    #+BEGIN_SRC emacs-lisp :tangle yes
      (with-eval-after-load 'emacs-lisp-mode
@@ -1398,7 +1472,41 @@ y 'counsel-yank-pop
       (company-mode 1)
      (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hooks)
    #+END_SRC
-
+*** keybindings 
+**** Hydras
+   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+END_SRC
+**** Evaling
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map elisp-eval-map
+        :keys ((core-keys-make-mode-prefix "e"))
+        :evil-keys ((core-keys-make-evil-mode-prefix "e"))
+        :major-modes (emacs-lisp-mode)
+        :evil-state (normal motion visual)
+        :prefix-cmd evaling
+        :bindings 
+        ("f" 'eval-defun
+         "$" 'lisp-state-eval-sexp-end-of-line
+         "b" 'eval-buffer
+         "e" 'eval-last-sexp
+         "f" 'eval-defun
+         "r" 'eval-region
+         ))
+    #+end_src
+**** Debugging 
+    #+begin_src emacs-lisp :tangle yes
+      (bind-map elisp-debug-map
+        :keys ((core-keys-make-mode-prefix "d"))
+        :evil-keys ((core-keys-make-evil-mode-prefix "d"))
+        :major-modes (emacs-lisp-mode)
+        :evil-state (normal motion visual)
+        :prefix-cmd debugging
+        :bindings 
+        ("F" 'spacemacs/edebug-instrument-defun-off
+         "f" 'edebug-defun
+         "t" 'spacemacs/elisp-toggle-debug-expr-and-eval-func
+         "m" 'macrostep-mode))
+  #+END_SRC
 ** c++-mode
 *** rtags
    #+BEGIN_SRC emacs-lisp :tangle yes
