@@ -17,9 +17,8 @@
   disable packages or configuration while still keeping it bundled with the mode
   it appleies to.
 
-* Initialize
-** package
-   Set up package repositories and load paths
+* Initialize package
+ We start by adding package repos and load paths and initialize package
    #+BEGIN_SRC emacs-lisp :tangle yes
      (require 'package)
      (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
@@ -29,32 +28,16 @@
        (normal-top-level-add-subdirs-to-load-path))
      (add-to-list 'load-path (concat user-emacs-directory "local/"))
      (package-initialize)
-     (unless (package-installed-p 'use-package)
-       (package-refresh-contents)
-       (package-install 'use-package))
-     (require 'use-package)
+#+END_SRC
+    Ensure some dependencies are installed. The packages use-package and bind-map are installed, these will be used to
+    manage packages and keybindings throughout the config.
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (require 'use-package)
+  (dolist (package '(dash use-package bind-map)) nil
+    (unless (package-installed-p package)
+      (package-refresh-contents)
+      (package-install package)))
    #+END_SRC
-
-** variables
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defvar core-evil-leader-key "SPC")
-     (defvar core-emacs-leader-key "C-c s")
-     (defvar core-evil-mode-leader-key ",")
-     (defvar core-emacs-mode-leader-key "C-c ,")
-   #+END_SRC
-
-** configuration helper functions
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun core-keys-make-prefix (key)
-       (concat core-emacs-leader-key " " key))
-     (defun core-keys-make-evil-prefix (key)
-       (concat core-evil-leader-key " " key))
-     (defun core-keys-make-mode-prefix (key)
-       (concat core-emacs-mode-leader-key " " key))
-     (defun core-keys-make-evil-mode-prefix (key)
-       (concat core-evil-mode-leader-key " " key))
-   #+END_SRC
-
 * Commands and functions
 ** from spacemacs
    This is a set of functions and commands copied from spacemacs
@@ -428,14 +411,13 @@
 * Evil
 ** evil
    #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package evil
-      :ensure t
-      :init
-      (setq evil-auto-indent nil)
-      (setq evil-want-integration nil)
-      (add-hook 'after-init-hook 'evil-mode)
-      :config
-  (evil-magit-init))
+     (use-package evil
+       :ensure t
+       :after evil-collection
+       :init
+       (add-hook 'after-init-hook 'evil-mode)
+       :config
+       (evil-magit-init))
    #+END_SRC
 
 ** evil-collection
@@ -443,7 +425,7 @@
      (use-package evil-collection
        :ensure t
        :init
-       :requires evil
+       (setq evil-want-integration nil)
        :config
        (evil-collection-init))
    #+END_SRC
@@ -751,7 +733,6 @@
    (use-package magit
    :ensure t)
 #+END_SRC
-
 ** projectile
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package projectile
@@ -842,9 +823,352 @@ using customize
     (setq custom-file path))
 #+END_SRC
 
+* Global keybindings
+** Variables
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defvar core-evil-leader-key "SPC")
+     (defvar core-emacs-leader-key "C-c s")
+     (defvar core-evil-mode-leader-key ",")
+     (defvar core-emacs-mode-leader-key "C-c ,")
+   #+END_SRC
+
+** Functions
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defun core-keys-make-prefix (key)
+       (concat core-emacs-leader-key " " key))
+     (defun core-keys-make-evil-prefix (key)
+       (concat core-evil-leader-key " " key))
+     (defun core-keys-make-mode-prefix (key)
+       (concat core-emacs-mode-leader-key " " key))
+     (defun core-keys-make-evil-mode-prefix (key)
+       (concat core-evil-mode-leader-key " " key))
+   #+END_SRC
+
+** Evil keys
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (evil-define-key '(insert normal visual) 'global-map
+       (kbd "M-/") 'hippie-expand)
+   #+END_SRC
+** Leader map
+*** base map
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (bind-map core-base-map
+       :keys (core-emacs-leader-key)
+       :evil-keys (core-evil-leader-key)
+       :evil-states (normal motion visual)
+       :override-minor-modes t
+       :bindings
+       ("0" 'winum-select-window-0-or-10
+        "1" 'winum-select-window-1
+        "2" 'winum-select-window-2
+        "3" 'winum-select-window-3
+        "4" 'winum-select-window-4
+        "5" 'winum-select-window-5
+        "6" 'winum-select-window-6
+        "7" 'winum-select-window-7
+        "8" 'winum-select-window-8
+        "9" 'winum-select-window-9
+        "!" 'shell-command
+        "v" 'er/expand-region
+        ";" 'evilnc-comment-operator
+        ":" 'evilnc-comment-and-copy-operator
+        "SPC" 'counsel-M-x
+        "TAB" 'spacemacs/alternate-buffer
+        "u" 'universal-argument
+        "d" 'dired
+        "'" 'my-shell-toggle-main-shell
+        "/" 'my-shell-toggle-buffer-local-shell))
+   #+END_SRC
+
+**** Errors
+    #+BEGIN_SRC emacs-lisp :tangle yes
+    (bind-map core-errors-map
+	  :keys ((core-keys-make-prefix "e"))
+	  :evil-keys ((core-keys-make-evil-prefix "e"))
+	  :evil-states (normal motion visual)
+	  :override-mode-name buffer-keys
+	  :prefix-cmd errors
+	  :bindings
+	  ("n" 'next-error
+	  "p" 'previous-error))
+ #+END_SRC
+
+**** Buffers
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-buffers-map
+	:keys ((core-keys-make-prefix "b"))
+	:evil-keys ((core-keys-make-evil-prefix "b"))
+	:evil-states (normal motion visual)
+	:prefix-cmd buffers
+	:bindings
+	("." 'spacemacs/buffer-transient-state/body
+	"1" 'buffer-to-window-1
+	"2" 'buffer-to-window-2
+	"3" 'buffer-to-window-3
+	"4" 'buffer-to-window-4
+	"5" 'buffer-to-window-5
+	"6" 'buffer-to-window-6
+	"7" 'buffer-to-window-7
+	"8" 'buffer-to-window-8
+	"9" 'buffer-to-window-9
+	"B" 'ibuffer
+	"N" 'spacemacs/new-empty-buffer
+	"P" 'spacemacs/copy-clipboard-to-whole-buffer
+	"R" 'spacemacs/safe-revert-buffer
+	"Y" 'spacemacs/copy-whole-buffer-to-clipboard
+	"b" 'switch-to-buffer
+	"d" 'spacemacs/kill-this-buffer
+	"e" 'spacemacs/safe-erase-buffer
+	"I" 'ibuffer
+	"m" 'spacemacs/kill-other-buffers
+	"n" 'next-buffer
+	"p" 'previous-buffer
+	"s" 'spacemacs/switch-to-scratch-buffer
+	"w" 'read-only-mode))
+    #+END_SRC
+
+**** Windows
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-windows-map
+        :keys ((core-keys-make-prefix "w"))
+        :evil-keys ((core-keys-make-evil-prefix "w"))
+        :evil-states (normal motion visual)
+        :prefix-cmd windows
+        :bindings
+        ("w" 'other-window
+         "o" 'other-frame
+         "s" 'split-window-below
+         "S" 'split-window-below-and-focus
+         "v" 'split-window-right
+         "V" 'split-window-right-and-focus
+         "=" 'balance-windows
+         "S" 'split-window-below-and-focus
+         "V" 'split-window-right-and-focus
+         "u" 'winner-undo
+         "U" 'winner-redo
+         "2" 'spacemacs/layout-double-columns
+         "3" 'spacemacs/layout-triple-columns
+         "_" 'spacemacs/maximize-horizontally
+         "b" 'spacemacs/switch-to-minibuffer-window
+         "d" 'spacemacs/delete-window
+         "D" 'delete-frame
+         "m" 'spacemacs/toggle-maximize-buffer
+         "r" 'spacemacs/rotate-windows-forward
+         "=" 'balance-windows
+         "F" 'make-frame
+         "h" 'evil-window-left
+         "j" 'evil-window-down
+         "k" 'evil-window-up
+         "l" 'evil-window-right
+         "H" 'evil-window-move-far-left
+         "J" 'evil-window-move-very-bottom
+         "K" 'evil-window-move-very-top
+         "L" 'evil-window-move-far-right
+         "<S-down>" 'evil-window-move-very-bottom
+         "<S-left>" 'evil-window-move-far-left
+         "<S-right>" 'evil-window-move-far-right
+         "<S-up>" 'evil-window-move-very-top
+         "<down>" 'evil-window-down
+         "<left>" 'evil-window-left
+         "<right>" 'evil-window-right
+         "<up>" 'evil-window-up))
+    #+END_SRC
+
+**** Files
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-files-map
+        :keys ((core-keys-make-prefix "f"))
+        :evil-keys ((core-keys-make-evil-prefix "f"))
+        :evil-states (normal motion visual)
+        :prefix-cmd file
+        :bindings
+        ("S" 'save-some-buffers
+         "b" 'counsel-bookmark
+         "g" 'rgrep
+         "j" 'dired-jump
+         "f" 'find-file
+         "l" 'find-file-literally
+         "r" 'counsel-recentf
+         "s" 'save-buffer
+         "y" 'spacemacs/show-and-copy-buffer-filename
+         "vd" 'add-dir-local-variable
+         "vf" 'add-file-local-variable
+         "vp" 'add-file-local-variable-prop-line))
+    #+END_SRC
+
+**** Compile/comment
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-compile-comment-map
+        :keys ((core-keys-make-prefix "c"))
+        :evil-keys ((core-keys-make-evil-prefix "c"))
+        :evil-states (normal motion visual)
+        :prefix-cmd compile-comment
+        :bindings
+        ("c" 'compile
+         "r" 'recompile
+         "k" 'kill-compilation
+         "l" 'my-comment-or-uncomment-region-or-line))
+    #+END_SRC
+
+**** Project
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-projectile-map
+        :keys ((core-keys-make-prefix "p"))
+        :evil-keys ((core-keys-make-evil-prefix "p"))
+        :evil-states (normal motion visual)
+        :prefix-cmd projectile
+        :bindings
+        ("SPC" 'counsel-projectile
+         "!" 'projectile-run-shell-command-in-root
+         "%" 'projectile-replace-regexp
+         "&" 'projectile-run-async-shell-command-in-root
+         "D" 'projectile-dired
+         "F" 'projectile-find-file-dwim
+         "G" 'projectile-regenerate-tags
+         "I" 'projectile-invalidate-cache
+         "R" 'projectile-replace
+         "T" 'projectile-test-project
+         "a" 'projectile-toggle-between-implementation-and-test
+         "b" 'counsel-projectile-switch-to-buffer
+         "c" 'projectile-compile-project
+         "d" 'counsel-projectile-find-dir
+         "e" 'projectile-edit-dir-locals
+         "f" 'counsel-projectile-find-file
+         "g" 'projectile-find-tag
+         "k" 'projectile-kill-buffers
+         "l" 'spacemacs/ivy-persp-switch-project
+         "o" 'org-projectile/goto-todos
+         "p" 'counsel-projectile-switch-project
+         "r" 'projectile-recentf
+         "v" 'projectile-vc))
+    #+END_SRC
+
+**** search
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map core-search-map
+         :keys ((core-keys-make-prefix "s"))
+         :evil-keys ((core-keys-make-evil-prefix "s"))
+         :evil-states (normal motion visual)
+         :prefix-cmd searching
+         :bindings
+         ("s" 'swiper
+         "K" 'ack'
+         "k" 'counsel-ack
+         "g" 'counsel-git-grep
+         "G" 'vc-git-grep
+         "a" 'counsel-ag
+         "A" 'ag
+         "e" 'evil-iedit-state))
+     #+END_SRC
+
+**** Git
+     #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map core-git-map
+      :keys ((core-keys-make-prefix "g"))
+      :evil-keys ((core-keys-make-evil-prefix "g"))
+      :evil-states (normal motion visual)
+      :prefix-cmd magit
+      :bindings
+      ("s" 'magit-status
+       "A" 'magit-cherry-pick-popup
+      "b" 'magit-branch-popup
+      "b" 'magit-bisect-popup
+      "c" 'magit-commit-popup
+      "d" 'magit-diff-popup
+      "f" 'magit-fetch-popup
+      "F" 'magit-pull-popup
+      "l" 'magit-log-popup
+      "P" 'magit-pushing-popup
+      "r" 'magit-rebase-popup
+      "t" magit-tag-popup
+      "T" magit-notes-popup
+      "_" 'magit-revert-popup
+      "O" 'magit-revert-popup
+      "z" 'magit-stash-popup
+      "!" 'magit-run-popup))
+     #+END_SRC
+
+***** git file
+  #+BEGIN_SRC emacs-lisp :tangle yes
+(bind-map core-magit-file-map
+  :keys ((concat core-emacs-leader-key " g f"))
+  :evil-keys ((concat core-evil-leader-key " g f"))
+  :evil-states (normal motion visual)
+  :prefix-cmd git-file
+  :bindings
+  ("f" 'magit-find-file
+  "d" 'magit-diff-buffer-file-popup
+  "f" 'magit-find-file
+  "l" 'magit-log-buffer-file))
+  #+END_SRC
+
+**** Jump/join
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map core-jump-join-map
+         :keys ((core-keys-make-prefix "j"))
+         :evil-keys ((core-keys-make-evil-prefix "j"))
+         :evil-states (normal motion visual)
+         :prefix-cmd jump-join
+         :bindings
+         ("D" 'dired-jump-other-window
+          "S" 'spacemacs/split-and-new-line
+          "d" 'dired-jump
+          "f" 'find-function
+          "i" 'imenu
+          "o" 'open-line
+          "q" 'dumb-jump-quick-look
+          "s" 'sp-split-sexp
+          "v" 'find-variablef
+          "b" 'avy-pop-mark
+          "j" 'evil-avy-goto-char-timer
+          "l" 'evil-avy-goto-line
+          "u" 'spacemacs/avy-goto-url
+          "w" 'evil-avy-goto-word-or-subword-1))
+     #+END_SRC
+
+**** insert
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map core-insert-map
+         :keys ((core-keys-make-prefix "i"))
+         :evil-keys ((core-keys-make-evil-prefix "i"))
+         :evil-states (normal motion visual)
+         :prefix-cmd inserting
+         :bindings
+         ("y" 'ivy-yasnippet))
+     #+END_SRC
+
+****  registers/rings/resume
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (bind-map core-insert-map
+         :keys ((core-keys-make-prefix "i"))
+         :evil-keys ((core-keys-make-evil-prefix "i"))
+         :evil-states (normal motion visual)
+         :prefix-cmd inserting
+         :bindings
+B 'switch-buffer-without-purpose
+D 'purpose-delete-non-dedicated-windows
+P 'purpose-set-window-purpose
+b 'purpose-switch-buffer-with-purpose
+d 'purpose-toggle-window-purpose-dedicated
+e 'spacemacs/ivy-evil-registers
+l 'ivy-resume
+m 'counsel-mark-ring
+p 'purpose-switch-buffer-with-some-purpose
+y 'counsel-yank-pop
+
+         ("y" 'ivy-yasnippet))
+
+     #+END_SRC
+** Prog-mode
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (evil-define-key '(normal visual) 'text-mode-map
+       ;; (kbd "TAB") 'indent-for-tab-command
+         "] e" 'move-text-down
+         "[ e" 'move-text-up
+         "M-/" 'hippie-expand)
+   #+END_SRC
+
 * Org
-** todos
-*** TODO eshell toggle
 ** variables
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq org-src-fontify-natively t)
@@ -859,136 +1183,136 @@ using customize
 
 ** keybindings
    #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map-for-major-mode org-mode
-         :keys (core-emacs-mode-leader-key)
-         :evil-keys (core-evil-mode-leader-key)
-         :evil-states (normal motion visual)
-         :override-minor-modes t
-         :bindings
-         ("<tab>" 'org-indent-block
-          " RET" 'org-ctrl-c-ret
-          "#" 'org-update-statistics-cookies
-          "'" 'org-edit-special
-          "g" 'org-ctrl-c-star
-          "," 'org-ctrl-c-ctrl-c
-          "-" 'org-ctrl-c-minus
-          "A" 'org-attach
-          "H" 'org-shiftleft
-          "J" 'org-shiftdown
-          "K" 'org-shiftup
-          "L" 'org-shiftright
-          "a" 'org-agenda
-          "c" 'org-capture
-          "C-S-h" 'org-shiftcontrolleft
-          "C-S-j" 'org-shiftcontroldown
-          "C-S-k" 'org-shiftcontrolup
-          "C-S-l" 'org-shiftcontrolright
-          "x b" 'spacemacs/org-bold
-          "x c" 'spacemacs/org-code
-          "x i" 'spacemacs/org-italic
-          "x o" 'org-open-at-point
-          "x r" 'spacemacs/org-clear
-          "x s" 'spacemacs/org-strike-through
-          "x u" 'spacemacs/org-underline
-          "x v" 'spacemacs/org-verbatim
-          "i H" 'org-insert-heading-after-current
-          "i K" 'spacemacs/insert-keybinding-org
-          "i d" 'org-insert-drawer
-          "i e" 'org-set-effort
-          "i f" 'org-footnote-new
-          "i h" 'org-insert-heading
-          "i l" 'org-insert-link
-          "i n" 'org-add-note
-          "i p" 'org-set-property
-          "i s" 'org-insert-subheading
-          "i t" 'org-set-tags
-          "M-RET" 'org-meta-return
-          "b ." 'spacemacs/org-babel-transient-state/body
-          "b I" 'org-babel-view-src-block-info
-          "b Z" 'org-babel-switch-to-session-with-code
-          "b a" 'org-babel-sha1-hash
-          "b b" 'org-babel-execute-src-block
-          "b B" 'org-babel-execute-buffer
-          "b c" 'org-babel-check-src-block
-          "b d" 'org-babel-demarcate-block
-          "b e" 'org-babel-execute-maybe
-          "b f" 'org-babel-tangle-file
-          "b g" 'org-babel-goto-named-src-block
-          "b i" 'org-babel-lob-ingest
-          "b j" 'org-babel-insert-header-arg
-          "b l" 'org-babel-load-in-session
-          "b n" 'org-babel-next-src-block
-          "b o" 'org-babel-open-src-block-result
-          "b p" 'org-babel-previous-src-block
-          "b r" 'org-babel-goto-named-result
-          "b s" 'org-babel-execute-subtree
-          "b t" 'org-babel-tangle
-          "b u" 'org-babel-goto-src-block-head
-          "b v" 'org-babel-expand-src-block
-          "b x" 'org-babel-do-key-sequence-in-edit-buffer
-          "b z" 'org-babel-switch-to-session
-          "s A" 'org-archive-subtree
-          "s N" 'widen
-          "s S" 'org-sort
-          "s a" 'org-toggle-archive-tag
-          "s b" 'org-tree-to-indirect-buffer
-          "s h" 'org-promote-subtree
-          "s j" 'org-move-subtree-down
-          "s k" 'org-move-subtree-up
-          "s l" 'org-demote-subtree
-          "s n" 'org-narrow-to-subtree
-          "s r" 'org-refile
-          "s s" 'org-sparse-tree
-          "T T" 'org-todo
-          "T V" 'space-doc-mode
-          "T c" 'org-toggle-checkbox
-          "T e" 'org-toggle-pretty-entities
-          "T i" 'org-toggle-inline-images
-          "T l" 'org-toggle-link-display
-          "T t" 'org-show-todo-tree
-          "T x" 'org-toggle-latex-fragment
-          "f i" 'org-feed-goto-inbox
-          "f u" 'org-feed-update-all
-          "e e" 'org-export-dispatch
-          "e m" 'org-mime-org-buffer-htmlize
-          "d T" 'org-time-stamp-inactive
-          "d d" 'org-deadline
-          "d s" 'org-schedule
-          "d t" 'org-time-stamp
-          "C c" 'org-clock-cancel
-          "C i" 'org-clock-in
-          "C o" 'org-clock-out
-          "C p" 'org-pomodoro
-          "C r" 'org-resolve-clocks
-          "t E" 'org-table-export
-          "t H" 'org-table-move-column-left
-          "t I" 'org-table-import
-          "t J" 'org-table-move-row-down
-          "t K" 'org-table-move-row-up
-          "t L" 'org-table-move-column-right
-          "t N" 'org-table-create-with-table.el
-          "t a" 'org-table-align
-          "t b" 'org-table-blank-field
-          "t c" 'org-table-convert
-          "t e" 'org-table-eval-formula
-          "t h" 'org-table-previous-field
-          "t j" 'org-table-next-row
-          "t l" 'org-table-next-field
-          "t n" 'org-table-create
-          "t p" 'org-plot/gnuplot
-          "t r" 'org-table-recalculate
-          "t s" 'org-table-sort-lines
-          "t w" 'org-table-wrap-region
-          "i D s" 'org-download-screenshot
-          "i D y" 'org-download-yank
-          "t t f" 'org-table-toggle-formula-debugger
-          "t t o" 'org-table-toggle-coordinate-overlays
-          "t i H" 'org-table-hline-and-move
-          "t i c" 'org-table-insert-column
-          "t i h" 'org-table-insert-hline
-          "t i r" 'org-table-insert-row
-          "t d c" 'org-table-delete-column
-          "t d r" 'org-table-kill-row))
+     (bind-map-for-major-mode org-mode
+       :keys (core-emacs-mode-leader-key)
+       :evil-keys (core-evil-mode-leader-key)
+       :evil-states (normal motion visual)
+       :override-minor-modes t
+       :bindings
+       ("<tab>" 'org-indent-block
+        " RET" 'org-ctrl-c-ret
+        "#" 'org-update-statistics-cookies
+        "'" 'org-edit-special
+        "g" 'org-ctrl-c-star
+        "," 'org-ctrl-c-ctrl-c
+        "-" 'org-ctrl-c-minus
+        "A" 'org-attach
+        "H" 'org-shiftleft
+        "J" 'org-shiftdown
+        "K" 'org-shiftup
+        "L" 'org-shiftright
+        "a" 'org-agenda
+        "c" 'org-capture
+        "C-S-h" 'org-shiftcontrolleft
+        "C-S-j" 'org-shiftcontroldown
+        "C-S-k" 'org-shiftcontrolup
+        "C-S-l" 'org-shiftcontrolright
+        "x b" 'spacemacs/org-bold
+        "x c" 'spacemacs/org-code
+        "x i" 'spacemacs/org-italic
+        "x o" 'org-open-at-point
+        "x r" 'spacemacs/org-clear
+        "x s" 'spacemacs/org-strike-through
+        "x u" 'spacemacs/org-underline
+        "x v" 'spacemacs/org-verbatim
+        "i H" 'org-insert-heading-after-current
+        "i K" 'spacemacs/insert-keybinding-org
+        "i d" 'org-insert-drawer
+        "i e" 'org-set-effort
+        "i f" 'org-footnote-new
+        "i h" 'org-insert-heading
+        "i l" 'org-insert-link
+        "i n" 'org-add-note
+        "i p" 'org-set-property
+        "i s" 'org-insert-subheading
+        "i t" 'org-set-tags
+        "M-RET" 'org-meta-return
+        "b ." 'spacemacs/org-babel-transient-state/body
+        "b I" 'org-babel-view-src-block-info
+        "b Z" 'org-babel-switch-to-session-with-code
+        "b a" 'org-babel-sha1-hash
+        "b b" 'org-babel-execute-src-block
+        "b B" 'org-babel-execute-buffer
+        "b c" 'org-babel-check-src-block
+        "b d" 'org-babel-demarcate-block
+        "b e" 'org-babel-execute-maybe
+        "b f" 'org-babel-tangle-file
+        "b g" 'org-babel-goto-named-src-block
+        "b i" 'org-babel-lob-ingest
+        "b j" 'org-babel-insert-header-arg
+        "b l" 'org-babel-load-in-session
+        "b n" 'org-babel-next-src-block
+        "b o" 'org-babel-open-src-block-result
+        "b p" 'org-babel-previous-src-block
+        "b r" 'org-babel-goto-named-result
+        "b s" 'org-babel-execute-subtree
+        "b t" 'org-babel-tangle
+        "b u" 'org-babel-goto-src-block-head
+        "b v" 'org-babel-expand-src-block
+        "b x" 'org-babel-do-key-sequence-in-edit-buffer
+        "b z" 'org-babel-switch-to-session
+        "s A" 'org-archive-subtree
+        "s N" 'widen
+        "s S" 'org-sort
+        "s a" 'org-toggle-archive-tag
+        "s b" 'org-tree-to-indirect-buffer
+        "s h" 'org-promote-subtree
+        "s j" 'org-move-subtree-down
+        "s k" 'org-move-subtree-up
+        "s l" 'org-demote-subtree
+        "s n" 'org-narrow-to-subtree
+        "s r" 'org-refile
+        "s s" 'org-sparse-tree
+        "T T" 'org-todo
+        "T V" 'space-doc-mode
+        "T c" 'org-toggle-checkbox
+        "T e" 'org-toggle-pretty-entities
+        "T i" 'org-toggle-inline-images
+        "T l" 'org-toggle-link-display
+        "T t" 'org-show-todo-tree
+        "T x" 'org-toggle-latex-fragment
+        "f i" 'org-feed-goto-inbox
+        "f u" 'org-feed-update-all
+        "e e" 'org-export-dispatch
+        "e m" 'org-mime-org-buffer-htmlize
+        "d T" 'org-time-stamp-inactive
+        "d d" 'org-deadline
+        "d s" 'org-schedule
+        "d t" 'org-time-stamp
+        "C c" 'org-clock-cancel
+        "C i" 'org-clock-in
+        "C o" 'org-clock-out
+        "C p" 'org-pomodoro
+        "C r" 'org-resolve-clocks
+        "t E" 'org-table-export
+        "t H" 'org-table-move-column-left
+        "t I" 'org-table-import
+        "t J" 'org-table-move-row-down
+        "t K" 'org-table-move-row-up
+        "t L" 'org-table-move-column-right
+        "t N" 'org-table-create-with-table.el
+        "t a" 'org-table-align
+        "t b" 'org-table-blank-field
+        "t c" 'org-table-convert
+        "t e" 'org-table-eval-formula
+        "t h" 'org-table-previous-field
+        "t j" 'org-table-next-row
+        "t l" 'org-table-next-field
+        "t n" 'org-table-create
+        "t p" 'org-plot/gnuplot
+        "t r" 'org-table-recalculate
+        "t s" 'org-table-sort-lines
+        "t w" 'org-table-wrap-region
+        "i D s" 'org-download-screenshot
+        "i D y" 'org-download-yank
+        "t t f" 'org-table-toggle-formula-debugger
+        "t t o" 'org-table-toggle-coordinate-overlays
+        "t i H" 'org-table-hline-and-move
+        "t i c" 'org-table-insert-column
+        "t i h" 'org-table-insert-hline
+        "t i r" 'org-table-insert-row
+        "t d c" 'org-table-delete-column
+        "t d r" 'org-table-kill-row))
 
    #+END_SRC
 
@@ -1096,342 +1420,6 @@ Which is defined below
     (company-mode)
     (add-to-list 'company-backends 'company-rtags))
 #+END_SRC
-
-* Keybindings
-** global
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (evil-define-key '(insert normal visual) 'global-map
-         (kbd "M-/") 'hippie-expand)
-   #+END_SRC
-** Leader map
-*** base map
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (bind-map core-base-map
-       :keys (core-emacs-leader-key)
-       :evil-keys (core-evil-leader-key)
-       :evil-states (normal motion visual)
-       :override-minor-modes t
-       :bindings
-       
-       (
-   #+END_SRC
-   from winum mode
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     "0" 'winum-select-window-0-or-10
-     "1" 'winum-select-window-1
-     "2" 'winum-select-window-2
-     "3" 'winum-select-window-3
-     "4" 'winum-select-window-4
-     "5" 'winum-select-window-5
-     "6" 'winum-select-window-6
-     "7" 'winum-select-window-7
-     "8" 'winum-select-window-8
-     "9" 'winum-select-window-9
-     "!" 'shell-command
-   #+END_SRC
-   from expand-region
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     "v" 'er/expand-region
-     ";" 'evilnc-comment-operator
-     ":" 'evilnc-comment-and-copy-operator
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     "SPC" 'counsel-M-x
-     "TAB" 'spacemacs/alternate-buffer
-     "u" 'universal-argument
-     "d" 'dired
-     "'" 'my-shell-toggle-main-shell
-     "/" 'my-shell-toggle-buffer-local-shell))
-   #+END_SRC
-
-*** Errors
-    #+BEGIN_SRC emacs-lisp :tangle yes
-    (bind-map core-errors-map
-	  :keys ((core-keys-make-prefix "e"))
-	  :evil-keys ((core-keys-make-evil-prefix "e"))
-	  :evil-states (normal motion visual)
-	  :override-mode-name buffer-keys
-	  :prefix-cmd errors
-	  :bindings
-	  ("n" 'next-error
-	  "p" 'previous-error))
- #+END_SRC
-
-*** Buffers
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-buffers-map
-	:keys ((core-keys-make-prefix "b"))
-	:evil-keys ((core-keys-make-evil-prefix "b"))
-	:evil-states (normal motion visual)
-	:prefix-cmd buffers
-	:bindings
-	("." 'spacemacs/buffer-transient-state/body
-	"1" 'buffer-to-window-1
-	"2" 'buffer-to-window-2
-	"3" 'buffer-to-window-3
-	"4" 'buffer-to-window-4
-	"5" 'buffer-to-window-5
-	"6" 'buffer-to-window-6
-	"7" 'buffer-to-window-7
-	"8" 'buffer-to-window-8
-	"9" 'buffer-to-window-9
-	"B" 'ibuffer
-	"N" 'spacemacs/new-empty-buffer
-	"P" 'spacemacs/copy-clipboard-to-whole-buffer
-	"R" 'spacemacs/safe-revert-buffer
-	"Y" 'spacemacs/copy-whole-buffer-to-clipboard
-	"b" 'switch-to-buffer
-	"d" 'spacemacs/kill-this-buffer
-	"e" 'spacemacs/safe-erase-buffer
-	"I" 'ibuffer
-	"m" 'spacemacs/kill-other-buffers
-	"n" 'next-buffer
-	"p" 'previous-buffer
-	"s" 'spacemacs/switch-to-scratch-buffer
-	"w" 'read-only-mode))
-    #+END_SRC
-
-*** Windows
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-windows-map
-        :keys ((core-keys-make-prefix "w"))
-        :evil-keys ((core-keys-make-evil-prefix "w"))
-        :evil-states (normal motion visual)
-        :prefix-cmd windows
-        :bindings
-        ("w" 'other-window
-         "o" 'other-frame
-         "s" 'split-window-below
-         "S" 'split-window-below-and-focus
-         "v" 'split-window-right
-         "V" 'split-window-right-and-focus
-         "=" 'balance-windows
-         "S" 'split-window-below-and-focus
-         "V" 'split-window-right-and-focus
-         "u" 'winner-undo
-         "U" 'winner-redo
-         "2" 'spacemacs/layout-double-columns
-         "3" 'spacemacs/layout-triple-columns
-         "_" 'spacemacs/maximize-horizontally
-         "b" 'spacemacs/switch-to-minibuffer-window
-         "d" 'spacemacs/delete-window
-         "D" 'delete-frame
-         "m" 'spacemacs/toggle-maximize-buffer
-         "r" 'spacemacs/rotate-windows-forward
-         "=" 'balance-windows
-         "F" 'make-frame
-         "h" 'evil-window-left
-         "j" 'evil-window-down
-         "k" 'evil-window-up
-         "l" 'evil-window-right
-         "H" 'evil-window-move-far-left
-         "J" 'evil-window-move-very-bottom
-         "K" 'evil-window-move-very-top
-         "L" 'evil-window-move-far-right
-         "<S-down>" 'evil-window-move-very-bottom
-         "<S-left>" 'evil-window-move-far-left
-         "<S-right>" 'evil-window-move-far-right
-         "<S-up>" 'evil-window-move-very-top
-         "<down>" 'evil-window-down
-         "<left>" 'evil-window-left
-         "<right>" 'evil-window-right
-         "<up>" 'evil-window-up))
-    #+END_SRC
-
-*** Files
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-files-map
-	:keys ((core-keys-make-prefix "f"))
-	:evil-keys ((core-keys-make-evil-prefix "f"))
-	:evil-states (normal motion visual)
-	:prefix-cmd file
-	:bindings
-	("S" 'save-some-buffers
-	 "b" 'counsel-bookmark
-	 "g" 'rgrep
-	 "j" 'dired-jump
-	 "f" 'find-file
-	 "l" 'find-file-literally
-	 "r" 'counsel-recentf
-	 "s" 'save-buffer
-	 "y" 'spacemacs/show-and-copy-buffer-filename
-	 "vd" 'add-dir-local-variable
-	 "vf" 'add-file-local-variable
-	 "vp" 'add-file-local-variable-prop-line))
-    #+END_SRC
-
-*** Compile/comment
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-compile-comment-map
-	    :keys ((core-keys-make-prefix "c"))
-	    :evil-keys ((core-keys-make-evil-prefix "c"))
-	    :evil-states (normal motion visual)
-	    :prefix-cmd compile-comment
-	    :bindings
-      (      "c" 'compile
-	    "r" 'recompile
-	    "k" 'kill-compilation
-	    "l" 'my-comment-or-uncomment-region-or-line))
-    #+END_SRC
-
-*** Project
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-projectile-map
-	:keys ((core-keys-make-prefix "p"))
-	:evil-keys ((core-keys-make-evil-prefix "p"))
-	:evil-states (normal motion visual)
-	:prefix-cmd projectile
-	:bindings
-	("SPC" 'counsel-projectile
-	 "!" 'projectile-run-shell-command-in-root
-	 "%" 'projectile-replace-regexp
-	 "&" 'projectile-run-async-shell-command-in-root
-	 "D" 'projectile-dired
-	 "F" 'projectile-find-file-dwim
-	 "G" 'projectile-regenerate-tags
-	 "I" 'projectile-invalidate-cache
-	 "R" 'projectile-replace
-	 "T" 'projectile-test-project
-	 "a" 'projectile-toggle-between-implementation-and-test
-	 "b" 'counsel-projectile-switch-to-buffer
-	 "c" 'projectile-compile-project
-	 "d" 'counsel-projectile-find-dir
-	 "e" 'projectile-edit-dir-locals
-	 "f" 'counsel-projectile-find-file
-	 "g" 'projectile-find-tag
-	 "k" 'projectile-kill-buffers
-	 "l" 'spacemacs/ivy-persp-switch-project
-	 "o" 'org-projectile/goto-todos
-	 "p" 'counsel-projectile-switch-project
-	 "r" 'projectile-recentf
-	 "v" 'projectile-vc))
-    #+END_SRC
-
-*** search
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map core-search-map
-         :keys ((core-keys-make-prefix "s"))
-         :evil-keys ((core-keys-make-evil-prefix "s"))
-         :evil-states (normal motion visual)
-         :prefix-cmd searching
-         :bindings
-         ("s" 'swiper
-         "K" 'ack'
-         "k" 'counsel-ack
-         "g" 'counsel-git-grep
-         "G" 'vc-git-grep
-         "a" 'counsel-ag
-         "A" 'ag
-         "e" 'evil-iedit-state))
-     #+END_SRC
-
-*** Git
-     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-git-map
-      :keys ((core-keys-make-prefix "g"))
-      :evil-keys ((core-keys-make-evil-prefix "g"))
-      :evil-states (normal motion visual)
-      :prefix-cmd magit
-      :bindings
-      ("s" 'magit-status
-       "A" 'magit-cherry-pick-popup
-      "b" 'magit-branch-popup
-      "b" 'magit-bisect-popup
-      "c" 'magit-commit-popup
-      "d" 'magit-diff-popup
-      "f" 'magit-fetch-popup
-      "F" 'magit-pull-popup
-      "l" 'magit-log-popup
-      "P" 'magit-pushing-popup
-      "r" 'magit-rebase-popup
-      "t" magit-tag-popup
-      "T" magit-notes-popup
-      "_" 'magit-revert-popup
-      "O" 'magit-revert-popup
-      "z" 'magit-stash-popup
-      "!" 'magit-run-popup))
-     #+END_SRC
-
-***** git file
-  #+BEGIN_SRC emacs-lisp :tangle yes
-(bind-map core-magit-file-map
-  :keys ((concat core-emacs-leader-key " g f"))
-  :evil-keys ((concat core-evil-leader-key " g f"))
-  :evil-states (normal motion visual)
-  :prefix-cmd git-file
-  :bindings
-  ("f" 'magit-find-file
-  "d" 'magit-diff-buffer-file-popup
-  "f" 'magit-find-file
-  "l" 'magit-log-buffer-file))
-  #+END_SRC
-
-*** Jump/join
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map core-jump-join-map
-         :keys ((core-keys-make-prefix "j"))
-         :evil-keys ((core-keys-make-evil-prefix "j"))
-         :evil-states (normal motion visual)
-         :prefix-cmd jump-join
-         :bindings
-         ("D" 'dired-jump-other-window
-          "S" 'spacemacs/split-and-new-line
-          "d" 'dired-jump
-          "f" 'find-function
-          "i" 'imenu
-          "o" 'open-line
-          "q" 'dumb-jump-quick-look
-          "s" 'sp-split-sexp
-          "v" 'find-variablef
-          "b" 'avy-pop-mark
-          "j" 'evil-avy-goto-char-timer
-          "l" 'evil-avy-goto-line
-          "u" 'spacemacs/avy-goto-url
-          "w" 'evil-avy-goto-word-or-subword-1))
-     #+END_SRC
-
-*** insert
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map core-insert-map
-         :keys ((core-keys-make-prefix "i"))
-         :evil-keys ((core-keys-make-evil-prefix "i"))
-         :evil-states (normal motion visual)
-         :prefix-cmd inserting
-         :bindings
-         ("y" 'ivy-yasnippet))
-     #+END_SRC
-
-***  registers/rings/resume
-     #+BEGIN_SRC emacs-lisp :tangle no
-       (bind-map core-insert-map
-         :keys ((core-keys-make-prefix "i"))
-         :evil-keys ((core-keys-make-evil-prefix "i"))
-         :evil-states (normal motion visual)
-         :prefix-cmd inserting
-         :bindings
-B 'switch-buffer-without-purpose
-D 'purpose-delete-non-dedicated-windows
-P 'purpose-set-window-purpose
-b 'purpose-switch-buffer-with-purpose
-d 'purpose-toggle-window-purpose-dedicated
-e 'spacemacs/ivy-evil-registers
-l 'ivy-resume
-m 'counsel-mark-ring
-p 'purpose-switch-buffer-with-some-purpose
-y 'counsel-yank-pop
-
-         ("y" 'ivy-yasnippet))
-
-     #+END_SRC
-** Prog-mode
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (evil-define-key '(normal visual) 'text-mode-map
-       ;; (kbd "TAB") 'indent-for-tab-command
-         "] e" 'move-text-down
-         "[ e" 'move-text-up
-         "M-/" 'hippie-expand)
-   #+END_SRC
 
 * Todos
 ** TODO ivy resume bindings
