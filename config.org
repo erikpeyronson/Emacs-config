@@ -525,7 +525,7 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-iedit-state
        	:ensure t
-       	:requires evil iedit)
+       	:requires (evil iedit))
     #+END_SRC
 *** evil-escape
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -670,7 +670,7 @@
   (use-package expand-region
     :ensure t)
 #+END_SRC
-
+    
 *** evil-multiple-cursors
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-mc
@@ -679,6 +679,37 @@
        	:config
        	(evil-mc-mode))
     #+END_SRC
+** visual
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package idle-highlight-mode
+     :ensure t
+     :config
+     ;; (add-hook 'prog-mode-hook 'idle-highlight-mode)
+     )
+
+     (use-package hl-anything 
+       :ensure t
+       :config
+       )
+     (use-package hl-indent          
+       :ensure t
+       :config
+       (add-hook 'prog-mode-hook 'hl-indent)
+       )
+     (use-package hl-sentence        
+       :ensure t
+       )
+     (use-package hl-todo            
+       :ensure t
+       :config
+       (global-hl-todo-mode)
+       )
+     (use-package rainbow-delimiters
+       :ensure t
+       :config
+       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+       )
+ #+END_SRC  
 ** completion
 *** yasnippet
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1011,6 +1042,7 @@ using customize
          "b" 'counsel-bookmark
          "g" 'rgrep
          "j" 'dired-jump
+         "J" 'dired-jump-other-window
          "f" 'find-file
          "l" 'find-file-literally
          "r" 'counsel-recentf
@@ -1145,7 +1177,7 @@ using customize
          "s" 'sp-split-sexp
          "v" 'find-variablef
          "b" 'avy-pop-mark
-         "j" 'my/imenu
+         "j" 'evil-avy-goto-char-timer
          "l" 'evil-avy-goto-line
          "u" 'spacemacs/avy-goto-url
          "w" 'evil-avy-goto-word-or-subword-1))
@@ -1387,7 +1419,7 @@ y 'counsel-yank-pop
    #+END_SRC
 ** hooks
   #+BEGIN_SRC emacs-lisp :tangle yes
-    (defun my-prog-mode-hooks ()
+    (defun my/prog-mode-hooks ()
       (add-hook 'local-write-file-hook 'my/remove-trailing-whitespace)
       (linum-mode))
     (add-hook 'prog-mode-hook 'my/prog-mode-hooks)
