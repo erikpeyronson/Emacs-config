@@ -413,19 +413,19 @@
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil
        :ensure t
-       :after evil-collection
        :init
-       (add-hook 'after-init-hook 'evil-mode)
+       (setq evil-want-integration nil)
        :config
-       (evil-magit-init))
+       (evil-mode 1)
+       ;; (evil-magit-init)
+       )
    #+END_SRC
 
 ** evil-collection
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil-collection
        :ensure t
-       :init
-       (setq evil-want-integration nil)
+       :after evil
        :config
        (evil-collection-init))
    #+END_SRC
@@ -481,10 +481,10 @@
 ** evil-magit
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package evil-magit
-          :ensure t
-           :requires (evil magit)
-           :init
-           (add-hook 'evil-mode-hook 'evil-magit-init))
+       :ensure t
+       :init
+       :config
+       (evil-magit-init))
    #+END_SRC
 
 ** evil-unimpaired
@@ -504,6 +504,12 @@
        :config (evil-rsi-mode 1))
    #+END_SRC
 
+** org-evil
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package org-evil
+        :ensure t
+        :requires evil)
+   #+END_SRC
 * Ivy
 ** ivy
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1172,13 +1178,6 @@ y 'counsel-yank-pop
 ** variables
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq org-src-fontify-natively t)
-   #+END_SRC
-
-** org-evil
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package org-evil
-        :ensure t
-        :requires evil org)
    #+END_SRC
 
 ** keybindings
