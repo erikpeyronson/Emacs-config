@@ -19,7 +19,7 @@
 
 * initialize package
  We start by adding package repos and load paths and initialize package
-   #+BEGIN_SRC emacs-lisp :tangle yes
+#+BEGIN_SRC emacs-lisp :tangle yes
      (require 'package)
      (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
      (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
@@ -1125,6 +1125,15 @@
     :ensure t)
 #+END_SRC
 
+*** link-hint
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package link-hint
+        :ensure t
+        :bind
+        (:map
+         my/jump-join-map
+         ("h" . link-hint)))
+    #+END_SRC
 ** windows and buffers
 *** winum-mode
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2327,7 +2336,7 @@ my/projectile-map
        (company-mode))
      (add-hook 'c++-mode-hook 'my/c++-company-setup)
    #+END_SRC
-** google-c-style
+*** google-c-style
   #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package google-c-style
         :ensure t
@@ -2335,7 +2344,7 @@ my/projectile-map
        (add-hook 'c++-mode-hook 'google-set-c-style))
 #+END_SRC
 
-** clang-format
+*** clang-format
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package clang-format
        	:ensure t
