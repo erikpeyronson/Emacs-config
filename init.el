@@ -1,6 +1,7 @@
 ;; init.el --- Emacs init-file
 
 ;; Code:
+(package-initialize)
 (require 'org)
 
 (defvar my-config-file (expand-file-name "config.org"
@@ -8,7 +9,6 @@
   "path to org file expanded using babel and evaluated at startup")
 
 (org-babel-load-file my-config-file)
-(package-initialize)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
