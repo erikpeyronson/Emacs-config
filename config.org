@@ -412,14 +412,14 @@
          (read-file-name "dir:" )))
    #+END_SRC
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun core-keys-make-prefix (key)
-       (concat core-emacs-leader-key " " key))
-     (defun core-keys-make-evil-prefix (key)
-       (concat core-evil-leader-key " " key))
-     (defun core-keys-make-mode-prefix (key)
-       (concat core-emacs-mode-leader-key " " key))
-     (defun core-keys-make-evil-mode-prefix (key)
-       (concat core-evil-mode-leader-key " " key))
+     (defun my/make-emacs-prefix (key)
+       (concat my/emacs-leader-key " " key))
+     (defun my/make-evil-prefix (key)
+       (concat my/evil-leader-key " " key))
+     (defun my/make-emacs-mode-prefix (key)
+       (concat my/emacs-mode-leader-key " " key))
+     (defun my/make-evil-mode-prefix (key)
+       (concat my/evil-mode-leader-key " " key))
    #+END_SRC
 *** search
     #+BEGIN_SRC emacs-lisp :tangle no
@@ -485,10 +485,10 @@
    #+END_SRC
 ** vars
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defvar core-evil-leader-key "SPC")
-     (defvar core-emacs-leader-key "C-c s")
-     (defvar core-evil-mode-leader-key ",")
-     (defvar core-emacs-mode-leader-key "C-c ,")
+     (defvar my/evil-leader-key "SPC")
+     (defvar my/emacs-leader-key "C-c s")
+     (defvar my/evil-mode-leader-key ",")
+     (defvar my/emacs-mode-leader-key "C-c ,")
      (defvar-local my/imenu-function 'imenu
        "Function called interactively by `my/imenu'")
    #+END_SRC
@@ -496,9 +496,9 @@
 ** keys
 *** leader
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (bind-map core-base-map
-       :keys (core-emacs-leader-key)
-       :evil-keys (core-evil-leader-key)
+     (bind-map my/base-map
+       :keys (my/emacs-leader-key)
+       :evil-keys (my/evil-leader-key)
        :evil-states (normal motion visual)
        :override-minor-modes t
        :bindings
@@ -523,16 +523,16 @@
         "'" 'my/main-shell
         "/" 'my/buffer-shell))
      (bind-map my/mode-leader-map
-       :evil-keys (core-evil-mode-leader-key)
-       :evil-keys (core-emacs-mode-leader-key)
+       :evil-keys (my/evil-mode-leader-key)
+       :evil-keys (my/emacs-mode-leader-key)
        :evil-states (normal motion visual)
        :override-minor-modes t)
    #+END_SRC
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-errors-map
-            :keys ((core-keys-make-prefix "e"))
-            :evil-keys ((core-keys-make-evil-prefix "e"))
+      (bind-map my/errors-map
+            :keys ((my/make-emacs-prefix "e"))
+            :evil-keys ((my/make-evil-prefix "e"))
             :evil-states (normal motion visual)
             :override-mode-name buffer-keys
             :prefix-cmd errors
@@ -543,9 +543,9 @@
 
 *** buffers
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-buffers-map
-	:keys ((core-keys-make-prefix "b"))
-	:evil-keys ((core-keys-make-evil-prefix "b"))
+      (bind-map my/buffers-map
+	:keys ((my/make-emacs-prefix "b"))
+	:evil-keys ((my/make-evil-prefix "b"))
 	:evil-states (normal motion visual)
 	:prefix-cmd buffers
 	:bindings
@@ -577,9 +577,9 @@
 
 *** Windows
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-windows-map
-        :keys ((core-keys-make-prefix "w"))
-        :evil-keys ((core-keys-make-evil-prefix "w"))
+      (bind-map my/windows-map
+        :keys ((my/make-emacs-prefix "w"))
+        :evil-keys ((my/make-evil-prefix "w"))
         :evil-states (normal motion visual)
         :prefix-cmd windows
         :bindings
@@ -624,9 +624,9 @@
 
 *** Files
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-files-map
-        :keys ((core-keys-make-prefix "f"))
-        :evil-keys ((core-keys-make-evil-prefix "f"))
+      (bind-map my/files-map
+        :keys ((my/make-emacs-prefix "f"))
+        :evil-keys ((my/make-evil-prefix "f"))
         :evil-states (normal motion visual)
         :prefix-cmd file
         :bindings
@@ -647,9 +647,9 @@
 
 *** compile/comment
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (bind-map core-compile-comment-map
-       :keys ((core-keys-make-prefix "c"))
-       :evil-keys ((core-keys-make-evil-prefix "c"))
+     (bind-map my/compile-comment-map
+       :keys ((my/make-emacs-prefix "c"))
+       :evil-keys ((my/make-evil-prefix "c"))
        :evil-states (normal motion visual)
        :prefix-cmd compile-comment
        :bindings
@@ -661,9 +661,9 @@
 
 *** Project
    #+BEGIN_SRC emacs-lisp :tangle yes
-          (bind-map core-projectile-map
-            :keys ((core-keys-make-prefix "p"))
-            :evil-keys ((core-keys-make-evil-prefix "p"))
+          (bind-map my/projectile-map
+            :keys ((my/make-emacs-prefix "p"))
+            :evil-keys ((my/make-evil-prefix "p"))
             :evil-states (normal motion visual)
             :prefix-cmd projectile
             :bindings
@@ -689,9 +689,9 @@
 
 *** search
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-search-map
-        :keys ((core-keys-make-prefix "s"))
-        :evil-keys ((core-keys-make-evil-prefix "s"))
+      (bind-map my/search-map
+        :keys ((my/make-emacs-prefix "s"))
+        :evil-keys ((my/make-evil-prefix "s"))
         :evil-states (normal motion visual)
         :prefix-cmd search/symbol
         :bindings
@@ -700,26 +700,26 @@
 
 *** git
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-git-map
-        :keys ((core-keys-make-prefix "g"))
-        :evil-keys ((core-keys-make-evil-prefix "g"))
+      (bind-map my/git-map
+        :keys ((my/make-emacs-prefix "g"))
+        :evil-keys ((my/make-evil-prefix "g"))
         :evil-states (normal motion visual)
-        :prefix-cmd magit)
+        :prefix-cmd git)
     #+end_src
 **** git file
     #+begin_src emacs-lisp :tangle yes
-      (bind-map core-git-file-map
-        :keys ((concat core-emacs-leader-key " g f"))
-        :evil-keys ((concat core-evil-leader-key " g f"))
+      (bind-map my/git-file-map
+        :keys ((concat my/emacs-leader-key " g f"))
+        :evil-keys ((concat my/evil-leader-key " g f"))
         :evil-states (normal motion visual)
         :prefix-cmd git-file)
     #+END_SRC
 
 *** Jump/join
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-jump-join-map
-        :keys ((core-keys-make-prefix "j"))
-        :evil-keys ((core-keys-make-evil-prefix "j"))
+      (bind-map my/jump-join-map
+        :keys ((my/make-emacs-prefix "j"))
+        :evil-keys ((my/make-evil-prefix "j"))
         :evil-states (normal motion visual)
         :prefix-cmd jump-join
         :bindings
@@ -737,18 +737,18 @@
 
 *** insert
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map core-insert-map
-        :keys ((core-keys-make-prefix "i"))
-        :evil-keys ((core-keys-make-evil-prefix "i"))
+      (bind-map my/insert-map
+        :keys ((my/make-emacs-prefix "i"))
+        :evil-keys ((my/make-evil-prefix "i"))
         :evil-states (normal motion visual)
         :prefix-cmd inserting)
     #+END_SRC
 
 *** text 
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map core-text-map
-         :keys ((core-keys-make-prefix "x"))
-         :evil-keys ((core-keys-make-evil-prefix "x"))
+       (bind-map my/text-map
+         :keys ((my/make-emacs-prefix "x"))
+         :evil-keys ((my/make-evil-prefix "x"))
          :evil-states (normal motion visual)
          :prefix-cmd text
          :bindings
@@ -827,6 +827,14 @@
 
 
      #+END_SRC
+***  registers/rings/resume
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map my/reg-ring-resume-map
+         :keys ((my/make-emacs-prefix "r"))
+         :evil-keys ((my/make-evil-prefix "r"))
+         :evil-states (normal motion visual)
+         :prefix-cmd regs-rings-resume)
+    #+END_SRC
 ** evil
 *** evil
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -835,20 +843,17 @@
        	:init
        	(setq evil-want-integration nil)
        	:config
-       	(evil-mode 1)
-       	;; (evil-magit-init)
-       	)
+       	(evil-mode 1))
     #+END_SRC
 *** evil-collection
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-collection
+        :after evil
         :ensure t
         :bind
-        (:map
-         jump-join
-         ("j" . evil-avy-goto-char-timer)
-         ("l" . evil-avy-goto-line)
-         ("w" . evil-avy-goto-word-or-subword-1))
+        (:map jump-join ("j" . evil-avy-goto-char-timer) ("l"
+         . evil-avy-goto-line) ("w"
+         . evil-avy-goto-word-or-subword-1))
         :config
         (evil-collection-init))
     #+END_SRC
@@ -865,8 +870,7 @@
       (use-package evil-iedit-state
         :ensure t
         :bind
-        (:map core-search-map
-              ("e" . evil-iedit-state/iedit-mode)))
+        (:map my/search-map ("e" . evil-iedit-state/iedit-mode)))
     #+END_SRC
 *** evil-escape
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -927,8 +931,8 @@
     #+END_SRC
 *** keybindings
   #+BEGIN_SRC emacs-lisp :tangle yes
-  (evil-define-key '(insert normal visual) 'global-map
-    (kbd "M-/") 'hippie-expand)
+  (evil-define-key '(insert normal visual) 'global-map (kbd "M-/")
+    'hippie-expand)
   #+END_SRC  
 ** ivy
 *** ivy
@@ -936,16 +940,12 @@
      (use-package ivy
        :ensure t
        :bind 
-       (:map
-        ivy-minibuffer-map 
-        (" " . ivy-alt-done)
-        ("C-j" . ivy-next-line)
-        ("C-k" . ivy-previous-line)
-        ("C-h" . 'ivy-backward-delete-char)
-        :map core-reg-ring-resume-map
-        ("m" . counsel-mark-ring)
-        ("y" . counsel-yank-pop))
-        ("l" . ivy-resume)
+       (:map ivy-minibuffer-map (" " . ivy-alt-done) ("C-j"
+        . ivy-next-line) ("C-k" . ivy-previous-line) ("C-h"
+        . 'ivy-backward-delete-char)
+        :map my/reg-ring-resume-map
+        ("m" . counsel-mark-ring) ("y" . counsel-yank-pop)) ("l"
+        . ivy-resume)
        :init
        (add-hook 'after-init-hook 'ivy-mode)
        :config
@@ -958,8 +958,7 @@
       (use-package ivy-yasnippet
         :ensure t
         :bind 
-        (:map core-insert-map
-              ("y" . ivy-yasnippet)))
+        (:map my/insert-map ("y" . ivy-yasnippet)))
     #+END_SRC
 *** ivy-hydra
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -973,17 +972,10 @@
      (use-package counsel
        :ensure t
        :bind 
-       (:map
-        core-search-map
-        ("k" . counsel-ack)
-        ("g" . counsel-git-grep)
-        ("s" . swiper)
-        ("K" . ack)
-        ("k" . counsel-ack)
-        ("g" . counsel-git-grep)
-        ("G" . vc-git-grep)
-        ("a" . counsel-ag)
-        ("A" . ag))
+       (:map my/search-map ("k" . counsel-ack) ("g"
+        . counsel-git-grep) ("s" . swiper) ("K" . ack) ("k"
+        . counsel-ack) ("g" . counsel-git-grep) ("G" . vc-git-grep)
+        ("a" . counsel-ag) ("A" . ag))
         :config
         (counsel-mode))
    #+END_SRC
@@ -1036,36 +1028,27 @@
      :config
      (setq highlight-symbol-color "white")
 
-     (face-spec-set
-      'highlight-symbol-face
-      '((t :foreground "#eee8d5"))
-      'face-override-spec))
+     (face-spec-set 'highlight-symbol-face '((t :foreground
+      "#eee8d5")) 'face-override-spec))
  #+end_src
  
  #+begin_src emacs-lisp :tangle no
 
-   (use-package hl-anything 
+   (use-package hl-anything
      :ensure t
      :config
-     )
-   (use-package hl-indent          
+     ) (use-package hl-indent
      :ensure t
      :config
-     (add-hook 'prog-mode-hook 'hl-indent)
-     )
-   (use-package hl-sentence        
+     (add-hook 'prog-mode-hook 'hl-indent) ) (use-package hl-sentence
      :ensure t
-     )
-   (use-package hl-todo            
+     ) (use-package hl-todo
      :ensure t
      :config
-     (global-hl-todo-mode)
-     )
-   (use-package rainbow-delimiters
+     (global-hl-todo-mode) ) (use-package rainbow-delimiters
      :ensure t
      :config
-     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-     )
+     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode) )
  #+END_SRC  
 ** completion
 *** yasnippet
@@ -1074,12 +1057,12 @@
         :ensure t
         :defer t
         :init
-        (add-hook 'prog-mode-hook 'yas-minor-mode)
-        (add-hook 'org-mode-hook 'yas-minor-mode)
+        (add-hook 'prog-mode-hook 'yas-minor-mode) (add-hook
+        'org-mode-hook 'yas-minor-mode)
         :config
-        (add-to-list 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
-        (yas-reload-all))
-    (use-package yasnippet-snippets
+        (add-to-list 'hippie-expand-try-functions-list
+        'yas-hippie-try-expand) (yas-reload-all)) (use-package
+        yasnippet-snippets
         :ensure t
         :requires yasnippet)
 #+END_SRC
@@ -1089,27 +1072,20 @@
   (use-package flycheck
     :ensure t
     :bind
-    (:map
-     core-errors-map
-     ("." . spacemacs/error-transient-state/body)
-     ("S" . flycheck-set-checker-executable)
-     ("b" . flycheck-buffer)
-     ("c" . flycheck-clear)
-     ("h" . flycheck-describe-checker)
-     ("l" . my/flycheck-toggle-error-list)
-     ("s" . flycheck-select-checker)
-     ("v" . flycheck-verify-setup)
-     ("x" . flycheck-explain-error-at-point)
-     ("y" . flycheck-copy-errors-as-kill)))
+    (:map my/errors-map ("." . spacemacs/error-transient-state/body)
+     ("S" . flycheck-set-checker-executable) ("b" . flycheck-buffer)
+     ("c" . flycheck-clear) ("h" . flycheck-describe-checker) ("l"
+     . my/flycheck-toggle-error-list) ("s" . flycheck-select-checker)
+     ("v" . flycheck-verify-setup) ("x"
+     . flycheck-explain-error-at-point) ("y"
+     . flycheck-copy-errors-as-kill)))
 #+END_SRC
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/flycheck-toggle-error-list ()
-         "Toggle flycheck's error list window"
-         (interactive)
-         (-if-let (window (flycheck-get-error-list-window))
-             (quit-window nil window)
-           (flycheck-list-errors)))
+       (defun my/flycheck-toggle-error-list () "Toggle flycheck's
+         error list window" (interactive) (-if-let (window
+         (flycheck-get-error-list-window)) (quit-window nil window)
+         (flycheck-list-errors)))
      #+END_SRC
 
 *** company
@@ -1117,13 +1093,9 @@
       (use-package company
        	:ensure t
        	:config
-       	(setq company-backends
-              '((company-dabbrev-code
-                 company-gtags
-                 company-etags
-                 company-keywords)
-               	company-files
-               	company-dabbrev)))
+       	(setq company-backends '((company-dabbrev-code company-gtags
+              company-etags company-keywords) company-files
+              company-dabbrev)))
      #+END_SRC
 
 ** navigation
@@ -1132,11 +1104,8 @@
     (use-package avy
       :ensure t
       :bind
-      (:map
-       core-jump-join-map
-       ("b" . avy-pop-mark)
-       ("w" . evil-avy-goto-word-or-subword-1)
-       ("b" . avy-pop-mark)))
+      (:map my/jump-join-map ("b" . avy-pop-mark) ("w"
+       . evil-avy-goto-word-or-subword-1) ("b" . avy-pop-mark)))
 #+END_SRC
 
 *** grep/ack/wgrep
@@ -1184,8 +1153,7 @@
   (use-package magit
     :ensure t
     :bind
-    (:map
-     core-git-map
+    (:map my/git-map
      ("s" . magit-status)
      ("A" . magit-cherry-pick-popup)
      ("b" . magit-branch-popup)
@@ -1203,7 +1171,7 @@
      ("O" . magit-revert-popup)
      ("z" . magit-stash-popup)
      ("!" . magit-run-popup)
-     :map core-git-file-map
+     :map my/git-file-map
      ("f" . magit-find-file)
      ("d" . magit-diff-buffer-file-popup)
      ("f" . magit-find-file)
@@ -1212,56 +1180,64 @@
 *** evil-magit
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package evil-magit
-       	:ensure t
-       	:init
-       	:config
-       	(evil-magit-init))
+        :after evil
+        :ensure t
+        :init
+        :config
+        (evil-magit-init))
     #+END_SRC
 ** projectile
-*** projectile
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package projectile
-    :config
-    (add-hook 'after-init-hook 'projectile-mode)
-    :ensure t
-    :bind
-    (:map core-projectile-map
-        ("!" . projectile-run-shell-command-in-root)
-        ("%" . projectile-replace-regexp)
-        ("&" . projectile-run-async-shell-command-in-root)
-        ("D" . projectile-dired)
-        ("F" . projectile-find-file-dwim)
-        ("G" . projectile-regenerate-tags)
-        ("I" . projectile-invalidate-cache)
-        ("R" . projectile-replace)
-        ("T" . projectile-test-project)
-        ("a" . projectile-toggle-between-implementation-and-test)
-        ("c" . projectile-compile-project)
-        ("e" . projectile-edit-dir-locals)
-        ("g" . projectile-find-tag)
-        ("k" . projectile-kill-buffers)
-        ("v" . projectile-vc)
-        ("r" . projectile-recentf)))
-#+END_SRC
+*** COMMENT projectile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package projectile
+        :config
+        (projectile-mode)
+        :ensure t
+        :bind
+        (:map
+         my/projectile-map
+         ("!" . projectile-run-shell-command-in-root)
+         ("%" . projectile-replace-regexp)
+         ("&" . projectile-run-async-shell-command-in-root)
+         ("d" . projectile-dired)
+         ("D" . projectile-dired-other-window)
+         ("F" . projectile-find-file-dwim)
+         ("G" . projectile-regenerate-tags)
+         ("I" . projectile-invalidate-cache)
+         ("R" . projectile-replace)
+         ("T" . projectile-test-project)
+         ("a" . projectile-toggle-between-implementation-and-test)
+         ("c" . projectile-compile-project)
+         ("e" . projectile-edit-dir-locals)
+         ("g" . projectile-find-tag)
+         ("k" . projectile-kill-buffers)
+         ("v" . projectile-vc)
+         ("b" . projectile-switch-to-buffer)
+         ("B" . projectile-ibuffer)
+         ("f" . projectile-find-file)
+         ("p" . projectile-lost-packages)
+         ("r" . projectile-recentf)))
+    #+END_SRC
 *** counsel-projectile
-   #+begin_src emacs-lisp :tangle yes
-     (use-package counsel-projectile
-       :ensure t
-       :bind
-       (:map core-projectile-map
-             ("SPC" . counsel-projectile)
-             ("b" . counsel-projectile-switch-to-buffer)
-             ("f" . counsel-projectile-find-file)
-             ("d" . counsel-projectile-find-dir)
-             ("p" . counsel-projectile-switch-project)))
+    #+begin_src emacs-lisp :tangle no
+      (use-package counsel-projectile
+        :ensure t
+        :bind
+        (:map 
+my/projectile-map
+              ("SPC" . counsel-projectile)
+              ("b" . counsel-projectile-switch-to-buffer)
+              ("f" . counsel-projectile-find-file)
+              ("d" . counsel-projectile-find-dir)
+              ("p" . counsel-projectile-switch-project)))
 
-   #+end_src
-
+    #+end_src
+    
 ** hydra
-#+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hydra
     :ensure t)
-#+END_SRC
+   #+END_SRC
 ** theme
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package solarized-theme
@@ -1269,20 +1245,20 @@
        (load-theme 'solarized-dark t)
        :ensure t)
    #+END_SRC
-
+   
 ** configuration
 *** minor-modes
-   #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle yes
      (menu-bar-mode 0)
      (tool-bar-mode 0)
      (scroll-bar-mode 0)
      (global-hl-line-mode)
      (setq initial-major-mode 'text-mode)
      (winner-mode 1)
-   #+END_SRC
+    #+END_SRC
 *** backup files
-   Keep temporary files to a backup-directory in emacs directory
-   #+BEGIN_SRC emacs-lisp :tangle no
+    Keep temporary files to a backup-directory in emacs directory
+    #+BEGIN_SRC emacs-lisp :tangle no
      (defvar tramp-backup-directory-alist)
      (defvar tramp-auto-save-directory)
      (let ((backup-dir "~/.emacs.d/.backups")
@@ -1300,20 +1276,20 @@
            version-control t      ; Use version numbers on backups,
            kept-new-versions 5    ; keep some new versions
            kept-old-versions 2)   ; and some old ones, too)
-   #+END_SRC
-
-Keep custom variables in a separate gitignored file to allow local customizations
-using customize
+    #+END_SRC
+    
+    Keep custom variables in a separate gitignored file to allow local customizations
+    using customize
 *** custom-vars
-#+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle yes
   (let ((path (concat user-emacs-directory "custom.el")))
     (unless (file-exists-p path) (write-region "" nil path))
     (setq custom-file path))
-#+END_SRC
-
+    #+END_SRC
+    
 ** shell
 *** vars
-     #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle yes
        (defcustom my-shell-program
        	 "/bin/bash"
        	 "Path to shell binary for shell opened by `my-shell-toggle-shell'"
@@ -1323,10 +1299,10 @@ using customize
        	 "^\\*term-.*\\*$"
        	 "Regexp used to identify if the current window is a term buffer"
        	 :group 'my-shell)
-     #+END_SRC
-
+    #+END_SRC
+    
 *** funcs
-      #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle yes
        	(defun my-shell-toggle-shell(shell-buffer-name)
        	  "Toggle a window and run program defined in `my-shell-program'
        	If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
@@ -1338,9 +1314,9 @@ using customize
                	  (switch-to-buffer buffer)
                	(term my-shell-program)
                	(rename-buffer shell-buffer-name)))))
-      #+END_SRC
-
-      #+BEGIN_SRC emacs-lisp :tangle yes
+    #+END_SRC
+    
+    #+BEGIN_SRC emacs-lisp :tangle yes
        	(defun my/main-shell ()
        	  "Toggle the main shell"
        	  (interactive)
@@ -1353,41 +1329,158 @@ using customize
 
        	(provide 'my-shell)
        	;;; my-shell.el ends here
-      #+END_SRC
-
+    #+END_SRC
+    
 *** keys
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map-set-keys core-base-map
+      (bind-map-set-keys my/base-map
         "'" 'my/main-shell
         "/" 'my/buffer-shell)
     #+END_SRC
-***  registers/rings/resume
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map core-reg-ring-resume-map
-         :keys ((core-keys-make-prefix "r"))
-         :evil-keys ((core-keys-make-evil-prefix "r"))
-         :evil-states (normal motion visual)
-         :prefix-cmd regs-rings-resume)
-     #+END_SRC
-     
-      (use-package evil
-        :ensure t
-        :init
-        (setq evil-want-integration nil)
-        :config
-        (evil-mode 1)
-        (evil-define-key '(insert normal visual) 'global-map
-          (kbd "M-/") 'hippie-expand))* org-mode
 * org
 ** org
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package org
     :pin org
+    :ensure t
     :config
        (setq org-src-fontify-natively t)
-    (setq my/imenu-function 'counsel-org-goto)
+       (setq my/imenu-function 'counsel-org-goto)
 
-    :ensure t)
+      (defun my/org-mode-hooks ()
+        (setq my/imenu-function #'counsel-org-goto))
+      (add-hook 'org-mode-hook 'my/org-mode-hooks)
+      (bind-map-for-major-mode org-mode
+        :keys (my/emacs-mode-leader-key)
+        :evil-keys (my/evil-mode-leader-key)
+        :evil-states (normal motion visual)
+        :override-minor-modes t
+        :bindings
+        ("<tab>" 'org-indent-block
+         " RET" 'org-ctrl-c-ret
+         "#" 'org-update-statistics-cookies
+         "'" 'org-edit-special
+         "g" 'org-ctrl-c-star
+         "," 'org-ctrl-c-ctrl-c
+         "-" 'org-ctrl-c-minus
+         "A" 'org-attach
+         "H" 'org-shiftleft
+         "J" 'org-shiftdown
+         "K" 'org-shiftup
+         "L" 'org-shiftright
+         "a" 'org-agenda
+         "c" 'org-capture
+         "C-S-h" 'org-shiftcontrolleft
+         "C-S-j" 'org-shiftcontroldown
+         "C-S-k" 'org-shiftcontrolup
+         "C-S-l" 'org-shiftcontrolright
+         "x b" 'spacemacs/org-bold
+         "x c" 'spacemacs/org-code
+         "x i" 'spacemacs/org-italic
+         "x o" 'org-open-at-point
+         "x r" 'spacemacs/org-clear
+         "x s" 'spacemacs/org-strike-through
+         "x u" 'spacemacs/org-underline
+         "x v" 'spacemacs/org-verbatim
+         "i H" 'org-insert-heading-after-current
+         "i K" 'spacemacs/insert-keybinding-org
+         "i d" 'org-insert-drawer
+         "i e" 'org-set-effort
+         "i f" 'org-footnote-new
+         "i h" 'org-insert-heading
+         "i l" 'org-insert-link
+         "i n" 'org-add-note
+         "i p" 'org-set-property
+         "i s" 'org-insert-subheading
+         "i t" 'org-set-tags
+         "M-RET" 'org-meta-return
+         "b ." 'spacemacs/org-babel-transient-state/body
+         "b I" 'org-babel-view-src-block-info
+         "b Z" 'org-babel-switch-to-session-with-code
+         "b a" 'org-babel-sha1-hash
+         "b b" 'org-babel-execute-src-block
+         "b B" 'org-babel-execute-buffer
+         "b c" 'org-babel-check-src-block
+         "b d" 'org-babel-demarcate-block
+         "b e" 'org-babel-execute-maybe
+         "b f" 'org-babel-tangle-file
+         "b g" 'org-babel-goto-named-src-block
+         "b i" 'org-babel-lob-ingest
+         "b j" 'org-babel-insert-header-arg
+         "b l" 'org-babel-load-in-session
+         "b n" 'org-babel-next-src-block
+         "b o" 'org-babel-open-src-block-result
+         "b p" 'org-babel-previous-src-block
+         "b r" 'org-babel-goto-named-result
+         "b s" 'org-babel-execute-subtree
+         "b t" 'org-babel-tangle
+         "b u" 'org-babel-goto-src-block-head
+         "b v" 'org-babel-expand-src-block
+         "b x" 'org-babel-do-key-sequence-in-edit-buffer
+         "b z" 'org-babel-switch-to-session
+         "s A" 'org-archive-subtree
+         "s N" 'widen
+         "s S" 'org-sort
+         "s a" 'org-toggle-archive-tag
+         "s b" 'org-tree-to-indirect-buffer
+         "s h" 'org-promote-subtree
+         "s j" 'org-move-subtree-down
+         "s k" 'org-move-subtree-up
+         "s l" 'org-demote-subtree
+         "s n" 'org-narrow-to-subtree
+         "s r" 'org-refile
+         "s s" 'org-sparse-tree
+         "T T" 'org-todo
+         "T V" 'space-doc-mode
+         "T c" 'org-toggle-checkbox
+         "T e" 'org-toggle-pretty-entities
+         "T i" 'org-toggle-inline-images
+         "T l" 'org-toggle-link-display
+         "T t" 'org-show-todo-tree
+         "T x" 'org-toggle-latex-fragment
+         "f i" 'org-feed-goto-inbox
+         "f u" 'org-feed-update-all
+         "e e" 'org-export-dispatch
+         "e m" 'org-mime-org-buffer-htmlize
+         "d T" 'org-time-stamp-inactive
+         "d d" 'org-deadline
+         "d s" 'org-schedule
+         "d t" 'org-time-stamp
+         "C c" 'org-clock-cancel
+         "C i" 'org-clock-in
+         "C o" 'org-clock-out
+         "C p" 'org-pomodoro
+         "C r" 'org-resolve-clocks
+         "t E" 'org-table-export
+         "t H" 'org-table-move-column-left
+         "t I" 'org-table-import
+         "t J" 'org-table-move-row-down
+         "t K" 'org-table-move-row-up
+         "t L" 'org-table-move-column-right
+         "t N" 'org-table-create-with-table.el
+         "t a" 'org-table-align
+         "t b" 'org-table-blank-field
+         "t c" 'org-table-convert
+         "t e" 'org-table-eval-formula
+         "t h" 'org-table-previous-field
+         "t j" 'org-table-next-row
+         "t l" 'org-table-next-field
+         "t n" 'org-table-create
+         "t p" 'org-plot/gnuplot
+         "t r" 'org-table-recalculate
+         "t s" 'org-table-sort-lines
+         "t w" 'org-table-wrap-region
+         "i D s" 'org-download-screenshot
+         "i D y" 'org-download-yank
+         "t t f" 'org-table-toggle-formula-debugger
+         "t t o" 'org-table-toggle-coordinate-overlays
+         "t i H" 'org-table-hline-and-move
+         "t i c" 'org-table-insert-column
+         "t i h" 'org-table-insert-hline
+         "t i r" 'org-table-insert-row
+         "t d c" 'org-table-delete-column
+         "t d r" 'org-table-kill-row)))
+    
 #+END_SRC
 ** org-projectile
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1395,7 +1488,7 @@ using customize
         :ensure t
         :bind
         (:map
-         core-projectile-map
+         my/projectile-map
          ("o" . org-projectile/goto-todos)))
     #+END_SRC
 ** company
@@ -1405,17 +1498,11 @@ using customize
              (company-mode))
            (add-hook 'org-mode-hook 'my/org-company-setup)
     #+END_SRC
-** hooks
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (defun my/org-mode-hooks ()
-       	(setq my/imenu-function #'counsel-org-goto))
-      (add-hook 'org-mode-hook 'my/org-mode-hooks)
-    #+END_SRC
 ** keys
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map-for-major-mode org-mode
-       	:keys (core-emacs-mode-leader-key)
-       	:evil-keys (core-evil-mode-leader-key)
+       	:keys (my/emacs-mode-leader-key)
+       	:evil-keys (my/evil-mode-leader-key)
        	:evil-states (normal motion visual)
        	:override-minor-modes t
        	:bindings
@@ -1549,10 +1636,10 @@ using customize
 * prog-mode
 ** keys
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (evil-define-key '(insert normal visual movement) 'global-map
+     (evil-define-key '(insert normal visual movement) 'prog-mode-map
        (kbd "TAB") 'indent-for-tab-command
        (kbd "M-/") 'hippie-expand)
-     (evil-define-key '(normal visual movement) 'global-map
+     (evil-define-key '(normal visual movement) 'prog-mode-map
        (kbd "] e") 'move-text-down
        (kbd "[ e") 'move-text-up)
    #+END_SRC
@@ -1593,8 +1680,8 @@ using customize
 **** Evaling
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map elisp-eval-map
-        :keys ((core-keys-make-mode-prefix "e"))
-        :evil-keys ((core-keys-make-evil-mode-prefix "e"))
+        :keys ((my/make-emacs-mode-prefix "e"))
+        :evil-keys ((my/make-evil-mode-prefix "e"))
         :major-modes (emacs-lisp-mode)
         :evil-state (normal motion visual)
         :prefix-cmd evaling
@@ -1610,8 +1697,8 @@ using customize
 **** Debugging
     #+begin_src emacs-lisp :tangle yes
       (bind-map elisp-debug-map
-        :keys ((core-keys-make-mode-prefix "d"))
-        :evil-keys ((core-keys-make-evil-mode-prefix "d"))
+        :keys ((my/make-emacs-mode-prefix "d"))
+        :evil-keys ((my/make-evil-mode-prefix "d"))
         :major-modes (emacs-lisp-mode)
         :evil-state (normal motion visual)
         :prefix-cmd debugging
@@ -1651,8 +1738,8 @@ using customize
 **** keys
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map-for-major-mode c++-mode
-      :keys (core-emacs-mode-leader-key)
-      :evil-keys (core-evil-mode-leader-key)
+      :keys (my/emacs-mode-leader-key)
+      :evil-keys (my/evil-mode-leader-key)
       :evil-states (normal motion visual)
       :prefix rtags
       :bindings
