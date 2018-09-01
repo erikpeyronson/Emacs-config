@@ -20,14 +20,14 @@
 * initialize package
  We start by adding package repos and load paths and initialize package
 #+BEGIN_SRC emacs-lisp :tangle yes
-     (require 'package)
-     (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-     (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-     (let ((default-directory (concat user-emacs-directory "submodules/")))
-       (normal-top-level-add-subdirs-to-load-path))
-     (add-to-list 'load-path (concat user-emacs-directory "local/"))
-     (package-initialize)
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (let ((default-directory (concat user-emacs-directory "submodules/")))
+    (normal-top-level-add-subdirs-to-load-path))
+  (add-to-list 'load-path (concat user-emacs-directory "local/"))
+  (package-initialize)
 #+END_SRC
     Ensure some dependencies are installed. The packages use-package and bind-map are installed, these will be used to
     manage packages and keybindings throughout the config.
@@ -851,9 +851,6 @@
         :after evil
         :ensure t
         :bind
-        (:map jump-join ("j" . evil-avy-goto-char-timer) ("l"
-         . evil-avy-goto-line) ("w"
-         . evil-avy-goto-word-or-subword-1))
         :config
         (evil-collection-init))
     #+END_SRC
@@ -1121,8 +1118,12 @@
     (use-package avy
       :ensure t
       :bind
-      (:map my/jump-join-map ("b" . avy-pop-mark) ("w"
-       . evil-avy-goto-word-or-subword-1) ("b" . avy-pop-mark)))
+      (:map my/jump-join-map 
+       ("b" . pop-mark)
+       ("w" . avy-goto-word-or-subword-1) 
+       ("b" . avy-pop-mark)
+       ("l" . avy-goto-line)
+))
 #+END_SRC
 
 *** link-hint
@@ -1982,23 +1983,23 @@ my/projectile-map
     
    #+END_SRC
 ** org-projectile
-    #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package org-projectile
         :ensure t
         :bind
         (:map
          my/projectile-map
          ("o" . org-projectile/goto-todos)))
-    #+END_SRC
+   #+END_SRC
 ** company
-    #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my/org-company-setup ()
              (add-to-list 'company-backends 'company-capf)
              (company-mode))
            (add-hook 'org-mode-hook 'my/org-company-setup)
-    #+END_SRC
+   #+END_SRC
 ** keys
-    #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle no
       (bind-map-for-major-mode org-mode
        	:keys (my/emacs-mode-leader-key)
        	:evil-keys (my/evil-mode-leader-key)
@@ -2129,9 +2130,8 @@ my/projectile-map
          "t i r" 'org-table-insert-row
          "t d c" 'org-table-delete-column
          "t d r" 'org-table-kill-row))
-
-    #+END_SRC
-
+   #+END_SRC
+   
 * prog-mode
 ** keys
    #+BEGIN_SRC emacs-lisp :tangle yes
