@@ -1086,15 +1086,6 @@
      #+END_SRC
 
 ** navigation
-*** avy
-#+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package avy
-      :ensure t
-      :bind
-      (:map my/jump-join-map ("b" . avy-pop-mark) ("w"
-       . evil-avy-goto-word-or-subword-1) ("b" . avy-pop-mark)))
-#+END_SRC
-
 *** grep/ack/wgrep
 #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package ag
@@ -1125,6 +1116,15 @@
     :ensure t)
 #+END_SRC
 
+*** avy
+#+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package avy
+      :ensure t
+      :bind
+      (:map my/jump-join-map ("b" . avy-pop-mark) ("w"
+       . evil-avy-goto-word-or-subword-1) ("b" . avy-pop-mark)))
+#+END_SRC
+
 *** link-hint
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package link-hint
@@ -1132,7 +1132,7 @@
         :bind
         (:map
          my/jump-join-map
-         ("h" . link-hint)))
+         ("h" . link-hint-open-link)))
     #+END_SRC
 ** windows and buffers
 *** winum-mode
@@ -1183,7 +1183,7 @@
         (evil-magit-init))
     #+END_SRC
 ** projectile
-*** COMMENT projectile
+*** projectile
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package projectile
         :config
@@ -1220,15 +1220,21 @@
         :ensure t
         :bind
         (:map 
-my/projectile-map
-              ("SPC" . counsel-projectile)
-              ("b" . counsel-projectile-switch-to-buffer)
-              ("f" . counsel-projectile-find-file)
-              ("d" . counsel-projectile-find-dir)
-              ("p" . counsel-projectile-switch-project)))
+         my/projectile-map
+         ("SPC" . counsel-projectile)
+         ("b" . counsel-projectile-switch-to-buffer)
+         ("f" . counsel-projectile-find-file)
+         ("d" . counsel-projectile-find-dir)
+         ("p" . counsel-projectile-switch-project)))
 
     #+end_src
-    
+*** ibuffer-projectile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package ibuffer-projectile
+        :ensure t
+        :config
+        (ibuffer-projectile-set-filter-groups))
+    #+END_SRC
 ** hydra
    #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hydra
@@ -1780,6 +1786,7 @@ my/projectile-map
     (setq custom-file path))
     #+END_SRC
     
+    
 ** shell
 *** vars
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2194,7 +2201,7 @@ my/projectile-map
         (bind-map-set-keys my/help-highlight-map
           "c" 'highlight-changes-visible-mode))
          
-      (add-hook 'prog-mode-hook 'my-setup-highlight-changes)
+      (add-hook 'prog-mode-hook 'my/setup-highlight-changes)
     #+END_SRC
 ** emacs-lisp-mode
 *** macrostep
