@@ -2190,7 +2190,8 @@ my/projectile-map
       (use-package highlight-parentheses
         :ensure t
         :config
-        (add-hook 'prog-mode-hook 'highlight-paren-mode))
+        (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
+
     #+END_SRC
 *** highlight-changes
     #+BEGIN_SRC emacs-lisp :tangle yes
