@@ -1035,10 +1035,504 @@
      ) (use-package hl-todo
      :ensure t
      :config
-     (global-hl-todo-mode) ) (use-package rainbow-delimiters
+     (global-hl-todo-mode) ) (
+   #+END_SRC  
+** completion
+*** yasnippet
+#+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package yasnippet
+        :ensure t
+        :defer t
+        :init
+        (add-hook 'prog-mode-hook 'yas-minor-mode) (add-hook
+        'org-mode-hook 'yas-minor-mode)
+        :config
+        (add-to-list 'hippie-expand-try-functions-list
+        'yas-hippie-try-expand) (yas-reload-all)) (use-package
+        yasnippet-snippets
+        :ensure t
+        :requires yasnippet)
+#+END_SRC
+
+*** flycheck
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package flycheck
+    :ensure t
+    :bind
+    (:map my/errors-map ("." . spacemacs/error-transient-state/body)
+     ("S" . flycheck-set-checker-executable) ("b" . flycheck-buffer)
+     ("c" . flycheck-clear) ("h" . flycheck-describe-checker) ("l"
+     . my/flycheck-toggle-error-list) ("s" . flycheck-select-checker)
+     ("v" . flycheck-verify-setup) ("x"
+     . flycheck-explain-error-at-point) ("y"
+     . flycheck-copy-errors-as-kill)))
+#+END_SRC
+**** funcs
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun my/flycheck-toggle-error-list () "Toggle flycheck's
+         error list window" (interactive) (-if-let (window
+         (flycheck-get-error-list-window)) (quit-window nil window)
+         (flycheck-list-errors)))
+     #+END_SRC
+
+*** company
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package company
+       	:ensure t
+       	:config
+       	(setq company-backends '((company-dabbrev-code company-gtags
+              company-etags company-keywords) company-files
+              company-dabbrev)))
+     #+END_SRC
+
+** navigation
+*** avy
+#+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package avy
+      :ensure t
+      :bind
+      (:map my/jump-join-map ("b" . avy-pop-mark) ("w"
+       . evil-avy-goto-word-or-subword-1) ("b" . avy-pop-mark)))
+#+END_SRC
+
+*** grep/ack/wgrep
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ag
+    :ensure t)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package ack
+    :ensure t)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep
+    :ensure t)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep-ack
+    :ensure t)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package wgrep-ag
+    :ensure t)
+#+END_SRC
+
+** windows and buffers
+*** winum-mode
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package winum
+    :ensure t
+    :config
+    (winum-mode))
+#+END_SRC
+
+** magit
+*** magit
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package magit
+    :ensure t
+    :bind
+    (:map my/git-map
+     ("s" . magit-status)
+     ("A" . magit-cherry-pick-popup)
+     ("b" . magit-branch-popup)
+     ("b" . magit-bisect-popup)
+     ("c" . magit-commit-popup)
+     ("d" . magit-diff-popup)
+     ("f" . magit-fetch-popup)
+     ("F" . magit-pull-popup)
+     ("l" . magit-log-popup)
+     ("P" . magit-pushing-popup)
+     ("r" . magit-rebase-popup)
+     ("t" . magit-tag-popup)
+     ("T" . magit-notes-popup)
+     ("_" . magit-revert-popup)
+     ("O" . magit-revert-popup)
+     ("z" . magit-stash-popup)
+     ("!" . magit-run-popup)
+     :map my/git-file-map
+     ("f" . magit-find-file)
+     ("d" . magit-diff-buffer-file-popup)
+     ("f" . magit-find-file)
+     ("l" . magit-log-buffer-file)))
+#+END_SRC
+*** evil-magit
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-magit
+        :after evil
+        :ensure t
+        :init
+        :config
+        (evil-magit-init))
+    #+END_SRC
+** projectile
+*** COMMENT projectile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package projectile
+        :config
+        (projectile-mode)
+        :ensure t
+        :bind
+        (:map
+         my/projectile-map
+         ("!" . projectile-run-shell-command-in-root)
+         ("%" . projectile-replace-regexp)
+         ("&" . projectile-run-async-shell-command-in-root)
+         ("d" . projectile-dired)
+         ("D" . projectile-dired-other-window)
+         ("F" . projectile-find-file-dwim)
+         ("G" . projectile-regenerate-tags)
+         ("I" . projectile-invalidate-cache)
+         ("R" . projectile-replace)
+         ("T" . projectile-test-project)
+         ("a" . projectile-toggle-between-implementation-and-test)
+         ("c" . projectile-compile-project)
+         ("e" . projectile-edit-dir-locals)
+         ("g" . projectile-find-tag)
+         ("k" . projectile-kill-buffers)
+         ("v" . projectile-vc)
+         ("b" . projectile-switch-to-buffer)
+         ("B" . projectile-ibuffer)
+         ("f" . projectile-find-file)
+         ("p" . projectile-lost-packages)
+         ("r" . projectile-recentf)))
+    #+END_SRC
+*** counsel-projectile
+    #+begin_src emacs-lisp :tangle no
+      (use-package counsel-projectile
+        :ensure t
+        :bind
+        (:map 
+my/projectile-map
+              ("SPC" . counsel-projectile)
+              ("b" . counsel-projectile-switch-to-buffer)
+              ("f" . counsel-projectile-find-file)
+              ("d" . counsel-projectile-find-dir)
+              ("p" . counsel-projectile-switch-project)))
+
+    #+end_src
+    
+** hydra
+   #+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package hydra
+    :ensure t)
+   #+END_SRC
+** theme
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package solarized-theme
+       :config
+       (load-theme 'solarized-dark t)
+       :ensure t)
+   #+END_SRC
+   
+** configuration
+*** minor-modes
+    #+BEGIN_SRC emacs-lisp :tangle yes
+     (menu-bar-mode 0)
+     (tool-bar-mode 0)
+     (scroll-bar-mode 0)
+     (global-hl-line-mode)
+     (setq initial-major-mode 'text-mode)
+     (winner-mode 1)
+    #+END_SRC
+*** backup files
+    Keep temporary files to a backup-directory in emacs directory
+    #+BEGIN_SRC emacs-lisp :tangle no
+     (defvar tramp-backup-directory-alist)
+     (defvar tramp-auto-save-directory)
+     (let ((backup-dir "~/.emacs.d/.backups")
+           (auto-saves-dir "~/.emacs.d/.auto-saves/"))
+       (dolist (dir (list backup-dir auto-saves-dir))
+         (when (not (file-directory-p dir))
+           (make-directory dir t)))
+       (setq backup-directory-alist `(("." . ,backup-dir))
+             auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
+             auto-save-list-file-prefix (concat auto-saves-dir ".saves-")
+             tramp-backup-directory-alist `((".*" . ,backup-dir))
+             tramp-auto-save-directory auto-saves-dir))
+     (setq backup-by-copying t    ; Don't delink hardlinks
+           delete-old-versions t  ; Clean up the backups
+           version-control t      ; Use version numbers on backups,
+           kept-new-versions 5    ; keep some new versions
+           kept-old-versions 2)   ; and some old ones, too)
+    #+END_SRC
+    
+    Keep custom variables in a separate gitignored file to allow local customizations
+    using customize
+*** custom-vars
+    #+BEGIN_SRC emacs-lisp :tangle yes
+  (let ((path (concat user-emacs-directory "custom.el")))
+    (unless (file-exists-p path) (write-region "" nil path))
+    (setq custom-file path))
+    #+END_SRC
+    
+** shell
+*** vars
+    #+BEGIN_SRC emacs-lisp :tangle yes
+       (defcustom my-shell-program
+       	 "/bin/bash"
+       	 "Path to shell binary for shell opened by `my-shell-toggle-shell'"
+       	 :group 'my-shell)
+
+       (defcustom my-shell-buffer-name-regex
+       	 "^\\*term-.*\\*$"
+       	 "Regexp used to identify if the current window is a term buffer"
+       	 :group 'my-shell)
+    #+END_SRC
+    
+*** funcs
+    #+BEGIN_SRC emacs-lisp :tangle yes
+       	(defun my-shell-toggle-shell(shell-buffer-name)
+       	  "Toggle a window and run program defined in `my-shell-program'
+       	If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
+       	  (if (string-match "^\\*term-.*\\*$" (buffer-name))
+              (delete-window)
+            (select-window (split-window-below))
+            (let ((buffer (get-buffer shell-buffer-name)))
+              (if buffer
+               	  (switch-to-buffer buffer)
+               	(term my-shell-program)
+               	(rename-buffer shell-buffer-name)))))
+    #+END_SRC
+    
+    #+BEGIN_SRC emacs-lisp :tangle yes
+       	(defun my/main-shell ()
+       	  "Toggle the main shell"
+       	  (interactive)
+       	  (my-shell-toggle-shell "*term-main*"))
+
+       	(defun my/buffer-shell ()
+       	  "Toggle a buffer local shell"
+       	  (interactive)
+       	  (my-shell-toggle-shell (concat "*term-" (buffer-name) "*")))
+
+       	(provide 'my-shell)
+       	;;; my-shell.el ends here
+    #+END_SRC
+    
+*** keys
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map-set-keys my/base-map
+        "'" 'my/main-shell
+        "/" 'my/buffer-shell)
+    #+END_SRC
+***  help-highlight
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map my/help-highlight-map
+        :keys ((my/make-emacs-prefix "h"))
+        :evil-keys ((my/make-evil-prefix "h"))
+        :evil-states (normal motion visual)
+        :prefix-cmd help-highlight)
+    #+END_SRC 
+** evil
+*** evil
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil
+       	:ensure t
+       	:init
+       	(setq evil-want-integration nil)
+       	:config
+       	(evil-mode 1))
+    #+END_SRC
+*** evil-collection
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-collection
+        :after evil
+        :ensure t
+        :bind
+        (:map jump-join ("j" . evil-avy-goto-char-timer) ("l"
+         . evil-avy-goto-line) ("w"
+         . evil-avy-goto-word-or-subword-1))
+        :config
+        (evil-collection-init))
+    #+END_SRC
+
+*** evil-rsi
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-rsi
+       	:ensure t
+       	:requires evil)
+    #+END_SRC
+
+*** evil-iedit-state
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-iedit-state
+        :ensure t
+        :bind
+        (:map my/search-map ("e" . evil-iedit-state/iedit-mode)))
+    #+END_SRC
+*** evil-escape
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-escape
+       	:ensure t
+       	:requires evil
+       	:config
+       	(evil-escape-mode 1))
+    #+END_SRC
+
+*** evil-nerd-commenter
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-nerd-commenter
+       	:ensure t
+       	:requires evil)
+    #+END_SRC
+
+*** evil-surround
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-surround
+       	:ensure t
+            :init
+            (add-hook 'after-init-hook 'global-evil-surround-mode)
+            :requires evil)
+    #+END_SRC
+
+*** evil-exchange
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-exchange
+       	:ensure t
+       	:requires evil
+       	:config
+       	(evil-exchange-cx-install))
+    #+END_SRC
+
+*** evil-unimpaired
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-unimpaired
+       	:load-path "sumodules/evil-unimpaired"
+       	:requires evil
+       	:init
+       	(add-hook 'evil-mode-hook 'evil-unimpaired-mode))
+    #+END_SRC
+
+*** evil-rsi
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-rsi
+       	:ensure t
+       	:requires evil
+       	:config (evil-rsi-mode 1))
+    #+END_SRC
+
+*** org-evil
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package org-evil
+         :ensure t
+         :requires evil)
+    #+END_SRC
+*** keybindings
+  #+BEGIN_SRC emacs-lisp :tangle yes
+  (evil-define-key '(insert normal visual) 'global-map (kbd "M-/")
+    'hippie-expand)
+  #+END_SRC  
+** ivy
+*** ivy
+    #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package ivy
+       :ensure t
+       :bind 
+       (:map ivy-minibuffer-map (" " . ivy-alt-done) ("C-j"
+        . ivy-next-line) ("C-k" . ivy-previous-line) ("C-h"
+        . 'ivy-backward-delete-char)
+        :map my/reg-ring-resume-map
+        ("m" . counsel-mark-ring) ("y" . counsel-yank-pop)) ("l"
+        . ivy-resume)
+       :init
+       (add-hook 'after-init-hook 'ivy-mode)
+       :config
+       (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
+       (evil-make-overriding-map ivy-occur-mode-map 'normal))
+   #+END_SRC
+    
+*** ivy-yasnippet
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package ivy-yasnippet
+        :ensure t
+        :bind 
+        (:map my/insert-map ("y" . ivy-yasnippet)))
+    #+END_SRC
+*** ivy-hydra
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package ivy-hydra
+       :ensure t
+       :requires (ivy))
+   #+END_SRC
+
+*** counsel
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package counsel
+       :ensure t
+       :bind 
+       (:map my/search-map ("k" . counsel-ack) ("g"
+        . counsel-git-grep) ("s" . swiper) ("K" . ack) ("k"
+        . counsel-ack) ("g" . counsel-git-grep) ("G" . vc-git-grep)
+        ("a" . counsel-ag) ("A" . ag))
+        :config
+        (counsel-mode))
+   #+END_SRC
+
+** editing
+*** iedit
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package iedit
+       :ensure t)
+   #+END_SRC
+*** which-key
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package which-key
+       :ensure t
+       :init
+       (add-hook 'after-init-hook 'which-key-mode))
+   #+END_SRC
+
+*** move-text
+    #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package move-text
+     :ensure t
+     :init
+     (add-hook 'after-init-hook 'which-key-mode))
+    #+END_SRC
+
+*** undo-tree
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package undo-tree
+    :ensure t)
+#+END_SRC
+
+*** expand-region
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package expand-region
+    :ensure t)
+#+END_SRC
+    
+*** evil-multiple-cursors
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package evil-mc
+       	:ensure t
+       	:requires evil
+       	:config)
+    #+END_SRC
+** visual
+   #+begin_src emacs-lisp :tangle no
+
+   (use-package hl-anything
      :ensure t
      :config
-     (add-hook 'prog-mode-hook 'rainbow-delimiters-mode) )
+     ) (use-package hl-indent
+     :ensure t
+     :config
+     (add-hook 'prog-mode-hook 'hl-indent) ) (use-package hl-sentence
+     :ensure t
+     ) (use-package hl-todo
+     :ensure t
+     :config
+     (global-hl-todo-mode) ) (
    #+END_SRC  
 ** completion
 *** yasnippet
@@ -1661,6 +2155,38 @@ my/projectile-map
                        'face-override-spec)
         (add-hook 'prog-mode-hook 'highlight-symbol-mode))
     #+end_src
+*** rainbow-delimiters
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (use-package rainbow-delimiters
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+#+END_SRC
+*** highlight-indent-guides
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package highlight-indentation
+        :ensure t
+        :config
+        (add-hook 'prog-mode-hook 'highlight-indentation-mode))
+    #+END_SRC
+*** highlight-parentheses
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package highlight-parentheses
+        :ensure t
+        :config
+        (add-hook 'prog-mode-hook 'highlight-paren-mode))
+    #+END_SRC
+*** highlight-changes
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/setup-highlight-changes ()
+        (highlight-changes-mode 1)
+        (highlight-changes-visible-mode 0)
+
+        (bind-map-set-keys my/help-highlight-map
+          "c" 'highlight-changes-visible-mode))
+         
+      (add-hook 'prog-mode-hook 'my-setup-highlight-changes)
+    #+END_SRC
 ** emacs-lisp-mode
 *** macrostep
     #+BEGIN_SRC emacs-lisp :tangle yes
