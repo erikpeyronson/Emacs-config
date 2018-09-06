@@ -726,6 +726,24 @@
 
 *** buffers
     #+BEGIN_SRC emacs-lisp :tangle yes
+      (defhydra hydra-cycle-buffer (:foreign-keys nil :hint nil)
+       "
+      [_1_-_9_]:buffer-to [n]
+      "
+	("1" buffer-to-window-1)
+	("2" buffer-to-window-2 )
+	("3" buffer-to-window-3)
+	("4" buffer-to-window-4)
+	("5" buffer-to-window-5)
+	("6" buffer-to-window-6)
+	("7" buffer-to-window-7)
+	("8" buffer-to-window-8)
+	("9" buffer-to-window-9)
+	("n" next-buffer "next")
+	("p" previous-buffer "previous")
+	("d" spacemacs/kill-this-buffer "kill")
+	("q" nil))
+
       (bind-map my/buffers-map
 	:keys ((my/make-emacs-prefix "b"))
 	:evil-keys ((my/make-evil-prefix "b"))
@@ -733,50 +751,69 @@
 	:prefix-cmd buffers
 	:bindings
 	("." 'spacemacs/buffer-transient-state/body
-	"1" 'buffer-to-window-1
-	"2" 'buffer-to-window-2
-	"3" 'buffer-to-window-3
-	"4" 'buffer-to-window-4
-	"5" 'buffer-to-window-5
-	"6" 'buffer-to-window-6
-	"7" 'buffer-to-window-7
-	"8" 'buffer-to-window-8
-	"9" 'buffer-to-window-9
-	"B" 'ibuffer
-	"N" 'spacemacs/new-empty-buffer
-	"P" 'spacemacs/copy-clipboard-to-whole-buffer
-	"R" 'spacemacs/safe-revert-buffer
-	"Y" 'spacemacs/copy-whole-buffer-to-clipboard
-	"b" 'switch-to-buffer
-	"d" 'spacemacs/kill-this-buffer
-	"e" 'spacemacs/safe-erase-buffer
-	"I" 'ibuffer
-	"m" 'spacemacs/kill-other-buffers
-	"n" 'next-buffer
-	"p" 'previous-buffer
-	"s" 'spacemacs/switch-to-scratch-buffer
-	"w" 'read-only-mode))
+	 "1" 'hydra-cycle-buffer/buffer-to-window-1
+	 "2" 'hydra-cycle-buffer/buffer-to-window-2
+	 "3" 'hydra-cycle-buffer/buffer-to-window-3
+	 "4" 'hydra-cycle-buffer/buffer-to-window-4
+	 "5" 'hydra-cycle-buffer/buffer-to-window-5
+	 "6" 'hydra-cycle-buffer/buffer-to-window-6
+	 "7" 'hydra-cycle-buffer/buffer-to-window-7
+	 "8" 'hydra-cycle-buffer/buffer-to-window-8
+	 "9" 'hydra-cycle-buffer/buffer-to-window-9
+	 "B" 'ibuffer
+	 "N" 'spacemacs/new-empty-buffer
+	 "P" 'spacemacs/copy-clipboard-to-whole-buffer
+	 "R" 'spacemacs/safe-revert-buffer
+	 "Y" 'spacemacs/copy-whole-buffer-to-clipboard
+	 "b" 'switch-to-buffer
+	 "d" 'spacemacs/kill-this-buffer
+	 "e" 'spacemacs/safe-erase-buffer
+	 "I" 'ibuffer
+	 "m" 'spacemacs/kill-other-buffers
+	 "n" 'hydra-cycle-buffer/next-buffer
+	 "p" 'hydra-cycle-buffer/previous-buffer
+	 "s" 'spacemacs/switch-to-scratch-buffer
+	 "w" 'read-only-mode))
     #+END_SRC
 
 *** Windows
     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defhydra hydra-window-navigation (:foreign-keys nil :exit nil)
+	("h" evil-window-left "left")
+	("j" evil-window-down "down")
+	("k" evil-window-up "up")
+	("l" evil-window-right "right")
+	("s" split-window-below "Split below")
+	("v" split-window-right "Split right")
+	("d" spacemacs/delete-window "delete")
+	("u" winner-undo "undo")
+	("U" winner-redo "redo")
+	("w" other-window "other window")
+	("d" delete-window "delete")
+	("o" other-frame "other frame")
+	("D" delete-frame "delete")
+	("q" nil "quit"))
+
+      (defhydra hydra-other-frame (:foreign-keys nil) ("o" other-frame "repeat"))
+      (defhydra hydra-other-window (:foreign-keys nil) ("w" other-window "repeat"))
+
       (bind-map my/windows-map
 	:keys ((my/make-emacs-prefix "w"))
 	:evil-keys ((my/make-evil-prefix "w"))
 	:evil-states (normal motion visual)
 	:prefix-cmd windows
 	:bindings
-	("w" 'other-window
-	 "o" 'other-frame
-	 "s" 'split-window-below
-	 "S" 'split-window-below-and-focus
-	 "v" 'split-window-right
-	 "V" 'split-window-right-and-focus
+	("w" 'hydra-other-window/other-window
+	 "o" 'hydra-other-frame/other-frame
+	 "s" 'hydra-window-navigation/split-window-below
+	 "S" 'hydra-window-navigation/split-window-below-and-focus
+	 "v" 'hydra-window-navigation/split-window-right
+	 "V" 'hydra-window-navigation/split-window-right-and-focus
 	 "=" 'balance-windows
 	 "S" 'split-window-below-and-focus
 	 "V" 'split-window-right-and-focus
-	 "u" 'winner-undo
-	 "U" 'winner-redo
+	 "u" 'hydra-window-navigation/winner-undo
+	 "U" 'hydra-window-navigation/winner-redo
 	 "2" 'spacemacs/layout-double-columns
 	 "3" 'spacemacs/layout-triple-columns
 	 "_" 'spacemacs/maximize-horizontally
@@ -787,10 +824,10 @@
 	 "r" 'spacemacs/rotate-windows-forward
 	 "=" 'balance-windows
 	 "F" 'make-frame
-	 "h" 'evil-window-left
-	 "j" 'evil-window-down
-	 "k" 'evil-window-up
-	 "l" 'evil-window-right
+	 "h" 'hydra-window-navigation/evil-window-left
+	 "j" 'hydra-window-navigation/evil-window-down
+	 "k" 'hydra-window-navigation/evil-window-up
+	 "l" 'hydra-window-navigation/evil-window-right
 	 "H" 'evil-window-move-far-left
 	 "J" 'evil-window-move-very-bottom
 	 "K" 'evil-window-move-very-top
