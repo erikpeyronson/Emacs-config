@@ -75,7 +75,7 @@
       (package-refresh-contents)
       (package-install package)))
   (require 'use-package)
-(require 'bind-map)
+  (require 'bind-map)
    #+END_SRC
 * theme
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1030,9 +1030,13 @@
 *** projectile
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package projectile
+	:init
+	(add-hook 'after-init-hook 'projectile-mode)
 	:config
-	(projectile-mode)
+	(setq projectile-enable-caching t)
+	(setq projectile-completion-system 'ivy)
 	:ensure t
+	:after evil
 	:bind
 	(:map
 	 my/projectile-map
@@ -1055,7 +1059,7 @@
 	 ("b" . projectile-switch-to-buffer)
 	 ("B" . projectile-ibuffer)
 	 ("f" . projectile-find-file)
-	 ("p" . projectile-lost-packages)
+	 ("p" . projectile-switch-project)
 	 ("r" . projectile-recentf)))
     #+END_SRC
 *** counsel-projectile
