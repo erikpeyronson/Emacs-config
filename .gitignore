@@ -2,8 +2,8 @@
 *
 # Now, whitelist anything that's a directory
 !config.org
-!local
-!local/*
+!packages
+!packages/*
 !submodules
 !submodules/*
 !snippets
