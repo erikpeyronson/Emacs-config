@@ -745,6 +745,7 @@
        :prefix-cmd compile-comment
        :bindings
        ("c" 'cp/compile
+	"C" 'cp/compile-in-project-with-read
 	"r" 'recompile
 	"k" 'kill-compilation
 	"l" 'my-comment-or-uncomment-region-or-line))
@@ -1228,22 +1229,23 @@
 
 *** flycheck
  #+BEGIN_SRC emacs-lisp :tangle yes
-   (use-package flycheck
-     :ensure t
-     :bind
-     (:map my/errors-map
-     ("." . spacemacs/error-transient-state/body)
-      ("S" . flycheck-set-checker-executable)
-      ("b" . flycheck-buffer)
-      ("c" . flycheck-clear)
-      ("h" . flycheck-describe-checker)
-      ("l" . my/flycheck-toggle-error-list)
-      ("s" . flycheck-select-checker)
-      ("v" . flycheck-verify-setup)
-      ("x" . flycheck-explain-error-at-point)
-      ("y" . flycheck-copy-errors-as-kill))
-     :config
-     (setq flycheck-idle-change-delay 2))
+     (use-package flycheck
+       :ensure t
+       :bind
+       (:map my/errors-map
+       ("." . spacemacs/error-transient-state/body)
+	("S" . flycheck-set-checker-executable)
+	("b" . flycheck-buffer)
+	("c" . flycheck-clear)
+	("h" . flycheck-describe-checker)
+	("l" . my/flycheck-toggle-error-list)
+	("s" . flycheck-select-checker)
+	("v" . flycheck-verify-setup)
+	("t" . flycheck-mode)
+	("x" . flycheck-explain-error-at-point)
+	("y" . flycheck-copy-errors-as-kill))
+       :config
+       (setq flycheck-idle-change-delay 2))
  #+END_SRC
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1749,8 +1751,9 @@
 	:ensure t
 	:bind
 	(:map
-	 my/search-map
-	 ("h" . highlight-symbol)
+	 my/help-highlight-map
+	 ("t" . highlight-symbol-mode)
+	 ("s" . highlight-symbol)
 	 ("n" . highlight-symbol-nav-mode)
 	 ("o" . highlight-symbol-occur)
 	 ("l" . highlight-symbol-list-all)
@@ -1939,9 +1942,15 @@
 	#+END_SRC
 **** company-rtags
      #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package company-rtags
-	:ensure t
-	:requires (company-mode rtags))
+		    (use-package company-rtags
+		      :ensure t
+		      :init
+		      (defun my/setup-company-rtags ()
+			(add-to-list 'company-backends 'company-rtags))
+		      (add-hook 'c++-mode-hook 'my/setup-company-rtags)
+
+		      :requires (company-mode rtags)
+		      :config)
      #+END_SRC
 **** flycheck-rtags
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1983,6 +1992,7 @@
 	(when (eq major-mode 'c++-mode)
 	  (when (locate-dominating-file (buffer-file-name) ".clang-format")
 	    (clang-format-buffer))))
+
       (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
 	    #+end_src
 ** python-mode

@@ -1,7 +1,7 @@
 (defvar-local cp/compile-program "make"
   "Program used when when calling `my-compile'")
 
-(defvar-local cp/compile-flags "-j8 all"
+(defvar-local cp/compile-flags "-j8 test"
   "Flags passed to `cp/make-program' when calling `my-compile'")
 
 (defvar-local cp/compile-command-func #'cp//create-make-command
@@ -93,16 +93,14 @@
   (message result))
 
 
-(add-hook 'compilation-finish-functions 'cp//compile-next)
-
 (defun cp/compile-in-project-with-read ()
   (interactive)
   (let ((default-directory
-	  (completing-read
+	  (file-name-directory (completing-read
 	   "Select makefile: "
 	   (directory-files-recursively
 	    (funcall cp/project-root-function) "Makefile")))))
-  (compile (funcall cp/compile-command-func)))
+    (cp/compile)))
 
 (defun cp/queue-compilation()
   (interactive)
@@ -173,10 +171,9 @@
 
 (require 'cc-cmds)
 (require 'subr-x)
-(defvar cp/gtest-header-regexp "^TEST_F(\\(.*\\), \\(.*\\)) {$")
+(defvar cp/gtest-header-regexp "^TEST\\(?:_F\\)?(\\(.*\\), \\(.*\\)) {$")
 (defvar cp/test-filename-regexp "^.*test.cc")
 (defvar cp/gtest-env-var-name "RUN_ARGS")
-(setq cp/gtest-header-regexp "^TEST(\\(.*\\), \\(.*\\)) {$")
 (defvar cp/test-list nil)
 
 (defun cp//parse-file-old ()

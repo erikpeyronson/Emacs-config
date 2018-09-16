@@ -7,7 +7,8 @@
 !submodules
 !submodules/*
 !snippets
-!snippets/*
+!snippets/**/*
+
 !.gitmodules
 !LICENCE
 !README.md
