@@ -594,55 +594,59 @@
 
 *** buffers
     #+BEGIN_SRC emacs-lisp :tangle yes
-	    (defhydra hydra-cycle-buffer (:foreign-keys nil :hint nil)
-	     "
-	    [_1_-_9_]:buffer-to [n]
-	    "
-	      ("1" buffer-to-window-1)
-	      ("2" buffer-to-window-2 )
-	      ("3" buffer-to-window-3)
-	      ("4" buffer-to-window-4)
-	      ("5" buffer-to-window-5)
-	      ("6" buffer-to-window-6)
-	      ("7" buffer-to-window-7)
-	      ("8" buffer-to-window-8)
-	      ("9" buffer-to-window-9)
-	      ("n" next-buffer "next")
-	      ("p" previous-buffer "previous")
-	      ("d" spacemacs/kill-this-buffer "kill")
-	      ("q" nil))
+      (defhydra hydra-cycle-buffer (:foreign-keys nil :hint nil)
+       "
+      [_1_-_9_]:buffer-to [n]
+      "
+	("1" buffer-to-window-1)
+	("2" buffer-to-window-2 )
+	("3" buffer-to-window-3)
+	("4" buffer-to-window-4)
+	("5" buffer-to-window-5)
+	("6" buffer-to-window-6)
+	("7" buffer-to-window-7)
+	("8" buffer-to-window-8)
+	("9" buffer-to-window-9)
+	("n" next-buffer "next")
+	("p" previous-buffer "previous")
+	("d" spacemacs/kill-this-buffer "kill")
+	("q" nil))
 
-	    (bind-map my/buffers-map
-	      :keys ((my/make-emacs-prefix "b"))
-	      :evil-keys ((my/make-evil-prefix "b"))
-	      :evil-states (normal motion visual)
-	      :prefix-cmd buffers
-	      :bindings
-	      ("." 'spacemacs/buffer-transient-state/body
-	       "1" 'buffer-to-window-1
-	       "2" 'buffer-to-window-2
-	       "3" 'buffer-to-window-3
-	       "4" 'buffer-to-window-4
-	       "5" 'buffer-to-window-5
-	       "6" 'buffer-to-window-6
-	       "7" 'buffer-to-window-7
-	       "8" 'buffer-to-window-8
-	       "9" 'buffer-to-window-9
-	       "B" 'ibuffer
-	       "N" 'spacemacs/new-empty-buffer
-	       "P" 'spacemacs/copy-clipboard-to-whole-buffer
-	       "R" 'spacemacs/safe-revert-buffer
-	       "Y" 'spacemacs/copy-whole-buffer-to-clipboard
-	       "b" 'switch-to-buffer
-	       "d" 'spacemacs/kill-this-buffer
-	       "e" 'spacemacs/safe-erase-buffer
-	       "I" 'ibuffer
-	       "m" 'spacemacs/kill-other-buffers
-	       "n" 'next-buffer
-	       "p" 'previous-buffer
-	       "s" 'spacemacs/switch-to-scratch-buffer
-	       "w" 'read-only-mode
-	       "." 'hydra-cycle-buffer))
+       (defhydra hydra/prev-next-buffer (:foreign-keys nil)
+	 ("n" next-buffer "next")
+	 ("p" previous-buffer "previous"))
+
+      (bind-map my/buffers-map
+	:keys ((my/make-emacs-prefix "b"))
+	:evil-keys ((my/make-evil-prefix "b"))
+	:evil-states (normal motion visual)
+	:prefix-cmd buffers
+	:bindings
+	("." 'spacemacs/buffer-transient-state/body
+	 "1" 'buffer-to-window-1
+	 "2" 'buffer-to-window-2
+	 "3" 'buffer-to-window-3
+	 "4" 'buffer-to-window-4
+	 "5" 'buffer-to-window-5
+	 "6" 'buffer-to-window-6
+	 "7" 'buffer-to-window-7
+	 "8" 'buffer-to-window-8
+	 "9" 'buffer-to-window-9
+	 "B" 'ibuffer
+	 "N" 'spacemacs/new-empty-buffer
+	 "P" 'spacemacs/copy-clipboard-to-whole-buffer
+	 "R" 'spacemacs/safe-revert-buffer
+	 "Y" 'spacemacs/copy-whole-buffer-to-clipboard
+	 "b" 'switch-to-buffer
+	 "d" 'spacemacs/kill-this-buffer
+	 "e" 'spacemacs/safe-erase-buffer
+	 "I" 'ibuffer
+	 "m" 'spacemacs/kill-other-buffers
+	 "n" 'hydra/prev-next-buffer/next-buffer
+	 "p" 'hydra/prev-next-buffer/previous-buffer
+	 "s" 'spacemacs/switch-to-scratch-buffer
+	 "w" 'read-only-mode
+	 "." 'hydra-cycle-buffer))
     #+END_SRC
 
 *** Windows
@@ -1089,7 +1093,6 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package ivy
 	:ensure t
-	:after projectile
 	:bind
 	(:map ivy-minibuffer-map
 	      (" " . ivy-alt-done)
@@ -1890,6 +1893,22 @@
 	  (setq my/imenu-function #'rtags-imenu))
 
 	(add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
+	  (defhydra hydra/rtags-nav (:hint nil :color pink )
+	    "
+      Rtags Naviagion
+      --------------------------------------------------------------------
+      _g_:find symbol  _r_:references   _p_:previous  _f_:forward
+      _i_:symbol-info  _n_:next         _b_:back      _q_:exit
+      --------------------------------------------------------------------
+      "
+	    ("r"  rtags-find-references-at-point)
+	    ("g"  rtags-find-symbol-at-point)
+	    ("p"  rtags-previous-match)
+	    ("f"  rtags-location-stack-forward)
+	    ("b"  rtags-location-stack-back)
+	    ("i"  rtags-symbol-info)
+	    ("n"  rtags-next-match)
+	    ("q"  nil :color blue))
 	:config
 	(add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
 	(add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
@@ -1903,23 +1922,9 @@
 	  :evil-keys (my/evil-mode-leader-key)
 	  :evil-states (normal motion visual)
 	  :prefix rtags
-	  :init
-	  (defhydra hydra/rtags-nav (:hint nil :color pink )
-	    "
-      _r_:references   _p_:previous  _f_:forward _q_:exit
-      _i_:symbol-info  _n_:next      _b_:back
-      "
-	   ("r"  rtags-find-references-at-point)
-	   ("g"  rtags-find-symbol-at-point)
-	   ("p"  rtags-previous-match)
-	   ("f"  rtags-location-stack-forward)
-	   ("b"  rtags-location-stack-back)
-	   ("i"  rtags-symbol-info)
-	   ("n"  rtags-next-match)
-	   ("q"  nil :color blue))
-
 	  :bindings
-	  ("g g"  'rtags-find-symbol-at-point
+	  ("g ." 'hydra/rtags-nav/body
+	   "g g"  'rtags-find-symbol-at-point
 	   "g G"  'rtags-find-symbol
 	   "g r"  'rtags-find-references-at-point
 	   "g R"  'rtags-find-references
