@@ -1,6 +1,11 @@
 ;; init.el --- Emacs init-file
 
 ;; Code:
+;; start by removing gui elements to make startup look nicer
+(menu-bar-mode 0)
+(tool-bar-mode 0)
+(scroll-bar-mode 0)
+
 (package-initialize)
 (require 'org)
 

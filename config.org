@@ -9,28 +9,6 @@
   disable packages or configuration while still keeping it bundled with the mode
   it appleies to.
 
-* initialize package
- We start by adding package repos and load paths and initialize package
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (require 'package)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-  (let ((default-directory (concat user-emacs-directory "submodules/")))
-    (normal-top-level-add-subdirs-to-load-path))
-  (add-to-list 'load-path (concat user-emacs-directory "packages/"))
-  (package-initialize)
-#+END_SRC
-    Ensure some dependencies are installed. The packages use-package and bind-map are installed, these will be used to
-    manage packages and keybindings throughout the config.
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (dolist (package '(dash use-package bind-map)) nil
-    (unless (package-installed-p package)
-      (package-refresh-contents)
-      (package-install package)))
-  (require 'use-package)
-(require 'bind-map)
-   #+END_SRC
 * general config
    Balance windows automatically
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -75,6 +53,36 @@
  (let ((path (concat user-emacs-directory "custom.el")))
    (unless (file-exists-p path) (write-region "" nil path))
    (setq custom-file path))
+   #+END_SRC
+
+* initialize package
+ We start by adding package repos and load paths and initialize package
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+  (let ((default-directory (concat user-emacs-directory "submodules/")))
+    (normal-top-level-add-subdirs-to-load-path))
+  (add-to-list 'load-path (concat user-emacs-directory "packages/"))
+  (package-initialize)
+#+END_SRC
+    Ensure some important dependencies are installed. The packages use-package and bind-map will be used to
+    manage packages and keybindings throughout the config.
+#+BEGIN_SRC emacs-lisp :tangle yes
+  (dolist (package '(dash use-package bind-map hydra)) nil
+    (unless (package-installed-p package)
+      (package-refresh-contents)
+      (package-install package)))
+  (require 'use-package)
+(require 'bind-map)
+   #+END_SRC
+* theme
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package solarized-theme
+       :config
+       (load-theme 'solarized-dark t)
+       :ensure t)
    #+END_SRC
 
 * utility functions
@@ -928,6 +936,7 @@
 	:ensure t
 	:init
 	(setq evil-want-integration nil)
+	(setq evil-want-keybinding nil)
 	:config
 	(evil-mode 1))
     #+END_SRC
@@ -1017,38 +1026,92 @@
   (evil-define-key '(insert normal visual) 'global-map (kbd "M-/")
     'hippie-expand)
   #+END_SRC
+** projectile
+*** projectile
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package projectile
+	:config
+	(projectile-mode)
+	:ensure t
+	:bind
+	(:map
+	 my/projectile-map
+	 ("!" . projectile-run-shell-command-in-root)
+	 ("%" . projectile-replace-regexp)
+	 ("&" . projectile-run-async-shell-command-in-root)
+	 ("d" . projectile-dired)
+	 ("D" . projectile-dired-other-window)
+	 ("F" . projectile-find-file-dwim)
+	 ("G" . projectile-regenerate-tags)
+	 ("I" . projectile-invalidate-cache)
+	 ("R" . projectile-replace)
+	 ("T" . projectile-test-project)
+	 ("a" . projectile-toggle-between-implementation-and-test)
+	 ("c" . projectile-compile-project)
+	 ("e" . projectile-edit-dir-locals)
+	 ("g" . projectile-find-tag)
+	 ("k" . projectile-kill-buffers)
+	 ("v" . projectile-vc)
+	 ("b" . projectile-switch-to-buffer)
+	 ("B" . projectile-ibuffer)
+	 ("f" . projectile-find-file)
+	 ("p" . projectile-lost-packages)
+	 ("r" . projectile-recentf)))
+    #+END_SRC
+*** counsel-projectile
+    #+begin_src emacs-lisp :tangle no
+      (use-package counsel-projectile
+	:ensure t
+	:bind
+	(:map
+	 my/projectile-map
+	 ("SPC" . counsel-projectile)
+	 ("b" . counsel-projectile-switch-to-buffer)
+	 ("f" . counsel-projectile-find-file)
+	 ("d" . counsel-projectile-find-dir)
+	 ("p" . counsel-projectile-switch-project)))
+
+    #+end_src
+*** ibuffer-projectile
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package ibuffer-projectile
+	:ensure t
+	:config
+	(ibuffer-projectile-set-filter-groups))
+    #+END_SRC
 ** ivy
 *** ivy
     #+BEGIN_SRC emacs-lisp :tangle yes
-	    (use-package ivy
-	      :ensure t
-	      :bind
-	      (:map ivy-minibuffer-map
-		    (" " . ivy-alt-done)
-		    ("C-j" . ivy-next-line)
-		    ("C-k" . ivy-previous-line)
-		    ("C-h" . 'ivy-backward-delete-char)
-		    :map my/reg-ring-resume-map
-		    ("m" . counsel-mark-ring)
-		    ("y" . counsel-yank-pop)
-		    ("l" . ivy-resume))
-	      :init
-	      (add-hook 'after-init-hook 'ivy-mode)
-	      :config
+      (use-package ivy
+	:ensure t
+	:after projectile
+	:bind
+	(:map ivy-minibuffer-map
+	      (" " . ivy-alt-done)
+	      ("C-j" . ivy-next-line)
+	      ("C-k" . ivy-previous-line)
+	      ("C-h" . 'ivy-backward-delete-char)
+	      :map my/reg-ring-resume-map
+	      ("m" . counsel-mark-ring)
+	      ("y" . counsel-yank-pop)
+	      ("l" . ivy-resume))
+	:init
+	(add-hook 'after-init-hook 'ivy-mode)
+	:config
 	(defvar spacemacs--counsel-commands
-  '(;; --line-number forces line numbers (disabled by default on windows)
-    ;; no --vimgrep because it adds column numbers that wgrep can't handle
-    ;; see https://github.com/syl20bnr/spacemacs/pull/8065
-    ("rg" . "rg --smart-case --no-heading --color never --line-number --max-columns 150 %s %S .")
-    ("ag" . "ag --nocolor --nogroup %s %S .")
-    ("pt" . "pt -e --nocolor --nogroup %s %S .")
-    ("ack" . "ack --nocolor --nogroup %s %S .")
-    ("grep" . "grep -nrP %s %S ."))
-  "An alist of search commands and their corresponding commands
-with options to run in the shell.")
-	      ;; (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
-	      ;; (evil-make-overriding-map ivy-occur-mode-map 'normal)
-      )
+	  '(;; --line-number forces line numbers (disabled by default on windows)
+	    ;; no --vimgrep because it adds column numbers that wgrep can't handle
+	    ;; see https://github.com/syl20bnr/spacemacs/pull/8065
+	    ("rg" . "rg --smart-case --no-heading --color never --line-number --max-columns 150 %s %S .")
+	    ("ag" . "ag --nocolor --nogroup %s %S .")
+	    ("pt" . "pt -e --nocolor --nogroup %s %S .")
+	    ("ack" . "ack --nocolor --nogroup %s %S .")
+	    ("grep" . "grep -nrP %s %S ."))
+	  "An alist of search commands and their corresponding commands
+      with options to run in the shell.")
+	;; (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
+	;; (evil-make-overriding-map ivy-occur-mode-map 'normal)
+	)
    #+END_SRC
 
 *** ivy-yasnippet
@@ -1304,72 +1367,11 @@ with options to run in the shell.")
 	:config
 	(evil-magit-init))
     #+END_SRC
-** projectile
-*** projectile
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package projectile
-	:config
-	(projectile-mode)
-	:ensure t
-	:bind
-	(:map
-	 my/projectile-map
-	 ("!" . projectile-run-shell-command-in-root)
-	 ("%" . projectile-replace-regexp)
-	 ("&" . projectile-run-async-shell-command-in-root)
-	 ("d" . projectile-dired)
-	 ("D" . projectile-dired-other-window)
-	 ("F" . projectile-find-file-dwim)
-	 ("G" . projectile-regenerate-tags)
-	 ("I" . projectile-invalidate-cache)
-	 ("R" . projectile-replace)
-	 ("T" . projectile-test-project)
-	 ("a" . projectile-toggle-between-implementation-and-test)
-	 ("c" . projectile-compile-project)
-	 ("e" . projectile-edit-dir-locals)
-	 ("g" . projectile-find-tag)
-	 ("k" . projectile-kill-buffers)
-	 ("v" . projectile-vc)
-	 ("b" . projectile-switch-to-buffer)
-	 ("B" . projectile-ibuffer)
-	 ("f" . projectile-find-file)
-	 ("p" . projectile-lost-packages)
-	 ("r" . projectile-recentf)))
-    #+END_SRC
-*** counsel-projectile
-    #+begin_src emacs-lisp :tangle no
-      (use-package counsel-projectile
-	:ensure t
-	:bind
-	(:map
-	 my/projectile-map
-	 ("SPC" . counsel-projectile)
-	 ("b" . counsel-projectile-switch-to-buffer)
-	 ("f" . counsel-projectile-find-file)
-	 ("d" . counsel-projectile-find-dir)
-	 ("p" . counsel-projectile-switch-project)))
-
-    #+end_src
-*** ibuffer-projectile
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package ibuffer-projectile
-	:ensure t
-	:config
-	(ibuffer-projectile-set-filter-groups))
-    #+END_SRC
 ** hydra
    #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package hydra
     :ensure t)
    #+END_SRC
-** theme
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package solarized-theme
-       :config
-       (load-theme 'solarized-dark t)
-       :ensure t)
-   #+END_SRC
-
 ** shell
 *** vars
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1433,9 +1435,7 @@ with options to run in the shell.")
      (use-package ediff
       :config
      (setq ediff-merge-split-window-function 'split-window-horizontally)
-     (setq ediff-split-window-function 'split-window-horizontally)
-
-      )
+     (setq ediff-split-window-function 'split-window-horizontally))
    #+END_SRC
 * org
 ** org
@@ -1581,7 +1581,7 @@ with options to run in the shell.")
 
    #+END_SRC
 ** org-projectile
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle no
       (use-package org-projectile
 	:ensure t
 	:bind
@@ -1973,7 +1973,7 @@ with options to run in the shell.")
 
 *** clang-format
     #+begin_src emacs-lisp :tangle yes
-      (use-package clang-format :config)
+      (use-package clang-format :ensure t)
 
       (defun my/clang-format-if-file-exists ()
 	(when (eq major-mode 'c++-mode)
