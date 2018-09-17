@@ -1905,7 +1905,8 @@
 	:evil-states (normal motion visual)
 	:prefix rtags
 	:bindings
-	("c t" 'cp/compile-gtest-suite-at-point
+	("t o" 'cp/gtest-occur
+	 "c t" 'cp/compile-gtest-suite-at-point
 	 "c s" 'cp/compile-gtest-test-at-point
 	 "c g" 'my/compile-and-gcov
 	 "c c" 'cp/compile

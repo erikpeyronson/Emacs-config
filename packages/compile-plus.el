@@ -294,4 +294,8 @@
     (cp/compile t (format "RUN_ARGS=\"%s\" test"
 			  (cp//gtest-flags arg group)))))
 
+(defun cp/gtest-occur ()
+  (interactive)
+  (occur cp/gtest-header-regexp))
+
 (provide 'compile-plus)
