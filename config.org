@@ -83,12 +83,29 @@
        :config
        (load-theme 'solarized-dark t)
        :ensure t)
-     (use-package doom-modeline
-       :ensure t
-       :defer t
-       :hook (after-init . doom-modeline-init))
    #+END_SRC
+* mode-line
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (defun my/setup-mode-line ()
+      (setq mode-line-format '("%e"
+			       (:eval
+				(winum-get-number-string))
+			       mode-line-front-space
+			       mode-line-mule-info
+			       mode-line-client
+			       mode-line-modified
+			       mode-line-remote
+			       mode-line-frame-identification
+			       mode-line-buffer-identification
+			       "   "
+			       mode-line-position
+			       evil-mode-line-tag
+			       (vc-mode vc-mode)
+			       "  " mode-line-misc-info
+			       mode-line-end-spaces)))
 
+    (add-hook 'after-change-major-mode-hook 'my/setup-mode-line)
+  #+END_SRC
 * utility functions
   #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my-read-expanded-filename ()
