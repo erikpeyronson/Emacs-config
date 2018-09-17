@@ -959,6 +959,20 @@
 	 :evil-states (normal motion visual)
 	 :prefix-cmd regs-rings-resume)
     #+END_SRC
+*** narrowing
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map my/narrow-map
+	:keys ((my/make-emacs-prefix "n"))
+	:evil-keys ((my/make-evil-prefix "n"))
+	:evil-states (normal motion visual)
+	:prefix-cmd regs-rings-resume
+	:bindings
+	("r" 'narrow-to-region
+	 "f" 'narrow-to-defun
+	 "p" 'narrow-to-page
+	 "w" 'widen))
+    #+END_SRC
+
 * global config
 ** evil
 *** evil
