@@ -2036,7 +2036,7 @@
 	 :init
 	 (defun my/setup-company-rtags ()
 	   (add-to-list 'company-backends 'company-rtags))
-	 :config
+	 :init
 	 (evil-define-key '(normal) 'c++-mode-map
 	   (kbd "C-SPC") 'company-rtags))
      #+END_SRC
@@ -2059,9 +2059,9 @@
     #+END_SRC
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my/c++-company-setup ()
-       (company-mode))
-     (add-hook 'c++-mode-hook 'my/c++-company-setup)
+      (defun my/c++-company-setup ()
+	(company-mode))
+      (add-hook 'c++-mode-hook 'my/c++-company-setup)
     #+END_SRC
 *** google-c-style
     #+BEGIN_SRC emacs-lisp :tangle yes
