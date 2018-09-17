@@ -677,69 +677,70 @@
 
 *** Windows
     #+BEGIN_SRC emacs-lisp :tangle yes
-	     (defhydra hydra/window-navigation (:foreign-keys nil :exit nil)
-	      ("h" evil-window-left "left")
-	      ("j" evil-window-down "down")
-	      ("k" evil-window-up "up")
-	      ("l" evil-window-right "right")
-	      ("s" split-window-below "Split below")
-	      ("v" split-window-right "Split right")
-	      ("d" spacemacs/delete-window "delete")
-	      ("u" winner-undo "undo")
-	      ("U" winner-redo "redo")
-	      ("w" other-window "other window")
-	      ("d" delete-window "delete")
-	      ("o" other-frame "other frame")
-	      ("D" delete-frame "delete")
-	      ("q" nil "quit"))
+       (defhydra hydra/window-navigation (:foreign-keys nil :exit nil)
+	("h" evil-window-left "left")
+	("j" evil-window-down "down")
+	("k" evil-window-up "up")
+	("l" evil-window-right "right")
+	("s" split-window-below "Split below")
+	("v" split-window-right "Split right")
+	("d" spacemacs/delete-window "delete")
+	("u" winner-undo "undo")
+	("U" winner-redo "redo")
+	("w" other-window "other window")
+	("d" delete-window "delete")
+	("o" other-frame "other frame")
+	("D" delete-frame "delete")
+	("q" nil "quit"))
 
-	    (defhydra hydra/other-frame (:foreign-keys nil) ("o" other-frame "repeat"))
-	    (defhydra hydra/other-window (:foreign-keys nil) ("w" other-window "repeat"))
+      (defhydra hydra/other-frame (:foreign-keys nil) ("o" other-frame "repeat"))
+      (defhydra hydra/other-window (:foreign-keys nil) ("w" other-window "repeat"))
+      (defhydra hydra/winner-repeat (:foreign-keys nil) ("u" winner-undo "undo") ("U" winner-redo "redo"))
 
-	    (bind-map my/windows-map
-	      :keys ((my/make-emacs-prefix "w"))
-	      :evil-keys ((my/make-evil-prefix "w"))
-	      :evil-states (normal motion visual)
-	      :prefix-cmd windows
-	      :bindings
-	      ("." 'hydra/window-navigation/body
-	       "w" 'hydra/other-window/other-window
-	       "o" 'hydra/other-frame/other-frame
-	       "s" 'split-window-below
-	       "S" 'split-window-below-and-focus
-	       "v" 'split-window-right
-	       "V" 'split-window-right-and-focus
-	       "=" 'balance-windows
-	       "S" 'split-window-below-and-focus
-	       "V" 'split-window-right-and-focus
-	       "u" 'winner-undo
-	       "U" 'winner-redo
-	       "2" 'spacemacs/layout-double-columns
-	       "3" 'spacemacs/layout-triple-columns
-	       "_" 'spacemacs/maximize-horizontally
-	       "b" 'spacemacs/switch-to-minibuffer-window
-	       "d" 'spacemacs/delete-window
-	       "D" 'delete-frame
-	       "m" 'spacemacs/toggle-maximize-buffer
-	       "r" 'spacemacs/rotate-windows-forward
-	       "=" 'balance-windows
-	       "F" 'make-frame
-	       "h" 'evil-window-left
-	       "j" 'evil-window-down
-	       "k" 'evil-window-up
-	       "l" 'evil-window-right
-	       "H" 'evil-window-move-far-left
-	       "J" 'evil-window-move-very-bottom
-	       "K" 'evil-window-move-very-top
-	       "L" 'evil-window-move-far-right
-	       "<S-down>" 'evil-window-move-very-bottom
-	       "<S-left>" 'evil-window-move-far-left
-	       "<S-right>" 'evil-window-move-far-right
-	       "<S-up>" 'evil-window-move-very-top
-	       "<down>" 'evil-window-down
-	       "<left>" 'evil-window-left
-	       "<right>" 'evil-window-right
-	       "<up>" 'evil-window-up))
+      (bind-map my/windows-map
+	:keys ((my/make-emacs-prefix "w"))
+	:evil-keys ((my/make-evil-prefix "w"))
+	:evil-states (normal motion visual)
+	:prefix-cmd windows
+	:bindings
+	("." 'hydra/window-navigation/body
+	 "w" 'hydra/other-window/other-window
+	 "o" 'hydra/other-frame/other-frame
+	 "s" 'split-window-below
+	 "S" 'split-window-below-and-focus
+	 "v" 'split-window-right
+	 "V" 'split-window-right-and-focus
+	 "=" 'balance-windows
+	 "S" 'split-window-below-and-focus
+	 "V" 'split-window-right-and-focus
+	 "u" 'hydra/winner-repeat/winner-undo
+	 "U" 'hydra/winner-repeat/winner-redo
+	 "2" 'spacemacs/layout-double-columns
+	 "3" 'spacemacs/layout-triple-columns
+	 "_" 'spacemacs/maximize-horizontally
+	 "b" 'spacemacs/switch-to-minibuffer-window
+	 "d" 'spacemacs/delete-window
+	 "D" 'delete-frame
+	 "m" 'spacemacs/toggle-maximize-buffer
+	 "r" 'spacemacs/rotate-windows-forward
+	 "=" 'balance-windows
+	 "F" 'make-frame
+	 "h" 'evil-window-left
+	 "j" 'evil-window-down
+	 "k" 'evil-window-up
+	 "l" 'evil-window-right
+	 "H" 'evil-window-move-far-left
+	 "J" 'evil-window-move-very-bottom
+	 "K" 'evil-window-move-very-top
+	 "L" 'evil-window-move-far-right
+	 "<S-down>" 'evil-window-move-very-bottom
+	 "<S-left>" 'evil-window-move-far-left
+	 "<S-right>" 'evil-window-move-far-right
+	 "<S-up>" 'evil-window-move-very-top
+	 "<down>" 'evil-window-down
+	 "<left>" 'evil-window-left
+	 "<right>" 'evil-window-right
+	 "<up>" 'evil-window-up))
     #+END_SRC
 
 *** Files
