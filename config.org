@@ -108,6 +108,11 @@
   #+END_SRC
 * utility functions
   #+BEGIN_SRC emacs-lisp :tangle yes
+    (defun my/-set-font-size-globally ()
+      (interactive)
+      (set-face-attribute 'default nil :height (string-to-int (read-from-minibuffer "font size: "))))
+  #+END_SRC
+  #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my-read-expanded-filename ()
        "Read a directory with completion and return the expanded filename"
        (expand-file-name
