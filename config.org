@@ -1491,7 +1491,10 @@
 ** vlf
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package vlf
-       :ensure t)
+       :ensure t
+       :config
+       (evil-define-key '(normal visual) 'vlf-occur-mode-map
+	 (kbd "C-m") 'vlf-occur-visit))
    #+END_SRC
 * org
 ** org
