@@ -1474,6 +1474,11 @@
      (setq ediff-merge-split-window-function 'split-window-horizontally)
      (setq ediff-split-window-function 'split-window-horizontally))
    #+END_SRC
+** vlf
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package vlf
+       :ensure t)
+   #+END_SRC
 * org
 ** org
    #+BEGIN_SRC emacs-lisp :tangle yes
