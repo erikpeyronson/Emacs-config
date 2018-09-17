@@ -1306,17 +1306,19 @@
 
 *** avy
  #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package avy
-	 :ensure t
-	 :bind
-	 (:map my/jump-join-map
-	  ("b" . pop-mark)
-	  ("w" . avy-goto-word-or-subword-1)
-	  ("j" . avy-goto-char)
-	  ("J" . avy-goto-char-2)
-	  ("T" . avy-goto-char-timer)
-	  ("b" . avy-pop-mark)
-	  ("l" . avy-goto-line)))
+   (use-package avy
+	:ensure t
+	:bind
+	(:map my/jump-join-map
+	      ("b" . pop-mark)
+	      ("w" . avy-goto-word-or-subword-1)
+	      ("j" . avy-goto-char)
+	      ("J" . avy-goto-char-2)
+	      ("T" . avy-goto-char-timer)
+	      ("b" . avy-pop-mark)
+	      ("l" . avy-goto-line))
+	:init
+	(setq avy-all-windows nil))
  #+END_SRC
 
 *** link-hint
