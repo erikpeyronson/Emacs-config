@@ -1937,8 +1937,8 @@
 	(add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
 	(setq rtags-display-result-backend 'ivy)
 	(setq rtags-imenu-syntax-highlighting t)
-	(setq rtags-autostart-diagnostics t)
-	(setq rtags-completions-enabled t)
+	(setq rtags-autostart-diagnostics nil)
+	(setq rtags-completions-enabled nil)
 	(setq rtags-enable-unsaved-reparsing t)
 	(bind-map-for-major-mode c++-mode
 	  :keys (my/emacs-mode-leader-key)
@@ -1981,7 +1981,7 @@
 		      :config)
      #+END_SRC
 **** flycheck-rtags
-     #+BEGIN_SRC emacs-lisp :tangle yes
+     #+BEGIN_SRC emacs-lisp :tangle no
       (use-package flycheck-rtags
 	:ensure t
 	:after (flycheck-mode rtags))
