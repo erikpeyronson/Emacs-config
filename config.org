@@ -83,6 +83,10 @@
        :config
        (load-theme 'solarized-dark t)
        :ensure t)
+     (use-package doom-modeline
+       :ensure t
+       :defer t
+       :hook (after-init . doom-modeline-init))
    #+END_SRC
 
 * utility functions
@@ -651,7 +655,7 @@
 
 *** Windows
     #+BEGIN_SRC emacs-lisp :tangle yes
-	     (defhydra hydra-window-navigation (:foreign-keys nil :exit nil)
+	     (defhydra hydra/window-navigation (:foreign-keys nil :exit nil)
 	      ("h" evil-window-left "left")
 	      ("j" evil-window-down "down")
 	      ("k" evil-window-up "up")
@@ -667,8 +671,8 @@
 	      ("D" delete-frame "delete")
 	      ("q" nil "quit"))
 
-	    (defhydra hydra-other-frame (:foreign-keys nil) ("o" other-frame "repeat"))
-	    (defhydra hydra-other-window (:foreign-keys nil) ("w" other-window "repeat"))
+	    (defhydra hydra/other-frame (:foreign-keys nil) ("o" other-frame "repeat"))
+	    (defhydra hydra/other-window (:foreign-keys nil) ("w" other-window "repeat"))
 
 	    (bind-map my/windows-map
 	      :keys ((my/make-emacs-prefix "w"))
@@ -676,9 +680,9 @@
 	      :evil-states (normal motion visual)
 	      :prefix-cmd windows
 	      :bindings
-	      ("." 'hydra-window-navigation
-	       "w" 'hydra-other-window/other-window
-	       "o" 'hydra-other-frame/other-frame
+	      ("." 'hydra/window-navigation/body
+	       "w" 'hydra/other-window/other-window
+	       "o" 'hydra/other-frame/other-frame
 	       "s" 'split-window-below
 	       "S" 'split-window-below-and-focus
 	       "v" 'split-window-right
