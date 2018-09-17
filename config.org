@@ -1305,7 +1305,7 @@
 	:ensure t
 	:bind
 	:config
-	(setq company-idle-delay 0.7)
+	(setq company-idle-delay 0.5)
 	(setq company-backends '((company-dabbrev-code
 				  company-gtags
 				  company-etags
@@ -1999,15 +1999,14 @@
 	#+END_SRC
 **** company-rtags
      #+BEGIN_SRC emacs-lisp :tangle yes
-		    (use-package company-rtags
-		      :ensure t
-		      :init
-		      (defun my/setup-company-rtags ()
-			(add-to-list 'company-backends 'company-rtags))
-		      (add-hook 'c++-mode-hook 'my/setup-company-rtags)
-
-		      :requires (company-mode rtags)
-		      :config)
+       (use-package company-rtags
+	 :ensure t
+	 :init
+	 (defun my/setup-company-rtags ()
+	   (add-to-list 'company-backends 'company-rtags))
+	 :config
+	 (evil-define-key '(normal) 'c++-mode-map
+	   (kbd "C-SPC") 'company-rtags))
      #+END_SRC
 **** flycheck-rtags
      #+BEGIN_SRC emacs-lisp :tangle no
@@ -2029,7 +2028,6 @@
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my/c++-company-setup ()
-       (add-to-list 'company-backends 'company-rtags)
        (company-mode))
      (add-hook 'c++-mode-hook 'my/c++-company-setup)
     #+END_SRC
