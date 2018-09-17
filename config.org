@@ -128,6 +128,12 @@
     (defun my/make-evil-mode-prefix (key)
       (concat my/evil-mode-leader-key " " key))
   #+END_SRC
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (defun my/delete-frame-with-prompt ()
+      (interactive)
+      (when (y-or-n-p "Really delete frame?")
+      (delete-frame)))
+  #+END_SRC
 * search commands
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my-counsel-ack-in-dir (arg)
@@ -720,7 +726,7 @@
 	 "_" 'spacemacs/maximize-horizontally
 	 "b" 'spacemacs/switch-to-minibuffer-window
 	 "d" 'spacemacs/delete-window
-	 "D" 'delete-frame
+	 "D" 'my/delete-frame-with-prompt
 	 "m" 'spacemacs/toggle-maximize-buffer
 	 "r" 'spacemacs/rotate-windows-forward
 	 "=" 'balance-windows
