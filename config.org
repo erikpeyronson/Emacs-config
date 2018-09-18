@@ -1519,31 +1519,48 @@
 	("p P" . counsel-spotify-previous)
 	("p p" . counsel-spotify-toggle-play-pause)))
    #+END_SRC
+** google-translate
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package google-translate
+      :ensure t)
+  #+END_SRC
 * plantuml-mode
-** plantuml-mode
+	** plantuml-mode
    #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package plantuml-mode
-       :ensure t)
+       :ensure t
+       :config
+       (add-to-list 'auto-mode-alist '("\\.dox\\'" . plantuml-mode))
+      (defun my/plantuml-preview-current-block ()
+	(interactive)
+	(plantuml-preview-current-block 16))
+
+     (defun my/plantuml-preview-region()
+	(interactive)
+	(plantuml-preview-region 16))
+
+     (defun my/plantuml-preview()
+	(interactive)
+	(plantuml-preview 16))
+
+      (bind-map-for-major-mode plantuml-mode
+	:keys (my/emacs-mode-leader-key)
+	:evil-keys (my/evil-mode-leader-key)
+	:evil-states (normal motion visual)
+	:prefix rtags
+	:bindings
+	("p B" 'plantuml-preview-current-block
+	 "p R" 'plantuml-preview-region
+	 "p P" 'plantuml-preview
+	 "p b" 'my/plantuml-preview-current-block
+	 "p r" 'my/plantuml-preview-region
+	 "p p" 'my/plantuml-preview)))
    #+END_SRC
 * markdown-mode
   #+BEGIN_SRC emacs-lisp :tangle yes
   (use-package markdown-mode
     :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.dox\\'" . markdown-mode))
-    (font-lock-add-keywords 'markdown-mode
-			;; mark each of three groups differently
-			;; @section label title
-			'(("^\\(@section\\) \\(.+?\\) \\(.+?\\)$"
-			   (1 font-lock-constant-face)
-			   (2 font-lock-comment-face)
-			   (3 font-lock-builtin-face))
-			  ;; @ref label
-			  ("\\(@ref\\)[[:space:]]+?\\(\\_<.+?\\_>\\)"
-			   (1 font-lock-constant-face)
-			   (2 font-lock-comment-face))
-			  ;; `@' not treated as part of symbol but look for next symbol end after `@'
-			  ("@.+?\\_>" . font-lock-constant-face))))
+    :config)
   #+END_SRC
 * org
 ** org
