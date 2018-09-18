@@ -1734,12 +1734,12 @@
 	 "x s" 'spacemacs/org-strike-through
 	 "x u" 'spacemacs/org-underline
 	 "x v" 'spacemacs/org-verbatim
-	 "i H" 'org-insert-heading-after-current
+	 "i h" 'org-insert-heading-after-current
+	 "i H" 'org-insert-heading
 	 "i K" 'spacemacs/insert-keybinding-org
 	 "i d" 'org-insert-drawer
 	 "i e" 'org-set-effort
 	 "i f" 'org-footnote-new
-	 "i h" 'org-insert-heading
 	 "i l" 'org-insert-link
 	 "i n" 'org-add-note
 	 "i p" 'org-set-property
