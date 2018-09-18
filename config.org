@@ -1503,6 +1503,18 @@
        (evil-define-key '(normal visual) 'vlf-occur-mode-map
 	 (kbd "C-m") 'vlf-occur-visit))
    #+END_SRC
+** counsel-spotify
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package counsel-spotify
+       :ensure t
+       :bind
+       (:map my/search-map
+	("p a" . counsel-spotify-search-artist)
+	("p A" . counsel-spotify-search-album)
+	("p s" . counsel-spotify-search-track)
+	("p n" . counsel-spoitfy-next)
+	("p p" . counsel-spotify-toggle-play-pause)))
+   #+END_SRC
 * plantuml-mode
 ** plantuml-mode
    #+BEGIN_SRC emacs-lisp :tangle yes
