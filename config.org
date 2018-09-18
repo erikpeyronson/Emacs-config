@@ -1960,6 +1960,7 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my/setup-c++-mode ()
 	(subword-mode))
+      (add-hook 'c++-mode-hook 'my/setup-c++-mode)
       (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
     #+END_SRC
     Add some paths for jumping between c and h files using 'ff-find-other-file
