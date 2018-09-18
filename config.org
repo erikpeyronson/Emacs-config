@@ -48,11 +48,14 @@
 
    Keep custom variables in a separate gitignored file to allow local customizations
    using customize
-** custom-vars
    #+BEGIN_SRC emacs-lisp :tangle yes
  (let ((path (concat user-emacs-directory "custom.el")))
    (unless (file-exists-p path) (write-region "" nil path))
    (setq custom-file path))
+   #+END_SRC
+   Speed up tramp
+   #+BEGIN_SRC emacs-lisp :tangle yes
+   (setq tramp-default-method "ssh")
    #+END_SRC
 
 * initialize package
