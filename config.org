@@ -1515,7 +1515,8 @@
 	("p a" . counsel-spotify-search-artist)
 	("p A" . counsel-spotify-search-album)
 	("p s" . counsel-spotify-search-track)
-	("p n" . counsel-spoitfy-next)
+	("p n" . counsel-spotify-next)
+	("p P" . counsel-spotify-previous)
 	("p p" . counsel-spotify-toggle-play-pause)))
    #+END_SRC
 * plantuml-mode
