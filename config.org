@@ -766,7 +766,8 @@
 	 "j" 'dired-jump
 	 "J" 'dired-jump-other-window
 	 "f" 'find-file
-	 "l" 'find-file-literally
+	 "L" 'find-file-literally
+	 "l" 'counsel-locate
 	 "r" 'counsel-recentf
 	 "s" 'save-buffer
 	 "y" 'spacemacs/show-and-copy-buffer-filename
@@ -983,6 +984,15 @@
 	 "w" 'widen))
     #+END_SRC
 
+*** toggle
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map my/toggle-map
+	:keys ((my/make-emacs-prefix "t"))
+	:evil-keys ((my/make-evil-prefix "n"))
+	:evil-states (normal motion visual)
+	:prefix-cmd regs-rings-resume
+	:bindings)
+    #+END_SRC
 * global config
 ** evil
 *** evil
@@ -1242,25 +1252,27 @@
 
 *** evil-mc
     #+BEGIN_SRC emacs-lisp :tangle yes
-	    (use-package evil-mc
-	      :ensure t
-	      :requires evil
-	      :config
-	      (evil-define-key '(normal visual) 'global-map
-		(kbd "g r t") 'evil-mc-mode
-		(kbd "g r N") 'evil-mc-skip-and-goto-next-cursor
-		(kbd "g r P") 'evil-mc-skip-and-goto-prev-cursor
-		(kbd "g r f") 'evil-mc-make-and-goto-first-cursor
-		(kbd "g r h") 'evil-mc-make-cursor-here
-		(kbd "g r j") 'evil-mc-make-cursor-move-next-line
-		(kbd "g r k") 'evil-mc-make-cursor-move-prev-line
-		(kbd "g r l") 'evil-mc-make-and-goto-last-cursor
-		(kbd "g r m") 'evil-mc-make-all-cursors
-		(kbd "g r n") 'evil-mc-skip-and-goto-next-match
-		(kbd "g r p") 'evil-mc-skip-and-goto-prev-match
-		(kbd "g r r") 'evil-mc-resume-cursors
-		(kbd "g r s") 'evil-mc-pause-cursors
-		(kbd "g r u") 'evil-mc-undo-all-cursors))
+      (use-package evil-mc
+	:ensure t
+	:requires evil
+	:bind
+	(:map my/toggle-map
+	      ("m" . evil-mc-mode))
+	:config
+	(evil-define-key '(normal visual) 'evil-mc-key-map
+	  (kbd "g r N") 'evil-mc-skip-and-goto-next-cursor
+	  (kbd "g r P") 'evil-mc-skip-and-goto-prev-cursor
+	  (kbd "g r f") 'evil-mc-make-and-goto-first-cursor
+	  (kbd "g r h") 'evil-mc-make-cursor-here
+	  (kbd "g r j") 'evil-mc-make-cursor-move-next-line
+	  (kbd "g r k") 'evil-mc-make-cursor-move-prev-line
+	  (kbd "g r l") 'evil-mc-make-and-goto-last-cursor
+	  (kbd "g r m") 'evil-mc-make-all-cursors
+	  (kbd "g r n") 'evil-mc-skip-and-goto-next-match
+	  (kbd "g r p") 'evil-mc-skip-and-goto-prev-match
+	  (kbd "g r r") 'evil-mc-resume-cursors
+	  (kbd "g r s") 'evil-mc-pause-cursors
+	  (kbd "g r u") 'evil-mc-undo-all-cursors))
     #+END_SRC
 ** visual
    #+begin_src emacs-lisp :tangle no
@@ -1300,6 +1312,8 @@
      (use-package flycheck
        :ensure t
        :bind
+	(:map my/toggle-map
+	      ("f" . flycheck-mode))
        (:map my/errors-map
        ("." . spacemacs/error-transient-state/body)
 	("S" . flycheck-set-checker-executable)
@@ -1884,6 +1898,8 @@
       (use-package highlight-symbol
 	:ensure t
 	:bind
+	(:map my/toggle-map
+	      ("h" . evil-mc-mode))
 	(:map
 	 my/help-highlight-map
 	 ("t" . highlight-symbol-mode)
