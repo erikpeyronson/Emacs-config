@@ -1327,6 +1327,7 @@
 	("x" . flycheck-explain-error-at-point)
 	("y" . flycheck-copy-errors-as-kill))
        :config
+       (setq flycheck-display-errors-function nil)
        (setq flycheck-idle-change-delay 2))
  #+END_SRC
 **** funcs
@@ -2091,8 +2092,8 @@
 	   "g h"  'rtags-print-class-hierarchy
 	   "g n"  'rtags-next-match
 	   "g p"  'rtags-previous-match
-	   "g f"  'rtags-location-stack-forward
-	   "g b"    'rtags-location-stack-back
+	   "g f"  'hydra/rtags-nav/rtags-location-stack-forward
+	   "g b"    'hydra/rtags-nav/rtags-location-stack-forward
 	   "g i"    'rtags-symbol-info
 	   "g e f"  'rtags-fix-fixit-at-point
 	   "g e F"  'rtags-fixit
