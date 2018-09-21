@@ -2108,7 +2108,7 @@
 	 (defun my/setup-company-rtags ()
 	   (add-to-list 'company-backends 'company-rtags))
 	 :init
-	 (evil-define-key '(normal) 'c++-mode-map
+	 (evil-define-key '(normal insert) 'c++-mode-map
 	   (kbd "C-SPC") 'company-rtags))
      #+END_SRC
 **** flycheck-rtags
