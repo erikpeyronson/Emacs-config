@@ -1471,8 +1471,8 @@
 		 :group 'my-shell)
 
        (defcustom my-shell-buffer-name-regex
-		 "^\\*term-.*\\*$"
-		 "Regexp used to identify if the current window is a term buffer"
+		 "^\\*shell-.*\\*$"
+		 "Regexp used to identify if the current window is a shell buffer"
 		 :group 'my-shell)
     #+END_SRC
 
@@ -1480,14 +1480,14 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
 	(defun my-shell-toggle-shell(shell-buffer-name)
 		  "Toggle a window and run program defined in `my-shell-program'
-	If a buffer SHELL-BUFFER-NAME reuse, else start a new term process"
-		  (if (string-match "^\\*term-.*\\*$" (buffer-name))
+	If a buffer SHELL-BUFFER-NAME reuse, else start a new shell process"
+		  (if (string-match "^\\*shell-.*\\*$" (buffer-name))
 	      (delete-window)
 	    (select-window (split-window-below))
 	    (let ((buffer (get-buffer shell-buffer-name)))
 	      (if buffer
 		  (switch-to-buffer buffer)
-		(term my-shell-program)
+		(shell my-shell-program)
 		(rename-buffer shell-buffer-name)))))
     #+END_SRC
 
@@ -1495,12 +1495,12 @@
 	(defun my/main-shell ()
 		  "Toggle the main shell"
 		  (interactive)
-		  (my-shell-toggle-shell "*term-main*"))
+		  (my-shell-toggle-shell "*shell-main*"))
 
 	(defun my/buffer-shell ()
 		  "Toggle a buffer local shell"
 		  (interactive)
-		  (my-shell-toggle-shell (concat "*term-" (buffer-name) "*")))
+		  (my-shell-toggle-shell (concat "*shell-" (buffer-name) "*")))
 
 	(provide 'my-shell)
 	;;; my-shell.el ends here
