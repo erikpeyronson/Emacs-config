@@ -991,7 +991,9 @@
 	:evil-keys ((my/make-evil-prefix "n"))
 	:evil-states (normal motion visual)
 	:prefix-cmd regs-rings-resume
-	:bindings)
+	:bindings
+("l" 'toggle-truncate-lines)
+)
     #+END_SRC
 * global config
 ** evil
