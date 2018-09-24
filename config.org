@@ -988,7 +988,7 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map my/toggle-map
 	:keys ((my/make-emacs-prefix "t"))
-	:evil-keys ((my/make-evil-prefix "n"))
+	:evil-keys ((my/make-evil-prefix "t"))
 	:evil-states (normal motion visual)
 	:prefix-cmd regs-rings-resume
 	:bindings
