@@ -45,6 +45,23 @@
 	  kept-new-versions 5    ; keep some new versions
 	  kept-old-versions 2)   ; and some old ones, too)
    #+END_SRC
+   close compilation window on sucessful compilation
+https://emacs.stackexchange.com/questions/62/hide-compilation-window
+   #+BEGIN_SRC emacs-lisp :tangle yes
+
+; from enberg on #emacs
+(setq compilation-finish-function
+  (lambda (buf str)
+    (if (null (string-match ".*exited abnormally.*" str))
+	;;no errors, make the compilation window go away in a few seconds
+	(progn
+	  (run-at-time
+	   "5 sec" nil 'delete-windows-on
+	   (get-buffer-create "*compilation*"))
+	  (message "No Compilation Errors!")))))
+(setq compilation-scroll-output t)
+   #+END_SRC
+
 
    Keep custom variables in a separate gitignored file to allow local customizations
    using customize
@@ -1261,6 +1278,7 @@
 	(:map my/toggle-map
 	      ("m" . evil-mc-mode))
 	:config
+	(add-hook 'prog-mode-hook 'evil-mc-mode)
 	(evil-define-key '(normal visual) 'evil-mc-key-map
 	  (kbd "g r N") 'evil-mc-skip-and-goto-next-cursor
 	  (kbd "g r P") 'evil-mc-skip-and-goto-prev-cursor
@@ -2012,6 +2030,11 @@
 	 "m" 'macrostep-mode))
   #+END_SRC
 ** c++-mode
+*** keys
+    #+BEGIN_SRC emacs-lisp :tangle yes
+	 (evil-define-key '(normal insert) 'c++-mode-map
+	   (kbd "TAB") 'c-indent-command)
+    #+END_SRC
 *** general
     Make .h files use c++-moode instead of c-m
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2132,7 +2155,6 @@
 	(flycheck-select-checker 'c/c++-clang)
 	(flycheck-mode))
 
-      (add-hook 'c++-mode-hook 'my/c++-flycheck-setup)
     #+END_SRC
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
