@@ -2031,10 +2031,6 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
   #+END_SRC
 ** c++-mode
 *** keys
-    #+BEGIN_SRC emacs-lisp :tangle yes
-	 (evil-define-key '(normal insert) 'c++-mode-map
-	   (kbd "TAB") 'c-indent-command)
-    #+END_SRC
 *** general
     Make .h files use c++-moode instead of c-m
     #+BEGIN_SRC emacs-lisp :tangle yes
