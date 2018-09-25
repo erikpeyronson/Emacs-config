@@ -993,7 +993,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:keys ((my/make-emacs-prefix "n"))
 	:evil-keys ((my/make-evil-prefix "n"))
 	:evil-states (normal motion visual)
-	:prefix-cmd regs-rings-resume
+	:prefix-cmd narrowing
 	:bindings
 	("r" 'narrow-to-region
 	 "f" 'narrow-to-defun
@@ -1007,7 +1007,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:keys ((my/make-emacs-prefix "t"))
 	:evil-keys ((my/make-evil-prefix "t"))
 	:evil-states (normal motion visual)
-	:prefix-cmd regs-rings-resume
+	:prefix-cmd toggling
 	:bindings
 ("l" 'toggle-truncate-lines)
 )
@@ -2150,7 +2150,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (defun my/c++-flycheck-setup ()
 	(flycheck-select-checker 'c/c++-clang)
 	(flycheck-mode))
-
+      (add-hook 'c++-mode-hook 'flycheck-mode)
     #+END_SRC
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2168,14 +2168,24 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 
 *** clang-format
     #+begin_src emacs-lisp :tangle yes
-      (use-package clang-format :ensure t)
+      (use-package clang-format :ensure t
+	:config
+	(bind-map-for-major-mode c++-mode
+	  :keys (my/emacs-mode-leader-key)
+	  :evil-keys (my/evil-mode-leader-key)
+	  :evil-states (normal motion visual)
+	  :prefix rtags
+	  :bindings
+	  ("f f" 'clang-format
+	  "f b" 'clang-format-buffer
+	   "f r" 'clang-format-region)))
 
-      (defun my/clang-format-if-file-exists ()
-	(when (eq major-mode 'c++-mode)
-	  (when (locate-dominating-file (buffer-file-name) ".clang-format")
-	    (clang-format-buffer))))
+	(defun my/clang-format-if-file-exists ()
+	  (when (eq major-mode 'c++-mode)
+	    (when (locate-dominating-file (buffer-file-name) ".clang-format")
+	      (clang-format-buffer))))
 
-      (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
 	    #+end_src
 ** python-mode
 *** anaconda-mode
