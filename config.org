@@ -56,7 +56,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	;;no errors, make the compilation window go away in a few seconds
 	(progn
 	  (run-at-time
-	   "5 sec" nil 'delete-windows-on
+	   "2 sec" nil 'delete-windows-on
 	   (get-buffer-create "*compilation*"))
 	  (message "No Compilation Errors!")))))
 (setq compilation-scroll-output t)
@@ -2054,8 +2054,8 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:prefix rtags
 	:bindings
 	("t o" 'cp/gtest-occur
-	 "c t" 'cp/compile-gtest-suite-at-point
-	 "c s" 'cp/compile-gtest-test-at-point
+	 "c T" 'cp/compile-gtest-suite-at-point
+	 "c t" 'cp/compile-gtest-test-at-point
 	 "c g" 'my/compile-and-gcov
 	 "c c" 'cp/compile
 	 "g a" 'ff-find-other-file))
