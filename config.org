@@ -638,6 +638,12 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
        :evil-states (normal motion visual)
        :override-minor-modes t)
    #+END_SRC
+*** global
+  #+BEGIN_SRC emacs-lisp :tangle yes
+  (evil-define-key '(insert normal visual) 'global-map
+  (kbd "M-/") 'hippie-expand
+  (kbd ">") 'repeat)
+  #+END_SRC
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map my/errors-map
@@ -1140,11 +1146,6 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	 :ensure t
 	 :requires evil)
     #+END_SRC
-*** keybindings
-  #+BEGIN_SRC emacs-lisp :tangle yes
-  (evil-define-key '(insert normal visual) 'global-map (kbd "M-/")
-    'hippie-expand)
-  #+END_SRC
 ** projectile
 *** projectile
     #+BEGIN_SRC emacs-lisp :tangle yes
