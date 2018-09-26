@@ -1051,7 +1051,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:keys ((my/make-emacs-prefix "o"))
 	:evil-keys ((my/make-evil-prefix "o"))
 	:evil-states (normal motion visual)
-	:prefix-cmd toggling
+	:prefix-cmd occuring
 	:bindings
 ("t" 'cp/gtest-occur
 "f" 'my/occur-fail
@@ -1069,7 +1069,9 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(setq evil-want-keybinding nil)
 	:config
   (evil-define-key '(insert normal visual) 'global-map
-  (kbd "M-/") 'hippie-expand
+  (kbd "M-/") 'hippie-expand)
+
+  (evil-define-key '(normal visual) 'global-map
   (kbd ">") 'repeat)
 	(evil-mode 1))
     #+END_SRC
@@ -2273,3 +2275,4 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 ** TODO clang-format hook
 ** TODO expand region reverse
 ** TODO ace-windows (hydra?)
+** TODO compile that close, test that doesnt
