@@ -209,9 +209,17 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
    #+END_SRC
 ** occur
 #+BEGIN_SRC emacs-lisp :tangle yes
-(defun my/occur-fail ()
-  (interactive)
-  (occur "fail"))
+  (defun my/occur-fail ()
+    (interactive)
+    (occur "fail"))
+  (defun my/occur-cout ()
+    (interactive)
+    (occur "\\(cout\\|cerr\\)"))
+  (defun my/delete-occur-window  ()
+    (interactive)
+    (let ((window (get-buffer-window "*Occur*")))
+      (when window
+	(delete-window window))))
 #+END_SRC
 * editing
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -639,11 +647,6 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
        :override-minor-modes t)
    #+END_SRC
 *** global
-  #+BEGIN_SRC emacs-lisp :tangle yes
-  (evil-define-key '(insert normal visual) 'global-map
-  (kbd "M-/") 'hippie-expand
-  (kbd ">") 'repeat)
-  #+END_SRC
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map my/errors-map
@@ -1051,7 +1054,9 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:prefix-cmd toggling
 	:bindings
 ("t" 'cp/gtest-occur
-"f" 'my/occur-fail))
+"f" 'my/occur-fail
+"c" 'my/occur-cout
+"d" 'my/delete-occur-window))
      #+END_SRC
 * global config
 ** evil
@@ -1063,6 +1068,9 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(setq evil-want-integration nil)
 	(setq evil-want-keybinding nil)
 	:config
+  (evil-define-key '(insert normal visual) 'global-map
+  (kbd "M-/") 'hippie-expand
+  (kbd ">") 'repeat)
 	(evil-mode 1))
     #+END_SRC
 *** evil-collection
