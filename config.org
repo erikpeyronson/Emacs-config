@@ -719,9 +719,17 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	("D" delete-frame "delete")
 	("q" nil "quit"))
 
-      (defhydra hydra/other-frame (:foreign-keys nil) ("o" other-frame "repeat"))
-      (defhydra hydra/other-window (:foreign-keys nil) ("w" other-window "repeat"))
-      (defhydra hydra/winner-repeat (:foreign-keys nil) ("u" winner-undo "undo") ("U" winner-redo "redo"))
+      (defhydra hydra/other-frame (:foreign-keys nil) )
+      (defhydra hydra/other-window (:foreign-keys nil)
+	("o" other-frame "other-frame")
+	("w" other-window "other-window")
+	("d" spacemacs/delete-window"delete-window")
+	("D" my/delete-frame-with-prompt "delete-frame")
+	("m" spacemacs/toggle-maximize-buffer "maximize/minimize")
+	("q" nil "exit"))
+      (defhydra hydra/winner-repeat (:foreign-keys nil)
+	("u" winner-undo "undo")
+	("U" winner-redo "redo"))
 
       (bind-map my/windows-map
 	:keys ((my/make-emacs-prefix "w"))
@@ -731,7 +739,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:bindings
 	("." 'hydra/window-navigation/body
 	 "w" 'hydra/other-window/other-window
-	 "o" 'hydra/other-frame/other-frame
+	 "o" 'hydra/other-window/other-frame
 	 "s" 'split-window-below
 	 "S" 'split-window-below-and-focus
 	 "v" 'split-window-right
