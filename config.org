@@ -1345,7 +1345,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
        (:map my/errors-map
        ("." . spacemacs/error-transient-state/body)
 	("S" . flycheck-set-checker-executable)
-	("b" . flycheck-buffer)
+	("e" . flycheck-buffer)
 	("c" . flycheck-clear)
 	("h" . flycheck-describe-checker)
 	("l" . my/flycheck-toggle-error-list)
@@ -1356,7 +1356,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	("y" . flycheck-copy-errors-as-kill))
        :config
        (setq flycheck-display-errors-function nil)
-       (setq flycheck-idle-change-delay 2))
+       (setq flycheck-idle-change-delay 4))
  #+END_SRC
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
