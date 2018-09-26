@@ -155,6 +155,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (delete-frame)))
   #+END_SRC
 * search commands
+** ack grep etc
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my-counsel-ack-in-dir (arg)
      "Read directory with completion and call counsel-ack"
@@ -206,6 +207,12 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 
 
    #+END_SRC
+** occur
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun my/occur-fail ()
+  (interactive)
+  (occur "fail"))
+#+END_SRC
 * editing
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my/remove-trailing-whitespace ()
@@ -719,8 +726,16 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	("D" delete-frame "delete")
 	("q" nil "quit"))
 
-      (defhydra hydra/other-frame (:foreign-keys nil) )
       (defhydra hydra/other-window (:foreign-keys nil)
+	("1" winum-select-window-1)
+	("2" winum-select-window-2)
+	("3" winum-select-window-3)
+	("4" winum-select-window-4)
+	("5" winum-select-window-5)
+	("6" winum-select-window-6)
+	("7" winum-select-window-7)
+	("8" winum-select-window-8)
+	("9" winum-select-window-9)
 	("o" other-frame "other-frame")
 	("w" other-window "other-window")
 	("d" spacemacs/delete-window"delete-window")
@@ -1020,6 +1035,18 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 ("l" 'toggle-truncate-lines)
 )
     #+END_SRC
+
+*** occur
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (bind-map my/occur-map
+	:keys ((my/make-emacs-prefix "o"))
+	:evil-keys ((my/make-evil-prefix "o"))
+	:evil-states (normal motion visual)
+	:prefix-cmd toggling
+	:bindings
+("t" 'cp/gtest-occur
+"f" 'my/occur-fail))
+     #+END_SRC
 * global config
 ** evil
 *** evil
