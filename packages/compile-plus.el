@@ -37,7 +37,7 @@
 	compile command string with extra flags"
   (interactive "p")
   (let ((default-directory (funcall cp/compile-directory-func))
-	(compilation-read-command (not prompt)));; promt user before runnint
+	(compilation-read-command prompt));; promt user before runnint
     (if flags
       (setq compile-command (concat compile-command flags " "))
     (setq compile-command (funcall cp/compile-command-func)))
@@ -281,7 +281,7 @@
   (let* ((test (cp//parse-gtest-at-point))
 	 (group (car test))
 	 (case (cdr test)))
-    (cp/compile t (format "%s=\"%s\" test"
+    (cp/compile t (format "%s=\"%s\""
 			 cp/gtest-env-var-name
 			  (cp//gtest-flags arg group case)))))
 

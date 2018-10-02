@@ -26,7 +26,7 @@
    #+END_SRC
 
    Keep temporary files to a backup-directory in emacs directory
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+BEGIN_SRC emacs-lisp :tangle yes
     (defvar tramp-backup-directory-alist)
     (defvar tramp-auto-save-directory)
     (let ((backup-dir "~/.emacs.d/.backups")
@@ -47,7 +47,7 @@
    #+END_SRC
    close compilation window on sucessful compilation
 https://emacs.stackexchange.com/questions/62/hide-compilation-window
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle no
 
 ; from enberg on #emacs
 (setq compilation-finish-function
@@ -98,11 +98,14 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
   (require 'bind-map)
    #+END_SRC
 * theme
-   #+BEGIN_SRC emacs-lisp :tangle yes
+ #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package solarized-theme
        :config
-       (load-theme 'solarized-dark t)
        :ensure t)
+
+(load-theme 'adwaita t)
+(set-face-background hl-line-face "light gray")
+(set-face-foreground hl-line-face "black")
    #+END_SRC
 * mode-line
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -719,6 +722,9 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 
 *** Windows
     #+BEGIN_SRC emacs-lisp :tangle yes
+(defun my/other-window-reverse ()
+(interactive)
+(other-window -1))
        (defhydra hydra/window-navigation (:foreign-keys nil :exit nil)
 	("h" evil-window-left "left")
 	("j" evil-window-down "down")
@@ -747,6 +753,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	("9" winum-select-window-9)
 	("o" other-frame "other-frame")
 	("w" other-window "other-window")
+	("W" my/other-window-reverse "other-window-rev")
 	("d" spacemacs/delete-window"delete-window")
 	("D" my/delete-frame-with-prompt "delete-frame")
 	("m" spacemacs/toggle-maximize-buffer "maximize/minimize")
@@ -763,6 +770,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:bindings
 	("." 'hydra/window-navigation/body
 	 "w" 'hydra/other-window/other-window
+	 "W" 'hydra/other-window/my/other-window-reverse
 	 "o" 'hydra/other-window/other-frame
 	 "s" 'split-window-below
 	 "S" 'split-window-below-and-focus
@@ -1053,10 +1061,13 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:evil-states (normal motion visual)
 	:prefix-cmd occuring
 	:bindings
-("t" 'cp/gtest-occur
+("o" 'occur
+"t" 'cp/gtest-occur
 "f" 'my/occur-fail
 "c" 'my/occur-cout
-"d" 'my/delete-occur-window))
+"d" 'my/delete-occur-window
+"n" 'occur-next-error
+"p" 'previous-error))
      #+END_SRC
 * global config
 ** evil
@@ -1474,7 +1485,8 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:bind
 	(:map
 	 my/jump-join-map
-	 ("h" . link-hint-open-link)))
+	 ("H" . link-hint-open-link)
+	 ("h" . link-hint-open-link-at-point)))
     #+END_SRC
 ** windows and buffers
 *** winum-mode
@@ -1554,7 +1566,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	    (let ((buffer (get-buffer shell-buffer-name)))
 	      (if buffer
 		  (switch-to-buffer buffer)
-		(shell my-shell-program)
+		(term my-shell-program)
 		(rename-buffer shell-buffer-name)))))
     #+END_SRC
 
@@ -2196,7 +2208,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (defun my/c++-flycheck-setup ()
 	(flycheck-select-checker 'c/c++-clang)
 	(flycheck-mode))
-      (add-hook 'c++-mode-hook 'flycheck-mode)
+      (remove-hook 'c++-mode-hook 'flycheck-mode)
     #+END_SRC
 *** company
     #+BEGIN_SRC emacs-lisp :tangle yes
