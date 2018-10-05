@@ -215,14 +215,25 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
   (defun my/occur-fail ()
     (interactive)
     (occur "fail"))
+
   (defun my/occur-cout ()
     (interactive)
     (occur "\\(cout\\|cerr\\)"))
+
   (defun my/delete-occur-window  ()
     (interactive)
     (let ((window (get-buffer-window "*Occur*")))
       (when window
 	(delete-window window))))
+
+  (defun my/occur-or-toggle-window (arg)
+    (interactive "p")
+    (let* ((buffer (get-buffer "*Occur*"))
+	   (window (get-buffer-window "*Occur*")))
+      (cond
+      (window (delete-window window))
+      (buffer (display-buffer buffer))
+      (t (call-interactively #'occur)))))
 #+END_SRC
 * editing
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1062,7 +1073,8 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:prefix-cmd occuring
 	:bindings
 ("o" 'occur
-"t" 'cp/gtest-occur
+"t" 'my/occur-or-toggle-window
+"g" 'cp/gtest-occur
 "f" 'my/occur-fail
 "c" 'my/occur-cout
 "d" 'my/delete-occur-window
@@ -2128,26 +2140,27 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  (setq my/imenu-function #'rtags-imenu))
 
 	(add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
-	  (defhydra hydra/rtags-nav (:hint nil :color pink )
-	    "
-      Rtags Naviagion
-      --------------------------------------------------------------------
-      _g_:find symbol  _r_:references   _p_:previous  _f_:forward
-      _i_:symbol-info  _n_:next         _b_:back      _q_:exit
-      --------------------------------------------------------------------
-      "
-	    ("r"  rtags-find-references-at-point)
-	    ("g"  rtags-find-symbol-at-point)
-	    ("p"  rtags-previous-match)
-	    ("f"  rtags-location-stack-forward)
-	    ("b"  rtags-location-stack-back)
-	    ("i"  rtags-symbol-info)
-	    ("n"  rtags-next-match)
-	    ("q"  nil :color blue))
+	(defhydra hydra/rtags-nav (:hint nil :color pink )
+	  "
+		  Rtags Naviagion
+		  --------------------------------------------------------------------
+		  _g_:find symbol  _r_:references   _p_:previous  _f_:forward _v_:visualize
+		  _i_:symbol-info  _n_:next         _b_:back      _q_:exit
+		  --------------------------------------------------------------------
+		  "
+	  ("r"  rtags-find-references-at-point)
+	  ("v" rtags-location-stack-visualize)
+	  ("g"  rtags-find-symbol-at-point)
+	  ("p"  rtags-previous-match)
+	  ("f"  rtags-location-stack-forward)
+	  ("b"  rtags-location-stack-back)
+	  ("i"  rtags-symbol-info)
+	  ("n"  rtags-next-match)
+	  ("q"  nil :color blue))
 	:config
 	(add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
 	(add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
-	(setq rtags-display-result-backend 'ivy)
+	(setq rtags-display-result-backend 'default)
 	(setq rtags-imenu-syntax-highlighting t)
 	(setq rtags-autostart-diagnostics nil)
 	(setq rtags-completions-enabled nil)
@@ -2174,12 +2187,47 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	   "g f"  'hydra/rtags-nav/rtags-location-stack-forward
 	   "g b"    'hydra/rtags-nav/rtags-location-stack-forward
 	   "g i"    'rtags-symbol-info
+	   "g t"    'rtags-symbol-type
+	   "g d"  'rtags-dependency-tree
+	   "g s"  'rtags-display-summary
+	   "g S"  'rtags-display-summary-as-message
 	   "g e f"  'rtags-fix-fixit-at-point
 	   "g e F"  'rtags-fixit
 	   "g e r"  'rtags-rename-symbol
 	   "g e i"  'rtags-get-include-file-for-symbol
-	   "g e m"  'rtags-make-member)))
-	#+END_SRC
+	   "g e m"  'rtags-make-member))
+
+	(defun run-with-local-idle-timer (secs repeat function &rest args)
+	  "Like `run-with-idle-timer', but always runs in the `current-buffer'.
+
+      Cancels itself, if this buffer was killed."
+	  (let* (;; Chicken and egg problem.
+		 (fns (make-symbol "local-idle-timer"))
+		 (timer (apply 'run-with-idle-timer secs repeat fns args))
+		 (fn `(lambda (&rest args)
+			(if (not (buffer-live-p ,(current-buffer)))
+			    (cancel-timer ,timer)
+			  (with-current-buffer ,(current-buffer)
+			    (apply (function ,function) args))))))
+	    (fset fns fn)
+	    fn
+	    timer))
+
+	(defvar-local my//rtags-idle-summary-timer nil)
+	(defvar my/rtags-idle-summary-delay 7)
+	(defun my/rtags-display-summary ()
+	  (when (eq major-mode 'c++-mode)
+	    (rtags-display-summary)))
+
+	(defun my/toggle-rtags-idle-summary ()
+	  (interactive)
+	  (if (not my//rtags-idle-summary-timer)
+	      (setq-local my//rtags-idle-summary-timer (run-with-idle-timer my/rtags-idle-summary-delay t #'my/rtags-display-summary))
+	    (cancel-timer my//rtags-idle-summary-timer)
+	    (setq my//rtags-idle-summary-timer nil)))
+  (my/toggle-rtags-idle-summary)
+	) ;; end use-package rtags
+    #+END_SRC
 **** company-rtags
      #+BEGIN_SRC emacs-lisp :tangle yes
        (use-package company-rtags
@@ -2198,7 +2246,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:after (flycheck-mode rtags))
      #+END_SRC
 **** ivy-rtags
-     #+BEGIN_SRC emacs-lisp :tangle yes
+     #+BEGIN_SRC emacs-lisp :tangle no
       (use-package ivy-rtags
 	:ensure t
 	:after (ivy rtags))
@@ -2245,6 +2293,90 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 
 	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
 	    #+end_src
+*** flycheck
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/c++-flycheck-setup ()
+	(flycheck-select-checker 'c/c++-clang)
+	(flycheck-mode))
+      (add-hook 'c++-mode-hook 'flycheck-mode)
+    #+END_SRC
+*** company
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/c++-company-setup ()
+	(company-mode))
+      (add-hook 'c++-mode-hook 'my/c++-company-setup)
+    #+END_SRC
+*** google-c-style
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package google-c-style
+	:ensure t
+	:config
+       (add-hook 'c++-mode-hook 'google-set-c-style))
+    #+END_SRC
+
+*** clang-format
+    #+begin_src emacs-lisp :tangle yes
+      (use-package clang-format :ensure t
+	:config
+	(bind-map-for-major-mode c++-mode
+	  :keys (my/emacs-mode-leader-key)
+	  :evil-keys (my/evil-mode-leader-key)
+	  :evil-states (normal motion visual)
+	  :prefix rtags
+	  :bindings
+	  ("f f" 'clang-format
+	  "f b" 'clang-format-buffer
+	   "f r" 'clang-format-region)))
+
+	(defun my/clang-format-if-file-exists ()
+	  (when (eq major-mode 'c++-mode)
+	    (when (locate-dominating-file (buffer-file-name) ".clang-format")
+	      (clang-format-buffer))))
+
+	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+	    #+end_src
+** python-mode
+*** anaconda-mode
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defun my-setup-python ()
+       (eldoc-mode))
+
+     (use-package anaconda-mode
+       :init
+       (add-hook 'python-mode-hook 'anaconda-mode)
+       (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+       :ensure t)
+     (use-package company-anaconda
+       :ensure t
+       :init
+       (defun my-setup-company-anaconda ()
+	 (add-to-list 'company-backends 'company-anaconda)
+	 (company-mode))
+       (add-hook 'python-mode-hook 'my-setup-company-anaconda))
+
+     (use-package pydoc :ensure t)
+     (use-package counsel-pydoc :ensure t)
+     (use-package importmagic :ensure t)
+   #+END_SRC
+
+* Todos
+** DONE ivy resume bindings
+   # ** TODO bindings for evil nerd commenter
+** DONE fix ivy-occur
+** TODO cursor color for state
+** TODO modeline
+** TODO smartparens
+   spc j s sp split sexp
+** TODO dumb-jump
+** TODO register keybindings
+
+
+** TODO snippets
+** TODO h cc file keybindings
+** DONE camelCaseMotion
+** TODO clang-format hook
+** TODO expand region reverse
+** TODO ace-windows (hydra?)	#+END_SRC
 ** python-mode
 *** anaconda-mode
    #+BEGIN_SRC emacs-lisp :tangle yes
