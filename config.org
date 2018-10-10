@@ -109,25 +109,31 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
    #+END_SRC
 * mode-line
   #+BEGIN_SRC emacs-lisp :tangle yes
-    (defun my/setup-mode-line ()
-      (setq mode-line-format '("%e"
-			       (:eval
-				(winum-get-number-string))
-			       mode-line-front-space
-			       mode-line-mule-info
-			       mode-line-client
-			       mode-line-modified
-			       mode-line-remote
-			       mode-line-frame-identification
-			       mode-line-buffer-identification
-			       "   "
-			       mode-line-position
-			       evil-mode-line-tag
-			       (vc-mode vc-mode)
-			       "  " mode-line-misc-info
-			       mode-line-end-spaces)))
+	(defun my/setup-mode-line ()
+	  (setq mode-line-format '("%e"
+				   (:eval
+				    (winum-get-number-string))
+				   mode-line-front-space
+				   mode-line-mule-info
+				   mode-line-client
+				   mode-line-modified
+				   mode-line-remote
+				   mode-line-frame-identification
+				   mode-line-buffer-identification
+				   "   "
+				   mode-line-position
+				   evil-mode-line-tag
+				   (vc-mode vc-mode)
+				   "  " mode-line-misc-info
+				   mode-line-end-spaces)))
 
-    (add-hook 'after-change-major-mode-hook 'my/setup-mode-line)
+	(add-hook 'after-change-major-mode-hook 'my/setup-mode-line)
+
+    (set-face-background 'mode-line "CadetBlue4")
+    (set-face-foreground 'mode-line "white")
+    (set-face-background 'mode-line-inactive "light gray")
+    (set-face-foreground 'mode-line-inactive "black")
+
   #+END_SRC
 * utility functions
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2144,8 +2150,8 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  "
 		  Rtags Naviagion
 		  --------------------------------------------------------------------
-		  _g_:find symbol  _r_:references   _p_:previous  _f_:forward _v_:visualize
-		  _i_:symbol-info  _n_:next         _b_:back      _q_:exit
+		  _g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
+		  _i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
 		  --------------------------------------------------------------------
 		  "
 	  ("r"  rtags-find-references-at-point)
@@ -2156,6 +2162,8 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  ("b"  rtags-location-stack-back)
 	  ("i"  rtags-symbol-info)
 	  ("n"  rtags-next-match)
+	  ("l"  rtags-list-result)
+	  ("L"  rtags-taglist)
 	  ("q"  nil :color blue))
 	:config
 	(add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
@@ -2179,11 +2187,12 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	   "g F"  'rtags-find-file
 	   "g v"  'rtags-find-virtuals-at-point
 	   "g m"  'rtags-find-member-function
-	   "g l"  'rtags-list-results
+	   "g l"  'hydra/rtags-nav/rtags-list-results
+	   "g L"  'hydra/rtags-nav/rtags-taglist
 	   "g c"  'rtags-close-taglist
 	   "g h"  'rtags-print-class-hierarchy
-	   "g n"  'rtags-next-match
-	   "g p"  'rtags-previous-match
+	   "g n"  'hydra/rtags-nav/rtags-next-match
+	   "g p"  'hydra/rtags-nav/rtags-previous-match
 	   "g f"  'hydra/rtags-nav/rtags-location-stack-forward
 	   "g b"    'hydra/rtags-nav/rtags-location-stack-forward
 	   "g i"    'rtags-symbol-info
@@ -2401,7 +2410,6 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
      (use-package importmagic :ensure t)
    #+END_SRC
 
-* Todos
 ** DONE ivy resume bindings
    # ** TODO bindings for evil nerd commenter
 ** DONE fix ivy-occur
@@ -2420,3 +2428,5 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 ** TODO expand region reverse
 ** TODO ace-windows (hydra?)
 ** TODO compile that close, test that doesnt
+
+** TODO rtags reindex functions
