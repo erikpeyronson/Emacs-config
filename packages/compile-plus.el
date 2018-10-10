@@ -278,6 +278,8 @@
   "Compile and run google test and filter for test case at point
      If called interactively with prefix arg repeat ARG times"
   (interactive "p")
+
+  (setq compile-command (funcall cp/compile-command-func))
   (let* ((test (cp//parse-gtest-at-point))
 	 (group (car test))
 	 (case (cdr test)))
@@ -289,6 +291,8 @@
   "Compile and run google test and filter for test group at point
      If called interactively with prefix arg repeat ARG times"
   (interactive "p")
+
+  (setq compile-command (funcall cp/compile-command-func))
   (let* ((test (cp//parse-gtest-at-point))
 	 (group (car test)))
     (cp/compile t (format "RUN_ARGS=\"%s\" test"
