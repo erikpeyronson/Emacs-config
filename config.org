@@ -2216,7 +2216,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(defvar-local my//rtags-idle-summary-timer nil)
 	(defvar my/rtags-idle-summary-delay 7)
 	(defun my/rtags-display-summary ()
-	  (when (eq major-mode 'c++-mode)
+	  (when (and (eq major-mode 'c++-mode) (symbol-at-point))
 	    (rtags-display-summary)))
 
 	(defun my/toggle-rtags-idle-summary ()
