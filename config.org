@@ -131,7 +131,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 
     (set-face-background 'mode-line "CadetBlue4")
     (set-face-foreground 'mode-line "white")
-    (set-face-background 'mode-line-inactive "light gray")
+    (set-face-background 'mode-line-inactive "light steel blue")
     (set-face-foreground 'mode-line-inactive "black")
 
   #+END_SRC
@@ -226,6 +226,12 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
     (interactive)
     (occur "\\(cout\\|cerr\\)"))
 
+  (defvar-local my/occur-function-regex "[a-z]+ \\([A-Za-z]+::\\)?[A-Za-z]+() {")
+
+  (defun my/occur-defun-function ()
+    (interactive)
+    (occur my/occur-function-regex))
+
   (defun my/delete-occur-window  ()
     (interactive)
     (let ((window (get-buffer-window "*Occur*")))
@@ -237,9 +243,9 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
     (let* ((buffer (get-buffer "*Occur*"))
 	   (window (get-buffer-window "*Occur*")))
       (cond
-      (window (delete-window window))
-      (buffer (display-buffer buffer))
-      (t (call-interactively #'occur)))))
+       (window (delete-window window))
+       (buffer (display-buffer buffer))
+       (t (call-interactively #'occur)))))
 #+END_SRC
 * editing
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1081,7 +1087,8 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 ("o" 'occur
 "t" 'my/occur-or-toggle-window
 "g" 'cp/gtest-occur
-"f" 'my/occur-fail
+"F" 'my/occur-fail
+"f" 'my/occur-function
 "c" 'my/occur-cout
 "d" 'my/delete-occur-window
 "n" 'occur-next-error
@@ -2016,7 +2023,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	:config
 	(setq highlight-symbol-color "white")
 	(face-spec-set 'highlight-symbol-face
-		       '((t :foreground "#eee8d5"))
+		       '((t :weight ultra-bold))
 		       'face-override-spec)
 	(add-hook 'prog-mode-hook 'highlight-symbol-mode))
     #+end_src
@@ -2107,6 +2114,11 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
   #+END_SRC
 ** c++-mode
 *** keys
+    #+BEGIN_SRC emacs-lisp :tangle yes
+	   (bind-map-for-major-mode my/compile-comment-map c++-mode
+	   :bindings
+	   ("t" cp/compile-gtest-test-at-point))
+    #+END_SRC
 *** general
     Make .h files use c++-moode instead of c-m
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2234,19 +2246,21 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	      (setq-local my//rtags-idle-summary-timer (run-with-idle-timer my/rtags-idle-summary-delay t #'my/rtags-display-summary))
 	    (cancel-timer my//rtags-idle-summary-timer)
 	    (setq my//rtags-idle-summary-timer nil)))
-  (my/toggle-rtags-idle-summary)
+;;  (my/toggle-rtags-idle-summary)
 	) ;; end use-package rtags
     #+END_SRC
 **** company-rtags
      #+BEGIN_SRC emacs-lisp :tangle yes
        (use-package company-rtags
 	 :ensure t
-	 :init
+	 :config
 	 (defun my/setup-company-rtags ()
 	   (add-to-list 'company-backends 'company-rtags))
+	   (add-hook 'c++-mode-hook 'my/setup-company-rtags)
 	 :init
 	 (evil-define-key '(normal insert) 'c++-mode-map
 	   (kbd "C-SPC") 'company-rtags))
+
      #+END_SRC
 **** flycheck-rtags
      #+BEGIN_SRC emacs-lisp :tangle no
@@ -2259,6 +2273,31 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (use-package ivy-rtags
 	:ensure t
 	:after (ivy rtags))
+     #+END_SRC
+**** eldoc
+     #+BEGIN_SRC emacs-lisp :tangle yes
+
+(defun fontify-string (str mode)
+  "Return STR fontified according to MODE."
+  (with-temp-buffer
+	(insert str)
+	(delay-mode-hooks (funcall mode))
+	(font-lock-default-function mode)
+	(font-lock-default-fontify-region
+	 (point-min) (point-max) nil)
+	(buffer-string)))
+  (defun rtags-eldoc-function ()
+    (let ((summary (rtags-get-summary-text)))
+      (and summary
+	   (fontify-string
+	    (replace-regexp-in-string
+	     "{[^}]*$" ""
+	     (mapconcat
+	      (lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
+	      (split-string summary "\r?\n")
+	      " "))
+	    major-mode))))
+
      #+END_SRC
 *** flycheck
     #+BEGIN_SRC emacs-lisp :tangle yes
