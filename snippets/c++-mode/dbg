@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: dbg
+# key: dbg
+# --
+
+std::cerr << __FILE__ << ":" << __LINE__ << ":0: DEBUG: " << __func__ << "()" <<$1 std::endl;$2

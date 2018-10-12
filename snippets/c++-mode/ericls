@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: ericls 
+# key: ericls
+# --
+
+class $1 {
+  public:
+  $1();
+  $1(const $1&) = delete;
+  $1& operator=(const $1&) = delete;
+  $1($1&&) = delete;
+  $1& operator=($1&&) = delete;
+  virtual ~$1() = default;
+  private:
+};
+$2
+

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: gtest_assert_false
+# key: ASSERT_FALSE
+# --
+ ASSERT_FALSE(${1:value});$3

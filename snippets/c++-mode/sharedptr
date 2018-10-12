@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sharedptr
+# key: sharedptr
+# --
+std::shared_ptr<$1> $2

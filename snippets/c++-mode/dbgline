@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: dbgline
+# key: dbgline
+# --
+std::cerr << "DEBUG: line: " << __LINE__ << " " <<$1 std::endl;$2

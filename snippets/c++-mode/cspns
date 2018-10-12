@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: cspns
+# key: cspns
+# --
+::casper_r3::$1

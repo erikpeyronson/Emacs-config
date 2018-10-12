@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: gtest_expect_that
+# key: expect
+# --
+EXPECT_THAT(${1:value}, ${2:matcher});$3

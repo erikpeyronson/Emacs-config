@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: gtest_assert_that
+# key: assertt
+# --
+ASSERT_THAT(${1:value}, ${2:matcher});$3

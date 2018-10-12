@@ -1,0 +1,23 @@
+# -*- mode: snippet -*-
+# name: eriheader
+# key: eriheader
+# --
+
+/*
+* Copyright Ericsson AB `(format-time-string "%Y")`
+*
+* The copyright to the computer programs herein is the property of
+* Ericsson AB. The programs may be used and/or copied only with the
+* written permission from Ericsson AB or in accordance with the terms
+* conditions stipulated in the agreement/contract under which the
+* programs have been supplied.
+*
+*/
+
+#ifndef $1_H
+#define $1_H
+
+namespace sc {
+$2
+} // namespace sc
+#endif  // $1_H

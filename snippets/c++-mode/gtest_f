@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name:gtest_f
+# key: gtest_f
+# --
+TEST_F(${1:ClassName}Test, ${2:testName}) {
+  $3
+}
