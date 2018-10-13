@@ -1,15 +1,93 @@
 * Emacs config
 
-  This is my emcas configuration written in ORG which is tangled by org babel
-  during startup.
+  This is yet another emacs configuration written in org mode. When
+  emacs is started this file is parsed and the code blocks below are
+  tangled into a file named config.el which loaded. Machine local code
+  can be put in a file init-local.el that will be loaded after
+  config.el
 
-  Its evil/ivy based and keybindings, package selection and setup is heavily
-  inspired by spacapplies for all subsection. The
-  sections are further divided into smaller blocks to make it possible to
-  disable packages or configuration while still keeping it bundled with the mode
-  it appleies to.
+  Its centered around evil/ivy and is heavily inspiered by
+  spacemacs. But with a less modular implementation adapted to my
+  needs.
 
-* general config
+  It's fairly stable with Emacs 26.1 running on REHL-7 Ubuntu 18.04
+  but i would strongly advice against trying to use it as is if you
+  dont know what your doing. Its highly personal and not ment to be
+  released Its licensed with GPLv3 due to using some code copied from
+  Spacemacs but except from that feel free to use it however you like
+  but dont expect any support.
+
+  The main rationale behind the structure of this document is to allow
+  for easy on the fly tweaks and additions and The main goals is to
+  keep the code as simple as possible to debug and and organized in a
+  way that makes it intuitive where new code should be added.
+
+** Overview
+
+   The sections below are organized around major and the goal is that
+   each section represent a major mode and should contains all
+   configuration around that major mode.
+
+   The code is grouped together in the major modes that they
+   configure. In a logical view the structure of this file can be seen
+   as a tree where the root represents fundamental-mode and each
+   subtree an inherited major mode. Leafes represents a
+   feaure/mode/library that may be used in the mode and all inherited
+   modes. Leaves may also add to or ovveride leaves leaves on lower levels
+
+   Each node is then implemented as a section with its corresponding
+   leaves and subtrees as subsections consisting of org-babel code
+   blocks that can be included or excluded by setting :tangle yes/no
+
+   #+name: structure
+   #+BEGIN_SRC ditaa
+     +--config
+     |  #BEGIN_SRC...
+     |
+     +--keys
+     |  #BEGIN_SRC..
+     |
+     +--prog-mode
+     |  +--config
+     |  |  #BEGIN_SRC...
+     |  |
+     |  +--keys
+     |  |  #BEGIN_SRC..
+     |  |
+     |  +--package
+     |  |  +--config
+     |  |  |  #BEGIN_SRC..
+     |  |  |
+     |  |  +--keys
+     |  |     #BEGIN_SRC..
+     |  |
+     |  +--c++-mode
+     |  |  +--config
+     |  |  |  #BEGIN_SRC...
+     |  |  |
+     |  |  +--keys
+     |  |     #BEGIN_SRC..
+     |  ...
+     |
+     |--org-mode
+     |  |
+     |  ...
+     |
+     ...
+   #+END_SRC
+   In practice this model is not strictly followed everywhere but the
+   should not exist any horizontal dependencies and you should never have
+   to traverse
+
+
+
+   Package configuration and installation is done using use-package
+   https://github.com/jwiegley/use-package and most keybindings
+   keys are bound using https://github.com/justbur/emacs-bind-map
+
+* general
+  This section does configures built in emacs behavior
+
    Balance windows automatically
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq window-combination-resize t)
