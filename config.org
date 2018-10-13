@@ -139,13 +139,22 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/-set-font-size-globally ()
       (interactive)
-      (set-face-attribute 'default nil :height (string-to-int (read-from-minibuffer "font size: "))))
+      (set-face-attribute 'default nil :height (string-to-number (read-from-minibuffer "font size: "))))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my-read-expanded-filename ()
        "Read a directory with completion and return the expanded filename"
        (expand-file-name
 	(read-file-name "dir:" )))
+  #+END_SRC
+  #+BEGIN_SRC emacs-lisp :tangle yes
+   (defun my/trim-string (string) ;; TODO move to utils or similar
+     "Remove white spaces in beginning and ending of STRING.
+	 White space here is any of: space, tab, emacs newline (line feed, ASCII 10).
+
+	 From http://ergoemacs.org/emacs/modernization_elisp_lib_problem.html
+	 "
+     (replace-regexp-in-string "\\`[ \t\n]*" "" (replace-regexp-in-string "[ \t\n]*\\'" "" string)))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/make-emacs-prefix (key)
@@ -2083,20 +2092,18 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
    #+END_SRC
 **** Evaling
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map elisp-eval-map
-	:keys ((my/make-emacs-mode-prefix "e"))
-	:evil-keys ((my/make-evil-mode-prefix "e"))
-	:major-modes (emacs-lisp-mode)
-	:evil-state (normal motion visual)
-	:prefix-cmd evaling
+      (bind-map-for-major-mode emacs-lisp-mode
+	:keys (my/emacs-mode-leader-key)
+	:evil-keys (my/evil-mode-leader-key)
+	:evil-states (normal motion visual)
+	:prefix elisp-eval
 	:bindings
-	("f" 'eval-defun
-	 "$" 'lisp-state-eval-sexp-end-of-line
-	 "b" 'eval-buffer
-	 "e" 'eval-last-sexp
-	 "f" 'eval-defun
-	 "r" 'eval-region
-	 ))
+	("e f" 'eval-defun
+	 "e $" 'lisp-state-eval-sexp-end-of-line
+	 "e b" 'eval-buffer
+	 "e e" 'eval-last-sexp
+	 "e f" 'eval-defun
+	 "e r" 'eval-region))
     #+end_src
 **** Debugging
     #+begin_src emacs-lisp :tangle yes
@@ -2160,12 +2167,12 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
 	(defhydra hydra/rtags-nav (:hint nil :color pink )
 	  "
-		  Rtags Naviagion
-		  --------------------------------------------------------------------
-		  _g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
-		  _i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
-		  --------------------------------------------------------------------
-		  "
+	Rtags Naviagion
+	--------------------------------------------------------------------
+	_g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
+	_i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
+	--------------------------------------------------------------------
+	"
 	  ("r"  rtags-find-references-at-point)
 	  ("v" rtags-location-stack-visualize)
 	  ("g"  rtags-find-symbol-at-point)
@@ -2185,6 +2192,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(setq rtags-autostart-diagnostics nil)
 	(setq rtags-completions-enabled nil)
 	(setq rtags-enable-unsaved-reparsing t)
+
 	(bind-map-for-major-mode c++-mode
 	  :keys (my/emacs-mode-leader-key)
 	  :evil-keys (my/evil-mode-leader-key)
@@ -2221,7 +2229,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(defun run-with-local-idle-timer (secs repeat function &rest args)
 	  "Like `run-with-idle-timer', but always runs in the `current-buffer'.
 
-      Cancels itself, if this buffer was killed."
+	    Cancels itself, if this buffer was killed."
 	  (let* (;; Chicken and egg problem.
 		 (fns (make-symbol "local-idle-timer"))
 		 (timer (apply 'run-with-idle-timer secs repeat fns args))
@@ -2246,7 +2254,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	      (setq-local my//rtags-idle-summary-timer (run-with-idle-timer my/rtags-idle-summary-delay t #'my/rtags-display-summary))
 	    (cancel-timer my//rtags-idle-summary-timer)
 	    (setq my//rtags-idle-summary-timer nil)))
-;;  (my/toggle-rtags-idle-summary)
+	;;  (my/toggle-rtags-idle-summary)
 	) ;; end use-package rtags
     #+END_SRC
 **** company-rtags
@@ -2384,29 +2392,84 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
 	    #+end_src
 ** python-mode
-*** anaconda-mode
+*** general
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my-setup-python ()
+	(eldoc-mode))
+    #+END_SRC
+*** defuns
+    #+BEGIN_SRC emacs-lisp :tangle yes
+
+      (defun my/python-shell-clear ()
+	(interactive)
+	(python-shell-send-string "print \"\\n\" \* 4"))
+
+      (defun my/python-shell-send-line ()
+	(interactive)
+	(save-excursion
+	;; (beginning-of-line-text)
+	;; (push-mark)
+	;; (end-of-line)
+	(let ((mark-active t)
+	      (start (progn (beginning-of-line-text) (point)))
+	      (end (progn (end-of-line) (point))))
+	  (python-shell-send-region start end))))
+    #+END_SRC
+*** keys
    #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-setup-python ()
-       (eldoc-mode))
 
-     (use-package anaconda-mode
-       :init
-       (add-hook 'python-mode-hook 'anaconda-mode)
-       (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-       :ensure t)
-     (use-package company-anaconda
-       :ensure t
-       :init
-       (defun my-setup-company-anaconda ()
-	 (add-to-list 'company-backends 'company-anaconda)
-	 (company-mode))
-       (add-hook 'python-mode-hook 'my-setup-company-anaconda))
-
-     (use-package pydoc :ensure t)
-     (use-package counsel-pydoc :ensure t)
-     (use-package importmagic :ensure t)
    #+END_SRC
+*** anaconda-mode
+**** anaconda-mode
+     #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package anaconda-mode
+	:init
+	(add-hook 'python-mode-hook 'anaconda-mode)
+	(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+	:ensure t)
+     #+END_SRC
 
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package company-anaconda
+	 :ensure t
+	 :init
+	 (defun my-setup-company-anaconda ()
+	   (add-to-list 'company-backends 'company-anaconda)
+	   (company-mode))
+	 (add-hook 'python-mode-hook 'my-setup-company-anaconda))
+     #+END_SRC
+
+*** pydoc
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package pydoc :ensure t)
+       (use-package counsel-pydoc :ensure t)
+ #+END_SRC
+*** importmagic
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package importmagic :ensure t)
+    #+END_SRC
+*** python-x
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package python-x
+	:ensure t
+	:config
+	(python-x-setup)
+	(bind-map-for-major-mode python-mode
+	  :keys (my/emacs-mode-leader-key)
+	  :evil-keys (my/evil-mode-leader-key)
+	  :evil-states (normal motion visual)
+	  :prefix eval
+	  :bindings
+	  ("e b" 'python-shell-send-buffer
+	   "e f" 'python-shell-send-defun
+	   "e F" 'python-shell-send-file
+	   "e r" 'python-shell-send-region
+	   "e R" 'python-shell-send-region-or-paragraph
+	   "e l" 'python-shell-send-line
+	   "e L" 'python-shell-send-line-and-step
+	   "e c" 'my/python-shell-clear
+	   "e s" 'python-shell-send-string)))
+    #+END_SRC
 * Todos
 ** DONE ivy resume bindings
    # ** TODO bindings for evil nerd commenter
@@ -2425,30 +2488,6 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 ** TODO clang-format hook
 ** TODO expand region reverse
 ** TODO ace-windows (hydra?)	#+END_SRC
-** python-mode
-*** anaconda-mode
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-setup-python ()
-       (eldoc-mode))
-
-     (use-package anaconda-mode
-       :init
-       (add-hook 'python-mode-hook 'anaconda-mode)
-       (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-       :ensure t)
-     (use-package company-anaconda
-       :ensure t
-       :init
-       (defun my-setup-company-anaconda ()
-	 (add-to-list 'company-backends 'company-anaconda)
-	 (company-mode))
-       (add-hook 'python-mode-hook 'my-setup-company-anaconda))
-
-     (use-package pydoc :ensure t)
-     (use-package counsel-pydoc :ensure t)
-     (use-package importmagic :ensure t)
-   #+END_SRC
-
 ** DONE ivy resume bindings
    # ** TODO bindings for evil nerd commenter
 ** DONE fix ivy-occur
