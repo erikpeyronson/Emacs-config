@@ -1,23 +1,20 @@
 * Emacs config
 
-  This is yet another emacs configuration written in org mode. When
-  emacs is started this file is parsed and the code blocks below are
-  tangled into a file named config.el which loaded. Machine local code
-  can be put in a file init-local.el that will be loaded after
+  This my emacs configuration written in org mode. When emacs is
+  started this file is parsed and the code blocks below are tangled
+  into a file named config.el which is then loaded. Untracked local
+  code can be put in a file init-local.el that will be loaded after
   config.el
 
-  After multiple .emacs.d/ bankrupcies and onset develop rsi symptoms
-  i moved to spacemacs. I really enjoyed vim keys and the space leader
-  key but found layers and alot of the conventions in the way..
-
-  Hence i decided create a simplified clone of the subset of spacemacs
-  that i use with the sole purpose of being easy to maintain and debug
-  with limited elisp skills.
+  This is basically a simplified clone of the subset of spacemacs that
+  i used implemented with the sole purpose of being easy to maintain
+  and debug with limited elisp skills.
 
   The goal is to keep the code decoupled enough that tweaking and
   adding stuff on the fly doesnt break things and structured in an
   intuitive way so that additions end up in the correct location
-  directly instead of just beeing appended to the end.
+  directly instead of just beeing appended to the end leading to a
+  disorganized chaos.
 
   It's fairly stable with Emacs 26.1 running on REHL-7, Ubuntu 18.04
   and Windows 10 (with limited functionality) but would strongly
@@ -29,147 +26,133 @@
 
 * Overview
 
-   This file is structured as a hierarchy of subsections that mirrors
-   emacs major mode inheritence.
+  The first section contains mode independent initialization code and
+  following that comes sections mirroring emacs mode inheritence
 
-   Logically it can be viewed as a a tree structure where each node
-   represents a major mode, each subtree to that node represents a
-   inherited major mode and each leaf represents a unit of
-   configuration (minor-mode, library or similar). Leaves can either
-   provide a new feature or extend a feature introduced on a higher
-   level of the same branch.
+  Logically it can be viewed as a a tree structure where each node
+  represents a major mode, each subtree to that node represents a
+  inherited major mode and each leaf represents a unit of
+  configuration (minor-mode, package, library or similar). Leaves can either
+  provide a new feature or extend a feature introduced on a higher
+  level of the same branch. This is then implemented as org
+  subheadings containing org-babel source blocks and documentation
+  that does not make sense to put in docstrings between.
 
-   The sections follow the pattern
-   #+name: structure
+   #+name: section-structure
    #+BEGIN_SRC ditaa
      +Fundamental-mode
        +--Major-mode
+       |  +--doc
        |  +--vars
-       |  |
        |  +--funcs
-       |  |
        |  +--setup
-       |  |
        |  +--keys
        |  |
        |  +--packages
        |  |  +--package
+       |  |     +--doc
        |  |     +--vars
-       |  |     |
        |  |     +--funcs
-       |  |     |
        |  |     +--setup
-       |  |     |
        |  |     +--keys
        |  |
        |  +---Major-mode
+       |     +--doc
        |     +--vars
-       |     |
        |     +--funcs
-       |     |
        |     +--setup
-       |     |
        |     +--keys
        |     |
        |     +--packages
-       |     |
        |     ...
        |
        +--Major-mode
+       |  +--doc
+       ...
      #+END_SRC
 
+     | subheadings | contains                                       |
+     |-------------+------------------------------------------------|
+     | *doc*       | Documentation, should not conatin any code     |
+     | *vars*      | Variable declarations for tweaking the section |
+     | *funcs*     | Helper functions and custom commands           |
+     | *setup*     | Setup code                                     |
+     | *keys*      | Keybindings                                    |
+     |             |                                                |
     Package configuration and installation is done using use-package
-    https://github.com/jwiegley/use-package and most keybindings
-    keys are bound using https://github.com/justbur/emacs-bind-map
+    https://github.com/jwiegley/use-package Keybindings keys are bound
+    using https://github.com/justbur/emacs-bind-map
 
-* general
+* initialization
+** doc
+   This section sets up package management, installs dependencies,
+   theme gui elements and other behavior that is not related directly
+   related to editing
+** vars
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (defvar my/backup-dir (expand-file-name ".backups"
+					     user-emacs-directory)
+       "Directory to put backup files. Changes require restart to take effect")
 
+     (defvar my/auto-saves-dir (expand-file-name ".backups"
+					     user-emacs-directory))
+       "Directory to put auto-save files. Changes require restart to take effect"
+   #+END_SRC
+** funcs
+   Close compilation window on sucessful compilation from:
+   https://emacs.stackexchange.com/questions/62/hide-compilation-window
+
+   WIP
+   #+BEGIN_SRC emacs-lisp :tangle no
+     (defun my/compilation-close-compilation-on-sucess (buf str)
+       (if (null (string-match ".*exited abnormally.*" str))
+	   ;;no errors, make the compilation window go away in a few seconds
+	   (progn
+	     (run-at-time
+	      "2 sec" nil 'delete-windows-on
+	      (get-buffer-create "*compilation*"))
+	     (message "No Compilation Errors!")))))
+   #+END_SRC
+
+** config
    Balance windows automatically
    #+BEGIN_SRC emacs-lisp :tangle yes
      (setq window-combination-resize t)
    #+END_SRC
 
-   Global minor modes
+   Keep temporary files in a backup-directory in emacs directory
    #+BEGIN_SRC emacs-lisp :tangle yes
-    (menu-bar-mode 0)
-    (tool-bar-mode 0)
-    (scroll-bar-mode 0)
-    (global-hl-line-mode)
-    (setq initial-major-mode 'text-mode)
-    (winner-mode 1)
+     (defvar my//tramp-backup-directory-alist)
+     (defvar my//tramp-auto-save-directory)
+
+     (dolist (dir (list my/backup-dir my/auto-saves-dir))
+       (when (not (file-directory-p dir))
+	 (make-directory dir t)))
+     (setq backup-directory-alist `(("." . ,my/backup-dir))
+	   auto-save-file-name-transforms `((".*" ,my/auto-saves-dir t))
+	   auto-save-list-file-prefix (concat my/auto-saves-dir ".saves-")
+	   my//tramp-backup-directory-alist `((".*" . ,my/backup-dir))
+	   my//tramp-auto-save-directory my/auto-saves-dir)
+     (setq backup-by-copying t    ; Don't delink hardlinks
+	   delete-old-versions t  ; Clean up the backups
+	   version-control t      ; Use version numbers on backups,
+	   kept-new-versions 5    ; keep some new versions
+	   kept-old-versions 2)   ; and some old ones, too)
    #+END_SRC
 
-   Keep temporary files to a backup-directory in emacs directory
-   #+BEGIN_SRC emacs-lisp :tangle yes
-    (defvar tramp-backup-directory-alist)
-    (defvar tramp-auto-save-directory)
-    (let ((backup-dir "~/.emacs.d/.backups")
-	  (auto-saves-dir "~/.emacs.d/.auto-saves/"))
-      (dolist (dir (list backup-dir auto-saves-dir))
-	(when (not (file-directory-p dir))
-	  (make-directory dir t)))
-      (setq backup-directory-alist `(("." . ,backup-dir))
-	    auto-save-file-name-transforms `((".*" ,auto-saves-dir t))
-	    auto-save-list-file-prefix (concat auto-saves-dir ".saves-")
-	    tramp-backup-directory-alist `((".*" . ,backup-dir))
-	    tramp-auto-save-directory auto-saves-dir))
-    (setq backup-by-copying t    ; Don't delink hardlinks
-	  delete-old-versions t  ; Clean up the backups
-	  version-control t      ; Use version numbers on backups,
-	  kept-new-versions 5    ; keep some new versions
-	  kept-old-versions 2)   ; and some old ones, too)
-   #+END_SRC
-   close compilation window on sucessful compilation
-https://emacs.stackexchange.com/questions/62/hide-compilation-window
+   Autoscroll compilation
    #+BEGIN_SRC emacs-lisp :tangle no
-
-; from enberg on #emacs
-(setq compilation-finish-function
-  (lambda (buf str)
-    (if (null (string-match ".*exited abnormally.*" str))
-	;;no errors, make the compilation window go away in a few seconds
-	(progn
-	  (run-at-time
-	   "2 sec" nil 'delete-windows-on
-	   (get-buffer-create "*compilation*"))
-	  (message "No Compilation Errors!")))))
-(setq compilation-scroll-output t)
+     (setq compilation-scroll-output t)
    #+END_SRC
 
 
    Keep custom variables in a separate gitignored file to allow local customizations
    using customize
    #+BEGIN_SRC emacs-lisp :tangle yes
- (let ((path (concat user-emacs-directory "custom.el")))
+   (let ((path (concat user-emacs-directory "custom.el")))
    (unless (file-exists-p path) (write-region "" nil path))
    (setq custom-file path))
    #+END_SRC
-   Speed up tramp
-   #+BEGIN_SRC emacs-lisp :tangle yes
-   (setq tramp-default-method "ssh")
-   #+END_SRC
-
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (defun my/make-emacs-prefix (key)
-	"create a key sequence ending with KEY, use together with
-	bind-map to add keys to the leader keymap"
-	(concat my/emacs-leader-key " " key))
-
-      (defun my/make-evil-prefix (key)
-	"create a key sequence ending with KEY, use together with
-      bind-map to add keys to the leader keymap for evil-emacs-state"
-	(concat my/evil-leader-key " " key))
-
-      (defun my/make-emacs-mode-prefix (key)
-	"create a key sequence ending with KEY, use together with
-      bind-map to add keys to mode-local keys the leader keymap for"
-	(concat my/emacs-mode-leader-key " " key))
-
-      (defun my/make-evil-mode-prefix (key)
-	"create a key sequence ending with KEY, use together with
-      bind-map to add keys to mode-local keys the leader keymap for evil-emacs-state"
-	(concat my/evil-mode-leader-key " " key))
-    #+END_SRC
 * initialize package
  We start by adding package repos and load paths and initialize package
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -192,13 +175,14 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
   (require 'use-package)
   (require 'bind-map)
    #+END_SRC
-* theme
+* theme and faces
  #+BEGIN_SRC emacs-lisp :tangle yes
      (use-package solarized-theme
        :config
        :ensure t)
 
 (load-theme 'adwaita t)
+(require 'hl-line)
 (set-face-background hl-line-face "light gray")
 (set-face-foreground hl-line-face "black")
    #+END_SRC
@@ -246,7 +230,28 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (defvar-local my/imenu-function 'imenu
 	"Function called interactively by `my/imenu'")
     #+END_SRC
-** COMMENT funcs
+** funcs
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/make-emacs-prefix (key)
+	"create a key sequence ending with KEY, use together with
+	bind-map to add keys to the leader keymap"
+	(concat my/emacs-leader-key " " key))
+
+      (defun my/make-evil-prefix (key)
+	"create a key sequence ending with KEY, use together with
+      bind-map to add keys to the leader keymap for evil-emacs-state"
+	(concat my/evil-leader-key " " key))
+
+      (defun my/make-emacs-mode-prefix (key)
+	"create a key sequence ending with KEY, use together with
+      bind-map to add keys to mode-local keys the leader keymap for"
+	(concat my/emacs-mode-leader-key " " key))
+
+      (defun my/make-evil-mode-prefix (key)
+	"create a key sequence ending with KEY, use together with
+      bind-map to add keys to mode-local keys the leader keymap for evil-emacs-state"
+	(concat my/evil-mode-leader-key " " key))
+    #+END_SRC
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/imenu ()
       "Call the function `my/imenu-function' interactively"
@@ -665,7 +670,17 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	    (delete-other-windows))))
     #+END_SRC
  # Global
-** keybindings
+** setup
+   Activate built in global minor modes
+   #+BEGIN_SRC emacs-lisp :tangle yes
+    (menu-bar-mode 0)
+    (tool-bar-mode 0)
+    (scroll-bar-mode 0)
+    (global-hl-line-mode)
+    (setq initial-major-mode 'text-mode)
+    (winner-mode 1)
+   #+END_SRC
+** keys
 *** base-map
    These are the keymaps that make up the global leader key
    hierarchy are defined and built in commands are bound here.
@@ -1123,25 +1138,43 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
  "n" 'occur-next-error
  "p" 'previous-error))
       #+END_SRC
-** setup
 ** packages
+*** tramp
+**** doc
+**** vars
+**** funcs
+**** setup
+   #+BEGIN_SRC emacs-lisp :tangle yes
+   (setq tramp-default-method "ssh")
+   #+END_SRC
+**** keys
 *** evil
-    #+BEGIN_SRC emacs-lisp :tangle yes
-	  (use-package evil
-	    :ensure t
-	    :init
-	    (setq evil-want-integration nil)
-	    (setq evil-want-keybinding nil)
-	    :config
-      (evil-define-key '(insert normal visual) 'global-map
-      (kbd "M-/") 'hippie-expand)
+**** doc
+**** vars
+**** funcs
+**** setup
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package evil
+	 :ensure t
+	 :init
+	 (setq evil-want-integration nil)
+	 (setq evil-want-keybinding nil))
+     #+END_SRC
+**** keys
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (evil-define-key '(insert normal visual) 'global-map
+	 (kbd "M-/") 'hippie-expand)
 
-      (evil-define-key '(normal visual) 'global-map
-      (kbd ">") 'repeat)
-	    (evil-mode 1))
-    #+END_SRC
+       (evil-define-key '(normal visual) 'global-map
+	 (kbd ">") 'repeat)
+       (evil-mode 1)
+     #+END_SRC
 
 *** evil-collection
+**** doc
+**** vars
+**** funcs
+**** setup
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-collection
 	  :after evil
@@ -1150,14 +1183,18 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  :config
 	  (evil-collection-init))
       #+END_SRC
-
+**** keys
 *** evil-rsi
+**** doc
+**** vars
+**** funcs
+**** setup
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-rsi
 	  :ensure t
 	  :requires evil)
       #+END_SRC
-
+**** keys
 *** evil-iedit-state
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-iedit-state
@@ -2014,7 +2051,12 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	   "t d c" 'org-table-delete-column
 	   "t d r" 'org-table-kill-row))
      #+END_SRC
-
+*** packages
+**** htmlize
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package htmlize
+	 :ensure t)
+     #+END_SRC
 ** Prog-mode
 *** vars
 *** funcs
@@ -2233,22 +2275,23 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-company-setup)
     #+END_SRC
 *** C++-mode
-**** c++-mode
-***** general
-     Make .h files use c++-moode instead of c-m
+**** vars
+**** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
        (defun my/setup-c++-mode ()
 	 (subword-mode))
-       (add-hook 'c++-mode-hook 'my/setup-c++-mode)
-       (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
      #+END_SRC
-     Add some paths for jumping between c and h files using 'ff-find-other-file
+
+**** config
      #+BEGIN_SRC emacs-lisp :tangle yes
        (require 'find-file)
+       (add-hook 'c++-mode-hook 'my/setup-c++-mode)
+       (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
        (add-to-list  'cc-search-directories "../inc")
        (add-to-list 'cc-search-directories "../src")
      #+END_SRC
      Setup keybindings
+**** keys
      #+BEGIN_SRC emacs-lisp :tangle yes
        (bind-map-for-major-mode c++-mode
 	 :keys (my/emacs-mode-leader-key)
@@ -2262,249 +2305,248 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  "c g" 'my/compile-and-gcov
 	  "c c" 'cp/compile
 	  "g a" 'ff-find-other-file))
+
+       (bind-map-for-major-mode my/compile-comment-map c++-mode
+	 :bindings
+	 ("t" cp/compile-gtest-test-at-point))
      #+END_SRC
-***** keys
-     #+BEGIN_SRC emacs-lisp :tangle yes
-	    (bind-map-for-major-mode my/compile-comment-map c++-mode
-	    :bindings
-	    ("t" cp/compile-gtest-test-at-point))
-     #+END_SRC
-**** rtags
+**** packages
 ***** rtags
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package rtags
-	 :ensure t
-	 :init
-	 (defun my/setup-rtags-hooks ()
-	   (setq my/imenu-function #'rtags-imenu))
-
-	 (add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
-	 (defhydra hydra/rtags-nav (:hint nil :color pink )
-	   "
-	 Rtags Naviagion
-	 --------------------------------------------------------------------
-	 _g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
-	 _i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
-	 --------------------------------------------------------------------
-	 "
-	   ("r"  rtags-find-references-at-point)
-	   ("v" rtags-location-stack-visualize)
-	   ("g"  rtags-find-symbol-at-point)
-	   ("p"  rtags-previous-match)
-	   ("f"  rtags-location-stack-forward)
-	   ("b"  rtags-location-stack-back)
-	   ("i"  rtags-symbol-info)
-	   ("n"  rtags-next-match)
-	   ("l"  rtags-list-result)
-	   ("L"  rtags-taglist)
-	   ("q"  nil :color blue))
-	 :config
-	 (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
-	 (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
-	 (setq rtags-display-result-backend 'default)
-	 (setq rtags-imenu-syntax-highlighting t)
-	 (setq rtags-autostart-diagnostics nil)
-	 (setq rtags-completions-enabled nil)
-	 (setq rtags-enable-unsaved-reparsing t)
-
-	 (bind-map-for-major-mode c++-mode
-	   :keys (my/emacs-mode-leader-key)
-	   :evil-keys (my/evil-mode-leader-key)
-	   :evil-states (normal motion visual)
-	   :prefix rtags
-	   :bindings
-	   ("g ." 'hydra/rtags-nav/body
-	    "g g"  'rtags-find-symbol-at-point
-	    "g G"  'rtags-find-symbol
-	    "g r"  'rtags-find-references-at-point
-	    "g R"  'rtags-find-references
-	    "g F"  'rtags-find-file
-	    "g v"  'rtags-find-virtuals-at-point
-	    "g m"  'rtags-find-member-function
-	    "g l"  'hydra/rtags-nav/rtags-list-results
-	    "g L"  'hydra/rtags-nav/rtags-taglist
-	    "g c"  'rtags-close-taglist
-	    "g h"  'rtags-print-class-hierarchy
-	    "g n"  'hydra/rtags-nav/rtags-next-match
-	    "g p"  'hydra/rtags-nav/rtags-previous-match
-	    "g f"  'hydra/rtags-nav/rtags-location-stack-forward
-	    "g b"    'hydra/rtags-nav/rtags-location-stack-forward
-	    "g i"    'rtags-symbol-info
-	    "g t"    'rtags-symbol-type
-	    "g d"  'rtags-dependency-tree
-	    "g s"  'rtags-display-summary
-	    "g S"  'rtags-display-summary-as-message
-	    "g e f"  'rtags-fix-fixit-at-point
-	    "g e F"  'rtags-fixit
-	    "g e r"  'rtags-rename-symbol
-	    "g e i"  'rtags-get-include-file-for-symbol
-	    "g e m"  'rtags-make-member))
-
-	 (defun run-with-local-idle-timer (secs repeat function &rest args)
-	   "Like `run-with-idle-timer', but always runs in the `current-buffer'.
-
-	     Cancels itself, if this buffer was killed."
-	   (let* (;; Chicken and egg problem.
-		  (fns (make-symbol "local-idle-timer"))
-		  (timer (apply 'run-with-idle-timer secs repeat fns args))
-		  (fn `(lambda (&rest args)
-			 (if (not (buffer-live-p ,(current-buffer)))
-			     (cancel-timer ,timer)
-			   (with-current-buffer ,(current-buffer)
-			     (apply (function ,function) args))))))
-	     (fset fns fn)
-	     fn
-	     timer))
-
-	 (defvar-local my//rtags-idle-summary-timer nil)
-	 (defvar my/rtags-idle-summary-delay 7)
-	 (defun my/rtags-display-summary ()
-	   (when (and (eq major-mode 'c++-mode) (symbol-at-point))
-	     (rtags-display-summary)))
-
-	 (defun my/toggle-rtags-idle-summary ()
-	   (interactive)
-	   (if (not my//rtags-idle-summary-timer)
-	       (setq-local my//rtags-idle-summary-timer (run-with-idle-timer my/rtags-idle-summary-delay t #'my/rtags-display-summary))
-	     (cancel-timer my//rtags-idle-summary-timer)
-	     (setq my//rtags-idle-summary-timer nil)))
-	 ;;  (my/toggle-rtags-idle-summary)
-	 ) ;; end use-package rtags
-     #+END_SRC
-***** company-rtags
+****** rtags
       #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package company-rtags
+	(use-package rtags
+	  :ensure t
+	  :init
+	  (defun my/setup-rtags-hooks ()
+	    (setq my/imenu-function #'rtags-imenu))
+
+	  (add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
+	  (defhydra hydra/rtags-nav (:hint nil :color pink )
+	    "
+	  Rtags Naviagion
+	  --------------------------------------------------------------------
+	  _g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
+	  _i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
+	  --------------------------------------------------------------------
+	  "
+	    ("r"  rtags-find-references-at-point)
+	    ("v" rtags-location-stack-visualize)
+	    ("g"  rtags-find-symbol-at-point)
+	    ("p"  rtags-previous-match)
+	    ("f"  rtags-location-stack-forward)
+	    ("b"  rtags-location-stack-back)
+	    ("i"  rtags-symbol-info)
+	    ("n"  rtags-next-match)
+	    ("l"  rtags-list-result)
+	    ("L"  rtags-taglist)
+	    ("q"  nil :color blue))
+	  :config
+	  (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
+	  (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
+	  (setq rtags-display-result-backend 'default)
+	  (setq rtags-imenu-syntax-highlighting t)
+	  (setq rtags-autostart-diagnostics nil)
+	  (setq rtags-completions-enabled nil)
+	  (setq rtags-enable-unsaved-reparsing t)
+
+	  (bind-map-for-major-mode c++-mode
+	    :keys (my/emacs-mode-leader-key)
+	    :evil-keys (my/evil-mode-leader-key)
+	    :evil-states (normal motion visual)
+	    :prefix rtags
+	    :bindings
+	    ("g ." 'hydra/rtags-nav/body
+	     "g g"  'rtags-find-symbol-at-point
+	     "g G"  'rtags-find-symbol
+	     "g r"  'rtags-find-references-at-point
+	     "g R"  'rtags-find-references
+	     "g F"  'rtags-find-file
+	     "g v"  'rtags-find-virtuals-at-point
+	     "g m"  'rtags-find-member-function
+	     "g l"  'hydra/rtags-nav/rtags-list-results
+	     "g L"  'hydra/rtags-nav/rtags-taglist
+	     "g c"  'rtags-close-taglist
+	     "g h"  'rtags-print-class-hierarchy
+	     "g n"  'hydra/rtags-nav/rtags-next-match
+	     "g p"  'hydra/rtags-nav/rtags-previous-match
+	     "g f"  'hydra/rtags-nav/rtags-location-stack-forward
+	     "g b"    'hydra/rtags-nav/rtags-location-stack-forward
+	     "g i"    'rtags-symbol-info
+	     "g t"    'rtags-symbol-type
+	     "g d"  'rtags-dependency-tree
+	     "g s"  'rtags-display-summary
+	     "g S"  'rtags-display-summary-as-message
+	     "g e f"  'rtags-fix-fixit-at-point
+	     "g e F"  'rtags-fixit
+	     "g e r"  'rtags-rename-symbol
+	     "g e i"  'rtags-get-include-file-for-symbol
+	     "g e m"  'rtags-make-member))
+
+	  (defun run-with-local-idle-timer (secs repeat function &rest args)
+	    "Like `run-with-idle-timer', but always runs in the `current-buffer'.
+
+	      Cancels itself, if this buffer was killed."
+	    (let* (;; Chicken and egg problem.
+		   (fns (make-symbol "local-idle-timer"))
+		   (timer (apply 'run-with-idle-timer secs repeat fns args))
+		   (fn `(lambda (&rest args)
+			  (if (not (buffer-live-p ,(current-buffer)))
+			      (cancel-timer ,timer)
+			    (with-current-buffer ,(current-buffer)
+			      (apply (function ,function) args))))))
+	      (fset fns fn)
+	      fn
+	      timer))
+
+	  (defvar-local my//rtags-idle-summary-timer nil)
+	  (defvar my/rtags-idle-summary-delay 7)
+	  (defun my/rtags-display-summary ()
+	    (when (and (eq major-mode 'c++-mode) (symbol-at-point))
+	      (rtags-display-summary)))
+
+	  (defun my/toggle-rtags-idle-summary ()
+	    (interactive)
+	    (if (not my//rtags-idle-summary-timer)
+		(setq-local my//rtags-idle-summary-timer (run-with-idle-timer my/rtags-idle-summary-delay t #'my/rtags-display-summary))
+	      (cancel-timer my//rtags-idle-summary-timer)
+	      (setq my//rtags-idle-summary-timer nil)))
+	  ;;  (my/toggle-rtags-idle-summary)
+	  ) ;; end use-package rtags
+      #+END_SRC
+****** company-rtags
+       #+BEGIN_SRC emacs-lisp :tangle yes
+	 (use-package company-rtags
+	   :ensure t
+	   :config
+	   (defun my/setup-company-rtags ()
+	     (add-to-list 'company-backends 'company-rtags))
+	     (add-hook 'c++-mode-hook 'my/setup-company-rtags)
+	   :init
+	   (evil-define-key '(normal insert) 'c++-mode-map
+	     (kbd "C-SPC") 'company-rtags))
+
+       #+END_SRC
+****** flycheck-rtags
+       #+BEGIN_SRC emacs-lisp :tangle no
+	(use-package flycheck-rtags
+	  :ensure t
+	  :after (flycheck-mode rtags))
+       #+END_SRC
+****** ivy-rtags
+       #+BEGIN_SRC emacs-lisp :tangle no
+	(use-package ivy-rtags
+	  :ensure t
+	  :after (ivy rtags))
+       #+END_SRC
+****** eldoc
+       #+BEGIN_SRC emacs-lisp :tangle yes
+
+  (defun fontify-string (str mode)
+    "Return STR fontified according to MODE."
+    (with-temp-buffer
+	  (insert str)
+	  (delay-mode-hooks (funcall mode))
+	  (font-lock-default-function mode)
+	  (font-lock-default-fontify-region
+	   (point-min) (point-max) nil)
+	  (buffer-string)))
+    (defun rtags-eldoc-function ()
+      (let ((summary (rtags-get-summary-text)))
+	(and summary
+	     (fontify-string
+	      (replace-regexp-in-string
+	       "{[^}]*$" ""
+	       (mapconcat
+		(lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
+		(split-string summary "\r?\n")
+		" "))
+	      major-mode))))
+
+       #+END_SRC
+***** flycheck
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(defun my/c++-flycheck-setup ()
+	  (flycheck-select-checker 'c/c++-clang)
+	  (flycheck-mode))
+	(remove-hook 'c++-mode-hook 'flycheck-mode)
+      #+END_SRC
+***** company
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(defun my/c++-company-setup ()
+	  (company-mode))
+	(add-hook 'c++-mode-hook 'my/c++-company-setup)
+      #+END_SRC
+***** google-c-style
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package google-c-style
 	  :ensure t
 	  :config
-	  (defun my/setup-company-rtags ()
-	    (add-to-list 'company-backends 'company-rtags))
-	    (add-hook 'c++-mode-hook 'my/setup-company-rtags)
-	  :init
-	  (evil-define-key '(normal insert) 'c++-mode-map
-	    (kbd "C-SPC") 'company-rtags))
+	 (add-hook 'c++-mode-hook 'google-set-c-style))
+      #+END_SRC
 
-      #+END_SRC
-***** flycheck-rtags
-      #+BEGIN_SRC emacs-lisp :tangle no
-       (use-package flycheck-rtags
-	 :ensure t
-	 :after (flycheck-mode rtags))
-      #+END_SRC
-***** ivy-rtags
-      #+BEGIN_SRC emacs-lisp :tangle no
-       (use-package ivy-rtags
-	 :ensure t
-	 :after (ivy rtags))
-      #+END_SRC
-***** eldoc
+***** clang-format
+      #+begin_src emacs-lisp :tangle yes
+	(use-package clang-format :ensure t
+	  :config
+	  (bind-map-for-major-mode c++-mode
+	    :keys (my/emacs-mode-leader-key)
+	    :evil-keys (my/evil-mode-leader-key)
+	    :evil-states (normal motion visual)
+	    :prefix rtags
+	    :bindings
+	    ("f f" 'clang-format
+	    "f b" 'clang-format-buffer
+	     "f r" 'clang-format-region)))
+
+	  (defun my/clang-format-if-file-exists ()
+	    (when (eq major-mode 'c++-mode)
+	      (when (locate-dominating-file (buffer-file-name) ".clang-format")
+		(clang-format-buffer))))
+
+	  (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+	      #+end_src
+***** flycheck
       #+BEGIN_SRC emacs-lisp :tangle yes
-
- (defun fontify-string (str mode)
-   "Return STR fontified according to MODE."
-   (with-temp-buffer
-	 (insert str)
-	 (delay-mode-hooks (funcall mode))
-	 (font-lock-default-function mode)
-	 (font-lock-default-fontify-region
-	  (point-min) (point-max) nil)
-	 (buffer-string)))
-   (defun rtags-eldoc-function ()
-     (let ((summary (rtags-get-summary-text)))
-       (and summary
-	    (fontify-string
-	     (replace-regexp-in-string
-	      "{[^}]*$" ""
-	      (mapconcat
-	       (lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
-	       (split-string summary "\r?\n")
-	       " "))
-	     major-mode))))
-
+	(defun my/c++-flycheck-setup ()
+	  (flycheck-select-checker 'c/c++-clang)
+	  (flycheck-mode))
+	(add-hook 'c++-mode-hook 'flycheck-mode)
       #+END_SRC
-**** flycheck
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/c++-flycheck-setup ()
-	 (flycheck-select-checker 'c/c++-clang)
-	 (flycheck-mode))
-       (remove-hook 'c++-mode-hook 'flycheck-mode)
-     #+END_SRC
-**** company
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/c++-company-setup ()
-	 (company-mode))
-       (add-hook 'c++-mode-hook 'my/c++-company-setup)
-     #+END_SRC
-**** google-c-style
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package google-c-style
-	 :ensure t
-	 :config
-	(add-hook 'c++-mode-hook 'google-set-c-style))
-     #+END_SRC
+***** company
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(defun my/c++-company-setup ()
+	  (company-mode))
+	(add-hook 'c++-mode-hook 'my/c++-company-setup)
+      #+END_SRC
+***** google-c-style
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package google-c-style
+	  :ensure t
+	  :config
+	 (add-hook 'c++-mode-hook 'google-set-c-style))
+      #+END_SRC
 
-**** clang-format
-     #+begin_src emacs-lisp :tangle yes
-       (use-package clang-format :ensure t
-	 :config
-	 (bind-map-for-major-mode c++-mode
-	   :keys (my/emacs-mode-leader-key)
-	   :evil-keys (my/evil-mode-leader-key)
-	   :evil-states (normal motion visual)
-	   :prefix rtags
-	   :bindings
-	   ("f f" 'clang-format
-	   "f b" 'clang-format-buffer
-	    "f r" 'clang-format-region)))
+***** clang-format
+      #+begin_src emacs-lisp :tangle yes
+	(use-package clang-format :ensure t
+	  :config
+	  (bind-map-for-major-mode c++-mode
+	    :keys (my/emacs-mode-leader-key)
+	    :evil-keys (my/evil-mode-leader-key)
+	    :evil-states (normal motion visual)
+	    :prefix rtags
+	    :bindings
+	    ("f f" 'clang-format
+	    "f b" 'clang-format-buffer
+	     "f r" 'clang-format-region)))
 
-	 (defun my/clang-format-if-file-exists ()
-	   (when (eq major-mode 'c++-mode)
-	     (when (locate-dominating-file (buffer-file-name) ".clang-format")
-	       (clang-format-buffer))))
+	  (defun my/clang-format-if-file-exists ()
+	    (when (eq major-mode 'c++-mode)
+	      (when (locate-dominating-file (buffer-file-name) ".clang-format")
+		(clang-format-buffer))))
 
-	 (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
-	     #+end_src
-**** flycheck
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/c++-flycheck-setup ()
-	 (flycheck-select-checker 'c/c++-clang)
-	 (flycheck-mode))
-       (add-hook 'c++-mode-hook 'flycheck-mode)
-     #+END_SRC
-**** company
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/c++-company-setup ()
-	 (company-mode))
-       (add-hook 'c++-mode-hook 'my/c++-company-setup)
-     #+END_SRC
-**** google-c-style
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package google-c-style
-	 :ensure t
-	 :config
-	(add-hook 'c++-mode-hook 'google-set-c-style))
-     #+END_SRC
-
-**** clang-format
-     #+begin_src emacs-lisp :tangle yes
-       (use-package clang-format :ensure t
-	 :config
-	 (bind-map-for-major-mode c++-mode
-	   :keys (my/emacs-mode-leader-key)
-	   :evil-keys (my/evil-mode-leader-key)
-	   :evil-states (normal motion visual)
-	   :prefix rtags
-	   :bindings
-	   ("f f" 'clang-format
-	   "f b" 'clang-format-buffer
-	    "f r" 'clang-format-region)))
-
-	 (defun my/clang-format-if-file-exists ()
-	   (when (eq major-mode 'c++-mode)
-	     (when (locate-dominating-file (buffer-file-name) ".clang-format")
-	       (clang-format-buffer))))
-
-	 (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
-	     #+end_src
+	  (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+	      #+end_src
 *** Python-mode
 **** python-mode
 ***** general
@@ -2633,3 +2675,5 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 
 ** TODO rtags reindex functions
 s
+
+** TODO add subsections to all packages
