@@ -6,86 +6,88 @@
   can be put in a file init-local.el that will be loaded after
   config.el
 
-  Its centered around evil/ivy and is heavily inspiered by
-  spacemacs. But with a less modular implementation adapted to my
-  needs.
+  After multiple .emacs.d/ bankrupcies and onset develop rsi symptoms
+  i moved to spacemacs. I really enjoyed vim keys and the space leader
+  key but found layers and alot of the conventions in the way..
 
-  It's fairly stable with Emacs 26.1 running on REHL-7 Ubuntu 18.04
-  but i would strongly advice against trying to use it as is if you
-  dont know what your doing. Its highly personal and not ment to be
-  released Its licensed with GPLv3 due to using some code copied from
-  Spacemacs but except from that feel free to use it however you like
-  but dont expect any support.
+  Hence i decided create a simplified clone of the subset of spacemacs
+  that i use with the sole purpose of being easy to maintain and debug
+  with limited elisp skills.
 
-  The main rationale behind the structure of this document is to allow
-  for easy on the fly tweaks and additions and The main goals is to
-  keep the code as simple as possible to debug and and organized in a
-  way that makes it intuitive where new code should be added.
+  The goal is to keep the code decoupled enough that tweaking and
+  adding stuff on the fly doesnt break things and structured in an
+  intuitive way so that additions end up in the correct location
+  directly instead of just beeing appended to the end.
 
-** Overview
+  It's fairly stable with Emacs 26.1 running on REHL-7, Ubuntu 18.04
+  and Windows 10 (with limited functionality) but would strongly
+  advice against trying to use it as is if you dont know what your
+  doing.
 
-   The sections below are organized around major and the goal is that
-   each section represent a major mode and should contains all
-   configuration around that major mode.
+  Its licensed with GPLv3 due to using some code copied from Spacemacs but except
+  from that feel free to use it however you like but dont expect any support.
 
-   The code is grouped together in the major modes that they
-   configure. In a logical view the structure of this file can be seen
-   as a tree where the root represents fundamental-mode and each
-   subtree an inherited major mode. Leafes represents a
-   feaure/mode/library that may be used in the mode and all inherited
-   modes. Leaves may also add to or ovveride leaves leaves on lower levels
+* Overview
 
-   Each node is then implemented as a section with its corresponding
-   leaves and subtrees as subsections consisting of org-babel code
-   blocks that can be included or excluded by setting :tangle yes/no
+   This file is structured as a hierarchy of subsections that mirrors
+   emacs major mode inheritence.
 
+   Logically it can be viewed as a a tree structure where each node
+   represents a major mode, each subtree to that node represents a
+   inherited major mode and each leaf represents a unit of
+   configuration (minor-mode, library or similar). Leaves can either
+   provide a new feature or extend a feature introduced on a higher
+   level of the same branch. With any forms of horizontal dependencies
+   strictly forbidden.
+
+   The sections follow the pattern
    #+name: structure
    #+BEGIN_SRC ditaa
-     +--config
-     |  #BEGIN_SRC...
-     |
-     +--keys
-     |  #BEGIN_SRC..
-     |
-     +--prog-mode
-     |  +--config
-     |  |  #BEGIN_SRC...
-     |  |
-     |  +--keys
-     |  |  #BEGIN_SRC..
-     |  |
-     |  +--package
-     |  |  +--config
-     |  |  |  #BEGIN_SRC..
-     |  |  |
-     |  |  +--keys
-     |  |     #BEGIN_SRC..
-     |  |
-     |  +--c++-mode
-     |  |  +--config
-     |  |  |  #BEGIN_SRC...
-     |  |  |
-     |  |  +--keys
-     |  |     #BEGIN_SRC..
-     |  ...
-     |
-     |--org-mode
-     |  |
-     |  ...
-     |
-     ...
-   #+END_SRC
-   In practice this model is not strictly followed everywhere but the
-   should not exist any horizontal dependencies and you should never have
-   to traverse
+     +Fundamental-mode
+       +--Major-mode
+       |  +--vars
+       |  |
+       |  +--funcs
+       |  |
+       |  +--setup
+       |  |
+       |  +--keys
+       |  |
+       |  +--packages
+       |  |  +--package
+       |  |     +--vars
+       |  |     |
+       |  |     +--funcs
+       |  |     |
+       |  |     +--setup
+       |  |     |
+       |  |     +--keys
+       |  |
+       |  +---Major-mode
+       |     +--vars
+       |     |
+       |     +--funcs
+       |     |
+       |     +--setup
+       |     |
+       |     +--keys
+       |     |
+       |     +--packages
+       |     |
+       |     ...
+       |
+       +--Major-mode
+     #+END_SRC
+    In practice this model is not strictly followed everywhere but the
+    should not exist any horizontal dependencies and you should never have
+    to traverse
 
 
-   Package configuration and installation is done using use-package
-   https://github.com/jwiegley/use-package and most keybindings
-   keys are bound using https://github.com/justbur/emacs-bind-map
+    Package configuration and installation is done using use-package
+    https://github.com/jwiegley/use-package and most keybindings
+    keys are bound using https://github.com/justbur/emacs-bind-map
 
 * general
-  This section does built in emacs behavior
 
    Balance windows automatically
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -152,6 +154,27 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
    (setq tramp-default-method "ssh")
    #+END_SRC
 
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (defun my/make-emacs-prefix (key)
+	"create a key sequence ending with KEY, use together with
+	bind-map to add keys to the leader keymap"
+	(concat my/emacs-leader-key " " key))
+
+      (defun my/make-evil-prefix (key)
+	"create a key sequence ending with KEY, use together with
+      bind-map to add keys to the leader keymap for evil-emacs-state"
+	(concat my/evil-leader-key " " key))
+
+      (defun my/make-emacs-mode-prefix (key)
+	"create a key sequence ending with KEY, use together with
+      bind-map to add keys to mode-local keys the leader keymap for"
+	(concat my/emacs-mode-leader-key " " key))
+
+      (defun my/make-evil-mode-prefix (key)
+	"create a key sequence ending with KEY, use together with
+      bind-map to add keys to mode-local keys the leader keymap for evil-emacs-state"
+	(concat my/evil-mode-leader-key " " key))
+    #+END_SRC
 * initialize package
  We start by adding package repos and load paths and initialize package
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -212,17 +235,6 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
     (set-face-foreground 'mode-line-inactive "black")
 
   #+END_SRC
-* utility functions
-* editing
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my/remove-trailing-whitespace ()
-       (interactive)
-       (save-excursion
-	 (goto-char (point-min))
-	 (while (re-search-forward "[ \t]+$" nil t)
-	   (replace-match "" nil nil)))
-       nil)
-   #+END_SRC
 * Fundamental-mode
 ** vars
     These keybindins are used to bind the spacemacs style
@@ -240,32 +252,21 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	"Function called interactively by `my/imenu'")
     #+END_SRC
 ** funcs
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (defun my/make-emacs-prefix (key)
-	"create a key sequence ending with KEY, use together with
-	bind-map to add keys to the leader keymap"
-	(concat my/emacs-leader-key " " key))
-
-      (defun my/make-evil-prefix (key)
-	"create a key sequence ending with KEY, use together with
-      bind-map to add keys to the leader keymap for evil-emacs-state"
-	(concat my/evil-leader-key " " key))
-
-      (defun my/make-emacs-mode-prefix (key)
-	"create a key sequence ending with KEY, use together with
-      bind-map to add keys to mode-local keys the leader keymap for"
-	(concat my/emacs-mode-leader-key " " key))
-
-      (defun my/make-evil-mode-prefix (key)
-	"create a key sequence ending with KEY, use together with
-      bind-map to add keys to mode-local keys the leader keymap for evil-emacs-state"
-	(concat my/evil-mode-leader-key " " key))
-    #+END_SRC
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/imenu ()
       "Call the function `my/imenu-function' interactively"
       (interactive)
       (call-interactively my/imenu-function))
+  #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp :tangle yes
+     (defun my/remove-trailing-whitespace ()
+       (interactive)
+       (save-excursion
+	 (goto-char (point-min))
+	 (while (re-search-forward "[ \t]+$" nil t)
+	   (replace-match "" nil nil)))
+       nil)
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -298,370 +299,370 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
       (when (y-or-n-p "Really delete frame?")
       (delete-frame)))
   #+END_SRC
-** spacemacs
-*** info/copyright
-   This is a set of functions and commands copied from spacemacs
-   mainly for window and buffer management.
+*** spacemacs
+**** info/copyright
+    This is a set of functions and commands copied from spacemacs
+    mainly for window and buffer management.
 
-   this is the original copyright notice
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     ;;; spacemacs-functions.el --- Library of selected functions taken from spacemacs
-     ;;
-     ;; Copyright (c) 2012-2017 Sylvain Benner & Contributors
-     ;;
-     ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
-     ;; URL: https://github.com/syl20bnr/spacemacs
-     ;;
-     ;; This file is not part of GNU Emacs.
-     ;;
-     ;;; License: GPLv3
-
-     ;; our own implementation of kill-this-buffer from menu-bar.el
-   #+END_SRC
-*** commands
+    this is the original copyright notice
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (defun spacemacs/kill-this-buffer (&optional arg)
-	"Kill the current buffer.
-      If the universal prefix argument is used then kill also the window."
-	(interactive "P")
-	(if (window-minibuffer-p)
-	    (abort-recursive-edit)
-	  (if (equal '(4) arg)
-	      (kill-buffer-and-window)
-	    (kill-buffer))))
+      ;;; spacemacs-functions.el --- Library of selected functions taken from spacemacs
+      ;;
+      ;; Copyright (c) 2012-2017 Sylvain Benner & Contributors
+      ;;
+      ;; Author: Sylvain Benner <sylvain.benner@gmail.com>
+      ;; URL: https://github.com/syl20bnr/spacemacs
+      ;;
+      ;; This file is not part of GNU Emacs.
+      ;;
+      ;;; License: GPLv3
+
+      ;; our own implementation of kill-this-buffer from menu-bar.el
+    #+END_SRC
+**** commands
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun spacemacs/kill-this-buffer (&optional arg)
+	 "Kill the current buffer.
+       If the universal prefix argument is used then kill also the window."
+	 (interactive "P")
+	 (if (window-minibuffer-p)
+	     (abort-recursive-edit)
+	   (if (equal '(4) arg)
+	       (kill-buffer-and-window)
+	     (kill-buffer))))
+     #+end_src
+
+     #+begin_src emacs-lisp :tangle yes
+       (defun spacemacs/ace-kill-this-buffer (&optional arg)
+	 "Ace kill visible buffer in a window.
+       If the universal prefix argument is used then kill also the window."
+	 (interactive "P")
+	 (require 'ace-window)
+	 (let (golden-ratio-mode)
+	   (aw-select
+	    " Ace - Kill buffer in Window"
+	    (lambda (window)
+	      (with-selected-window window
+		(spacemacs/kill-this-buffer arg))))))
+     #+end_src
+
+     #+begin_src emacs-lisp :tangle yes
+       ;; found at http://emacswiki.org/emacs/KillingBuffers
+       (defun spacemacs/kill-other-buffers (&optional arg)
+	 "Kill all other buffers.
+       If the universal prefix argument is used then will the windows too."
+	 (interactive "P")
+	 (when (yes-or-no-p (format "Killing all buffers except \"%s\"? "
+				    (buffer-name)))
+	   (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))
+	   (when (equal '(4) arg) (delete-other-windows))
+	   (message "Buffers deleted!")))
+     #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; http://camdez.com/blog/2013/11/14/emacs-show-buffer-file-name/
+      (defun spacemacs/show-and-copy-buffer-filename ()
+	"Show and copy the full path to the current file in the minibuffer."
+	(interactive)
+	;; list-buffers-directory is the variable set in dired buffers
+	(let ((file-name (or (buffer-file-name) list-buffers-directory)))
+	  (if file-name
+	      (message (kill-new file-name))
+	    (error "Buffer not visiting a file"))))
     #+end_src
 
     #+begin_src emacs-lisp :tangle yes
-      (defun spacemacs/ace-kill-this-buffer (&optional arg)
-	"Ace kill visible buffer in a window.
-      If the universal prefix argument is used then kill also the window."
-	(interactive "P")
-	(require 'ace-window)
-	(let (golden-ratio-mode)
-	  (aw-select
-	   " Ace - Kill buffer in Window"
-	   (lambda (window)
-	     (with-selected-window window
-	       (spacemacs/kill-this-buffer arg))))))
+      (defun spacemacs/new-empty-buffer ()
+	"Create a new buffer called untitled(<n>)"
+	(interactive)
+	(let ((newbuf (generate-new-buffer-name "untitled")))
+	  (switch-to-buffer newbuf)))
     #+end_src
 
     #+begin_src emacs-lisp :tangle yes
-      ;; found at http://emacswiki.org/emacs/KillingBuffers
-      (defun spacemacs/kill-other-buffers (&optional arg)
-	"Kill all other buffers.
-      If the universal prefix argument is used then will the windows too."
-	(interactive "P")
-	(when (yes-or-no-p (format "Killing all buffers except \"%s\"? "
-				   (buffer-name)))
-	  (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))
-	  (when (equal '(4) arg) (delete-other-windows))
-	  (message "Buffers deleted!")))
+      (defun spacemacs/safe-revert-buffer ()
+	"Prompt before reverting the file."
+	(interactive)
+	(revert-buffer nil nil))
     #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     ;; http://camdez.com/blog/2013/11/14/emacs-show-buffer-file-name/
-     (defun spacemacs/show-and-copy-buffer-filename ()
-       "Show and copy the full path to the current file in the minibuffer."
-       (interactive)
-       ;; list-buffers-directory is the variable set in dired buffers
-       (let ((file-name (or (buffer-file-name) list-buffers-directory)))
-	 (if file-name
-	     (message (kill-new file-name))
-	   (error "Buffer not visiting a file"))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/safe-erase-buffer ()
+	"Prompt before erasing the content of the file."
+	(interactive)
+	(if (y-or-n-p (format "Erase content of buffer %s ? " (current-buffer)))
+	    (erase-buffer)))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/new-empty-buffer ()
-       "Create a new buffer called untitled(<n>)"
-       (interactive)
-       (let ((newbuf (generate-new-buffer-name "untitled")))
-	 (switch-to-buffer newbuf)))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      ;; http://stackoverflow.com/a/10216338/4869
+      (defun spacemacs/copy-whole-buffer-to-clipboard ()
+	"Copy entire buffer to clipboard"
+	(interactive)
+	(clipboard-kill-ring-save (point-min) (point-max)))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/safe-revert-buffer ()
-       "Prompt before reverting the file."
-       (interactive)
-       (revert-buffer nil nil))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/copy-clipboard-to-whole-buffer ()
+	"Copy clipboard and replace buffer"
+	(interactive)
+	(delete-region (point-min) (point-max))
+	(clipboard-yank)
+	(deactivate-mark))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/safe-erase-buffer ()
-       "Prompt before erasing the content of the file."
-       (interactive)
-       (if (y-or-n-p (format "Erase content of buffer %s ? " (current-buffer)))
-	   (erase-buffer)))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/switch-to-scratch-buffer ()
+	"Switch to the `*scratch*' buffer. Create it first if needed."
+	(interactive)
+	(let ((exists (get-buffer "*scratch*")))
+	  (switch-to-buffer (get-buffer-create "*scratch*"))
+	  (when (and (not exists)
+		     (not (eq major-mode dotspacemacs-scratch-mode))
+		     (fboundp dotspacemacs-scratch-mode))
+	    (funcall dotspacemacs-scratch-mode))))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     ;; http://stackoverflow.com/a/10216338/4869
-     (defun spacemacs/copy-whole-buffer-to-clipboard ()
-       "Copy entire buffer to clipboard"
-       (interactive)
-       (clipboard-kill-ring-save (point-min) (point-max)))
-   #+end_src
-
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/copy-clipboard-to-whole-buffer ()
-       "Copy clipboard and replace buffer"
-       (interactive)
-       (delete-region (point-min) (point-max))
-       (clipboard-yank)
-       (deactivate-mark))
-   #+end_src
-
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/switch-to-scratch-buffer ()
-       "Switch to the `*scratch*' buffer. Create it first if needed."
-       (interactive)
-       (let ((exists (get-buffer "*scratch*")))
-	 (switch-to-buffer (get-buffer-create "*scratch*"))
-	 (when (and (not exists)
-		    (not (eq major-mode dotspacemacs-scratch-mode))
-		    (fboundp dotspacemacs-scratch-mode))
-	   (funcall dotspacemacs-scratch-mode))))
-   #+end_src
-
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
-       "Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
-	controls whether focus moves to new window (with buffer), or stays on
-	current"
-       (interactive)
-       (let ((b (current-buffer))
-	     (w1 (selected-window))
-	     (w2 (winum-get-window-by-number windownum)))
-	 (unless (eq w1 w2)
-	   (set-window-buffer w2 b)
-	   (switch-to-prev-buffer)
-	   (unrecord-window-buffer w1 b)))
-       (when follow-focus-p (select-window (winum-get-window-by-number windownum))))
-   #+end_src
-
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
-       "Swaps visible buffers between active window and selected window.
-	follow-focus-p controls whether focus moves to new window (with buffer), or
-	stays on current"
-       (interactive)
-       (let* ((b1 (current-buffer))
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
+	"Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
+	 controls whether focus moves to new window (with buffer), or stays on
+	 current"
+	(interactive)
+	(let ((b (current-buffer))
 	      (w1 (selected-window))
-	      (w2 (winum-get-window-by-number windownum))
-	      (b2 (window-buffer w2)))
-	 (unless (eq w1 w2)
-	   (set-window-buffer w1 b2)
-	   (set-window-buffer w2 b1)
-	   (unrecord-window-buffer w1 b1)
-	   (unrecord-window-buffer w2 b2)))
-       (when follow-focus-p (select-window-by-number windownum)))
+	      (w2 (winum-get-window-by-number windownum)))
+	  (unless (eq w1 w2)
+	    (set-window-buffer w2 b)
+	    (switch-to-prev-buffer)
+	    (unrecord-window-buffer w1 b)))
+	(when follow-focus-p (select-window (winum-get-window-by-number windownum))))
+    #+end_src
 
-     (dotimes (i 9)
-       (let ((n (+ i 1)))
-	 (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
-		  ,(format "Move buffer to the window with number %i." n)
-		  (interactive "P")
-		  (if arg
-		      (spacemacs/swap-buffers-to-window ,n t)
-		    (spacemacs/move-buffer-to-window ,n t))))
-	 (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
-		  (interactive)
-		  (spacemacs/move-buffer-to-window ,n nil)))
-	 (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
-		  (interactive)
-		  (spacemacs/swap-buffers-to-window ,n nil)))
-	 ))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
+	"Swaps visible buffers between active window and selected window.
+	 follow-focus-p controls whether focus moves to new window (with buffer), or
+	 stays on current"
+	(interactive)
+	(let* ((b1 (current-buffer))
+	       (w1 (selected-window))
+	       (w2 (winum-get-window-by-number windownum))
+	       (b2 (window-buffer w2)))
+	  (unless (eq w1 w2)
+	    (set-window-buffer w1 b2)
+	    (set-window-buffer w2 b1)
+	    (unrecord-window-buffer w1 b1)
+	    (unrecord-window-buffer w2 b2)))
+	(when follow-focus-p (select-window-by-number windownum)))
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/rotate-windows-backward (count)
-       "Rotate each window backwards.
-     Dedicated (locked) windows are left untouched."
-       (interactive "p")
-       (spacemacs/rotate-windows-forward (* -1 count)))
-   #+end_src
+      (dotimes (i 9)
+	(let ((n (+ i 1)))
+	  (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
+		   ,(format "Move buffer to the window with number %i." n)
+		   (interactive "P")
+		   (if arg
+		       (spacemacs/swap-buffers-to-window ,n t)
+		     (spacemacs/move-buffer-to-window ,n t))))
+	  (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
+		   (interactive)
+		   (spacemacs/move-buffer-to-window ,n nil)))
+	  (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
+		   (interactive)
+		   (spacemacs/swap-buffers-to-window ,n nil)))
+	  ))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
-       "Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
-	controls whether focus moves to new window (with buffer), or stays on
-	current"
-       (interactive)
-       (let ((b (current-buffer))
-	     (w1 (selected-window))
-	     (w2 (winum-get-window-by-number windownum)))
-	 (unless (eq w1 w2)
-	   (set-window-buffer w2 b)
-	   (switch-to-prev-buffer)
-	   (unrecord-window-buffer w1 b)))
-       (when follow-focus-p (select-window (winum-get-window-by-number windownum))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/rotate-windows-backward (count)
+	"Rotate each window backwards.
+      Dedicated (locked) windows are left untouched."
+	(interactive "p")
+	(spacemacs/rotate-windows-forward (* -1 count)))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
-       "Swaps visible buffers between active window and selected window.
-	follow-focus-p controls whether focus moves to new window (with buffer), or
-	stays on current"
-       (interactive)
-       (let* ((b1 (current-buffer))
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/move-buffer-to-window (windownum follow-focus-p)
+	"Moves a buffer to a window, using the spacemacs numbering. follow-focus-p
+	 controls whether focus moves to new window (with buffer), or stays on
+	 current"
+	(interactive)
+	(let ((b (current-buffer))
 	      (w1 (selected-window))
-	      (w2 (winum-get-window-by-number windownum))
-	      (b2 (window-buffer w2)))
-	 (unless (eq w1 w2)
-	   (set-window-buffer w1 b2)
-	   (set-window-buffer w2 b1)
-	   (unrecord-window-buffer w1 b1)
-	   (unrecord-window-buffer w2 b2)))
-       (when follow-focus-p (select-window-by-number windownum)))
+	      (w2 (winum-get-window-by-number windownum)))
+	  (unless (eq w1 w2)
+	    (set-window-buffer w2 b)
+	    (switch-to-prev-buffer)
+	    (unrecord-window-buffer w1 b)))
+	(when follow-focus-p (select-window (winum-get-window-by-number windownum))))
+    #+end_src
 
-     (dotimes (i 9)
-       (let ((n (+ i 1)))
-	 (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
-		  ,(format "Move buffer to the window with number %i." n)
-		  (interactive "P")
-		  (if arg
-		      (spacemacs/swap-buffers-to-window ,n t)
-		    (spacemacs/move-buffer-to-window ,n t))))
-	 (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
-		  (interactive)
-		  (spacemacs/move-buffer-to-window ,n nil)))
-	 (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
-		  (interactive)
-		  (spacemacs/swap-buffers-to-window ,n nil)))
-	 ))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/swap-buffers-to-window (windownum follow-focus-p)
+	"Swaps visible buffers between active window and selected window.
+	 follow-focus-p controls whether focus moves to new window (with buffer), or
+	 stays on current"
+	(interactive)
+	(let* ((b1 (current-buffer))
+	       (w1 (selected-window))
+	       (w2 (winum-get-window-by-number windownum))
+	       (b2 (window-buffer w2)))
+	  (unless (eq w1 w2)
+	    (set-window-buffer w1 b2)
+	    (set-window-buffer w2 b1)
+	    (unrecord-window-buffer w1 b1)
+	    (unrecord-window-buffer w2 b2)))
+	(when follow-focus-p (select-window-by-number windownum)))
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/delete-window (&optional arg)
-       "Delete the current window.
-     If the universal prefix argument is used then kill the buffer too."
-       (interactive "P")
-       (if (equal '(4) arg)
-	   (kill-buffer-and-window)
-	 (delete-window)))
-   #+end_src
+      (dotimes (i 9)
+	(let ((n (+ i 1)))
+	  (eval `(defun ,(intern (format "buffer-to-window-%s" n)) (&optional arg)
+		   ,(format "Move buffer to the window with number %i." n)
+		   (interactive "P")
+		   (if arg
+		       (spacemacs/swap-buffers-to-window ,n t)
+		     (spacemacs/move-buffer-to-window ,n t))))
+	  (eval `(defun ,(intern (format "move-buffer-window-no-follow-%s" n)) ()
+		   (interactive)
+		   (spacemacs/move-buffer-to-window ,n nil)))
+	  (eval `(defun ,(intern (format "swap-buffer-window-no-follow-%s" n)) ()
+		   (interactive)
+		   (spacemacs/swap-buffers-to-window ,n nil)))
+	  ))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     ;; from http://dfan.org/blog/2009/02/19/emacs-dedicated-windows/
-     (defun spacemacs/toggle-current-window-dedication ()
-       "Toggle dedication state of a window."
-       (interactive)
-       (let* ((window    (selected-window))
-	      (dedicated (window-dedicated-p window)))
-	 (set-window-dedicated-p window (not dedicated))
-	 (message "Window %sdedicated to %s"
-		  (if dedicated "no longer " "")
-		  (buffer-name))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/delete-window (&optional arg)
+	"Delete the current window.
+      If the universal prefix argument is used then kill the buffer too."
+	(interactive "P")
+	(if (equal '(4) arg)
+	    (kill-buffer-and-window)
+	  (delete-window)))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     ;; from https://gist.github.com/timcharper/493269
-     (defun spacemacs/split-window-vertically-and-switch ()
-       (interactive)
-       (split-window-vertically)
-       (other-window 1))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      ;; from http://dfan.org/blog/2009/02/19/emacs-dedicated-windows/
+      (defun spacemacs/toggle-current-window-dedication ()
+	"Toggle dedication state of a window."
+	(interactive)
+	(let* ((window    (selected-window))
+	       (dedicated (window-dedicated-p window)))
+	  (set-window-dedicated-p window (not dedicated))
+	  (message "Window %sdedicated to %s"
+		   (if dedicated "no longer " "")
+		   (buffer-name))))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/split-window-horizontally-and-switch ()
-       (interactive)
-       (split-window-horizontally)
-       (other-window 1))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      ;; from https://gist.github.com/timcharper/493269
+      (defun spacemacs/split-window-vertically-and-switch ()
+	(interactive)
+	(split-window-vertically)
+	(other-window 1))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/layout-triple-columns ()
-       " Set the layout to triple columns. "
-       (interactive)
-       (delete-other-windows)
-       (dotimes (i 2) (split-window-right))
-       (balance-windows))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/split-window-horizontally-and-switch ()
+	(interactive)
+	(split-window-horizontally)
+	(other-window 1))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/layout-double-columns ()
-       " Set the layout to double columns. "
-       (interactive)
-       (delete-other-windows)
-       (split-window-right))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/layout-triple-columns ()
+	" Set the layout to triple columns. "
+	(interactive)
+	(delete-other-windows)
+	(dotimes (i 2) (split-window-right))
+	(balance-windows))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/toggle-frame-fullscreen ()
-       "Respect the `dotspacemacs-fullscreen-use-non-native' variable when
-     toggling fullscreen."
-       (interactive)
-       (if dotspacemacs-fullscreen-use-non-native
-	   (spacemacs/toggle-frame-fullscreen-non-native)
-	 (toggle-frame-fullscreen)))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/layout-double-columns ()
+	" Set the layout to double columns. "
+	(interactive)
+	(delete-other-windows)
+	(split-window-right))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/toggle-fullscreen ()
-       "Toggle full screen on X11 and Carbon"
-       (interactive)
-       (cond
-	((eq window-system 'x)
-	 (set-frame-parameter nil 'fullscreen
-			      (when (not (frame-parameter nil 'fullscreen))
-				'fullboth)))
-	((eq window-system 'mac)
-	 (set-frame-parameter
-	  nil 'fullscreen
-	  (when (not (frame-parameter nil 'fullscreen)) 'fullscreen)))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/toggle-frame-fullscreen ()
+	"Respect the `dotspacemacs-fullscreen-use-non-native' variable when
+      toggling fullscreen."
+	(interactive)
+	(if dotspacemacs-fullscreen-use-non-native
+	    (spacemacs/toggle-frame-fullscreen-non-native)
+	  (toggle-frame-fullscreen)))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/toggle-frame-fullscreen-non-native ()
-       "Toggle full screen non-natively. Uses the `fullboth' frame paramerter
-	rather than `fullscreen'. Useful to fullscreen on OSX w/o animations."
-       (interactive)
-       (modify-frame-parameters
-	nil
-	`((maximized
-	   . ,(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-		(frame-parameter nil 'fullscreen)))
-	  (fullscreen
-	   . ,(if (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
-		  (if (eq (frame-parameter nil 'maximized) 'maximized)
-		      'maximized)
-		'fullboth)))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/toggle-fullscreen ()
+	"Toggle full screen on X11 and Carbon"
+	(interactive)
+	(cond
+	 ((eq window-system 'x)
+	  (set-frame-parameter nil 'fullscreen
+			       (when (not (frame-parameter nil 'fullscreen))
+				 'fullboth)))
+	 ((eq window-system 'mac)
+	  (set-frame-parameter
+	   nil 'fullscreen
+	   (when (not (frame-parameter nil 'fullscreen)) 'fullscreen)))))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/switch-to-minibuffer-window ()
-       "switch to minibuffer window (if active)"
-       (interactive)
-       (when (active-minibuffer-window)
-	 (select-window (active-minibuffer-window))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/toggle-frame-fullscreen-non-native ()
+	"Toggle full screen non-natively. Uses the `fullboth' frame paramerter
+	 rather than `fullscreen'. Useful to fullscreen on OSX w/o animations."
+	(interactive)
+	(modify-frame-parameters
+	 nil
+	 `((maximized
+	    . ,(unless (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
+		 (frame-parameter nil 'fullscreen)))
+	   (fullscreen
+	    . ,(if (memq (frame-parameter nil 'fullscreen) '(fullscreen fullboth))
+		   (if (eq (frame-parameter nil 'maximized) 'maximized)
+		       'maximized)
+		 'fullboth)))))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     (defun spacemacs/alternate-buffer (&optional window)
-       "Switch back and forth between current and last buffer in the
-     current window."
-       (interactive)
-       (let ((current-buffer (window-buffer window)))
-	 ;; if no window is found in the windows history, `switch-to-buffer' will
-	 ;; default to calling `other-buffer'.
-	 (switch-to-buffer
-	  (cl-find-if (lambda (buffer)
-			(not (eq buffer current-buffer)))
-		      (mapcar #'car (window-prev-buffers window))))))
-   #+end_src
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/switch-to-minibuffer-window ()
+	"switch to minibuffer window (if active)"
+	(interactive)
+	(when (active-minibuffer-window)
+	  (select-window (active-minibuffer-window))))
+    #+end_src
 
-   #+begin_src emacs-lisp :tangle yes
-     ;; from https://gist.github.com/3402786
-     (defun spacemacs/toggle-maximize-buffer ()
-       "Maximize buffer"
-       (interactive)
-       (if (and (= 1 (length (window-list)))
-		(assoc ?_ register-alist))
-	   (jump-to-register ?_)
-	 (progn
-	   (window-configuration-to-register ?_)
-	   (delete-other-windows))))
-   #+END_SRC
-# Global
+    #+begin_src emacs-lisp :tangle yes
+      (defun spacemacs/alternate-buffer (&optional window)
+	"Switch back and forth between current and last buffer in the
+      current window."
+	(interactive)
+	(let ((current-buffer (window-buffer window)))
+	  ;; if no window is found in the windows history, `switch-to-buffer' will
+	  ;; default to calling `other-buffer'.
+	  (switch-to-buffer
+	   (cl-find-if (lambda (buffer)
+			 (not (eq buffer current-buffer)))
+		       (mapcar #'car (window-prev-buffers window))))))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle yes
+      ;; from https://gist.github.com/3402786
+      (defun spacemacs/toggle-maximize-buffer ()
+	"Maximize buffer"
+	(interactive)
+	(if (and (= 1 (length (window-list)))
+		 (assoc ?_ register-alist))
+	    (jump-to-register ?_)
+	  (progn
+	    (window-configuration-to-register ?_)
+	    (delete-other-windows))))
+    #+END_SRC
+ # Global
 ** keybindings
 *** base-map
    These are the keymaps that make up the global leader key
@@ -1120,110 +1121,25 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
  "n" 'occur-next-error
  "p" 'previous-error))
       #+END_SRC
-** occur
-*** vars
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defvar-local my/occur-function-regex "[a-z]+ \\([A-Za-z]+::\\)?[A-Za-z]+() {")
-#+END_SRC
-*** funcs
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (defun my/occur-fail ()
-    (interactive)
-    (occur "fail"))
+** setup
+** packages
+*** evil
+    #+BEGIN_SRC emacs-lisp :tangle yes
+	  (use-package evil
+	    :ensure t
+	    :init
+	    (setq evil-want-integration nil)
+	    (setq evil-want-keybinding nil)
+	    :config
+      (evil-define-key '(insert normal visual) 'global-map
+      (kbd "M-/") 'hippie-expand)
 
-  (defun my/occur-cout ()
-    (interactive)
-    (occur "\\(cout\\|cerr\\)"))
+      (evil-define-key '(normal visual) 'global-map
+      (kbd ">") 'repeat)
+	    (evil-mode 1))
+    #+END_SRC
 
-  (defun my/occur-defun-function ()
-    (interactive)
-    (occur my/occur-function-regex))
-
-  (defun my/delete-occur-window  ()
-    (interactive)
-    (let ((window (get-buffer-window "*Occur*")))
-      (when window
-	(delete-window window))))
-
-  (defun my/occur-or-toggle-window (arg)
-    (interactive "p")
-    (let* ((buffer (get-buffer "*Occur*"))
-	   (window (get-buffer-window "*Occur*")))
-      (cond
-       (window (delete-window window))
-       (buffer (display-buffer buffer))
-       (t (call-interactively #'occur)))))
-#+END_SRC
-*** keybindings
-** ack grep etc
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-counsel-ack-in-dir (arg)
-     "Read directory with completion and call counsel-ack"
-       (interactive "P")
-       (let ((default-directory (my-read-expanded-filename))
-	     (initial-input ""))
-	     (when arg
-	       (setq initial-input (word-at-point)))
-	     (counsel-ack initial-input)))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defun my-counsel-git-grep-in-dir ()
-       (interactive)
-       (let ((path (my-read-expanded-filename)))
-	 (counsel-git-grep nil (concat " -- " path " ")))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defun my-counesl-grep-in-dir (arg)
-       "Read directory with completion and call counsel-grep"
-       (interactive"P")
-       (let ((default-directory (my-read-expanded-filename)))
-	 (counsel-grep)))
-   #+END_SRC
-
-   #+BEGIN_SRC emacs-lisp :tangle no
-     (defun my-counsel-ag-in-dir (arg)
-     "Read directory with completion and call counsel-grep"
-     (let ((default-directory (my-read-expanded-filename)))
-       (let ((default-directory (expand-file-name
-			       (read-file-name "Starting directory: "))))
-       (counsel-grep)))
-   #+end_src
-
-   #+begin_src emacs-lisp :tangle no
-     (defvar my-imenu-function #'imenu
-       "Function called interctively by `my-imenu-or-similar'
-       automatically buffer local when set ")
-
-     (defun my-imenu-or-similar ()
-       "Call the function defined in `my-imenu-function'"
-       (interactive)
-       (call-interactively my-imenu-function))
-
-   #+END_SRC
-   #+BEGIN_SRC emacs-lisp :tangle no
-  (defun my-counsel-git-grep-in-dir ()
-
-
-   #+END_SRC
-** Evil
-**** evil
-      #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package evil
-	  :ensure t
-	  :init
-	  (setq evil-want-integration nil)
-	  (setq evil-want-keybinding nil)
-	  :config
-    (evil-define-key '(insert normal visual) 'global-map
-    (kbd "M-/") 'hippie-expand)
-
-    (evil-define-key '(normal visual) 'global-map
-    (kbd ">") 'repeat)
-	  (evil-mode 1))
-      #+END_SRC
-**** evil-collection
+*** evil-collection
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-collection
 	  :after evil
@@ -1233,21 +1149,22 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  (evil-collection-init))
       #+END_SRC
 
-**** evil-rsi
+*** evil-rsi
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-rsi
 	  :ensure t
 	  :requires evil)
       #+END_SRC
 
-**** evil-iedit-state
+*** evil-iedit-state
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-iedit-state
 	  :ensure t
 	  :bind
 	  (:map my/search-map ("e" . evil-iedit-state/iedit-mode)))
       #+END_SRC
-**** evil-escape
+
+*** evil-escape
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-escape
 	  :ensure t
@@ -1256,14 +1173,14 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  (evil-escape-mode 1))
       #+END_SRC
 
-**** evil-nerd-commenter
+*** evil-nerd-commenter
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-nerd-commenter
 	  :ensure t
 	  :requires evil)
       #+END_SRC
 
-**** evil-surround
+*** evil-surround
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-surround
 	  :ensure t
@@ -1272,7 +1189,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	      :requires evil)
       #+END_SRC
 
-**** evil-exchange
+*** evil-exchange
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-exchange
 	  :ensure t
@@ -1281,7 +1198,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  (evil-exchange-cx-install))
       #+END_SRC
 
-**** evil-unimpaired
+*** evil-unimpaired
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-unimpaired
 	  :load-path "sumodules/evil-unimpaired"
@@ -1290,7 +1207,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  (add-hook 'evil-mode-hook 'evil-unimpaired-mode))
       #+END_SRC
 
-**** evil-rsi
+*** evil-rsi
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-rsi
 	  :ensure t
@@ -1298,7 +1215,7 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	  :config (evil-rsi-mode 1))
       #+END_SRC
 
-**** evil-mc
+*** evil-mc
        #+BEGIN_SRC emacs-lisp :tangle yes
 	 (use-package evil-mc
 	   :ensure t
@@ -1323,634 +1240,629 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	     (kbd "g r s") 'evil-mc-pause-cursors
 	     (kbd "g r u") 'evil-mc-undo-all-cursors))
        #+END_SRC
-**** org-evil
+*** org-evil
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package org-evil
 	   :ensure t
 	   :requires evil)
       #+END_SRC
-** Ivy
 *** ivy
-      #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package ivy
-	  :ensure t
-	  :bind
-	  (:map ivy-minibuffer-map
-		(" " . ivy-alt-done)
-		("C-j" . ivy-next-line)
-		("C-k" . ivy-previous-line)
-		("C-h" . 'ivy-backward-delete-char)
-		:map my/reg-ring-resume-map
-		("m" . counsel-mark-ring)
-		("y" . counsel-yank-pop)
-		("l" . ivy-resume))
-	  :init
-	  (add-hook 'after-init-hook 'ivy-mode)
-	  :config
-	  (defvar spacemacs--counsel-commands
-	    '(;; --line-number forces line numbers (disabled by default on windows)
-	      ;; no --vimgrep because it adds column numbers that wgrep can't handle
-	      ;; see https://github.com/syl20bnr/spacemacs/pull/8065
-	      ("rg" . "rg --smart-case --no-heading --color never --line-number --max-columns 150 %s %S .")
-	      ("ag" . "ag --nocolor --nogroup %s %S .")
-	      ("pt" . "pt -e --nocolor --nogroup %s %S .")
-	      ("ack" . "ack --nocolor --nogroup %s %S .")
-	      ("grep" . "grep -nrP %s %S ."))
-	    "An alist of search commands and their corresponding commands
-	with options to run in the shell.")
-	  ;; (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
-	  ;; (evil-make-overriding-map ivy-occur-mode-map 'normal)
-	  )
-     #+END_SRC
+       #+BEGIN_SRC emacs-lisp :tangle yes
+	 (use-package ivy
+	   :ensure t
+	   :bind
+	   (:map ivy-minibuffer-map
+		 (" " . ivy-alt-done)
+		 ("C-j" . ivy-next-line)
+		 ("C-k" . ivy-previous-line)
+		 ("C-h" . 'ivy-backward-delete-char)
+		 :map my/reg-ring-resume-map
+		 ("m" . counsel-mark-ring)
+		 ("y" . counsel-yank-pop)
+		 ("l" . ivy-resume))
+	   :init
+	   (add-hook 'after-init-hook 'ivy-mode)
+	   :config
+	   (defvar spacemacs--counsel-commands
+	     '(;; --line-number forces line numbers (disabled by default on windows)
+	       ;; no --vimgrep because it adds column numbers that wgrep can't handle
+	       ;; see https://github.com/syl20bnr/spacemacs/pull/8065
+	       ("rg" . "rg --smart-case --no-heading --color never --line-number --max-columns 150 %s %S .")
+	       ("ag" . "ag --nocolor --nogroup %s %S .")
+	       ("pt" . "pt -e --nocolor --nogroup %s %S .")
+	       ("ack" . "ack --nocolor --nogroup %s %S .")
+	       ("grep" . "grep -nrP %s %S ."))
+	     "An alist of search commands and their corresponding commands
+	 with options to run in the shell.")
+	   ;; (evil-set-initial-state 'ivy-occur-grep-mode 'normal)
+	   ;; (evil-make-overriding-map ivy-occur-mode-map 'normal)
+	   )
+      #+END_SRC
 
 *** ivy-yasnippet
-      #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package ivy-yasnippet
-	  :ensure t
-	  :bind
-	  (:map my/insert-map ("y" . ivy-yasnippet)))
-      #+END_SRC
+       #+BEGIN_SRC emacs-lisp :tangle yes
+	 (use-package ivy-yasnippet
+	   :ensure t
+	   :bind
+	   (:map my/insert-map ("y" . ivy-yasnippet)))
+       #+END_SRC
 *** ivy-hydra
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package ivy-hydra
-	 :ensure t
-	 :requires (ivy))
-     #+END_SRC
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package ivy-hydra
+	  :ensure t
+	  :requires (ivy))
+      #+END_SRC
 
 *** counsel
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package counsel
-	 :ensure t
-	 :bind
-	 (:map my/search-map ("k" . counsel-ack) ("g"
-	  . counsel-git-grep) ("s" . swiper) ("K" . ack) ("k"
-	  . counsel-ack) ("g" . counsel-git-grep) ("G" . vc-git-grep)
-	  ("a" . counsel-ag) ("A" . ag))
-	  :config
-	  (counsel-mode))
-     #+END_SRC
-
-** Projectile
-**** projectile
-       #+BEGIN_SRC emacs-lisp :tangle yes
-	 (use-package projectile
-	   :init
-	   (add-hook 'after-init-hook 'projectile-mode)
-	   :config
-	   (setq projectile-enable-caching t)
-	   (setq projectile-completion-system 'ivy)
-	   :ensure t
-	   :after evil
-	   :bind
-	   (:map
-	    my/projectile-map
-	    ("!" . projectile-run-shell-command-in-root)
-	    ("%" . projectile-replace-regexp)
-	    ("&" . projectile-run-async-shell-command-in-root)
-	    ("d" . projectile-dired)
-	    ("D" . projectile-dired-other-window)
-	    ("F" . projectile-find-file-dwim)
-	    ("G" . projectile-regenerate-tags)
-	    ("I" . projectile-invalidate-cache)
-	    ("R" . projectile-replace)
-	    ("T" . projectile-test-project)
-	    ("a" . projectile-toggle-between-implementation-and-test)
-	    ("c" . projectile-compile-project)
-	    ("e" . projectile-edit-dir-locals)
-	    ("g" . projectile-find-tag)
-	    ("k" . projectile-kill-buffers)
-	    ("v" . projectile-vc)
-	    ("b" . projectile-switch-to-buffer)
-	    ("B" . projectile-ibuffer)
-	    ("f" . projectile-find-file)
-	    ("p" . projectile-switch-project)
-	    ("r" . projectile-recentf)))
-       #+END_SRC
-**** counsel-projectile
-       #+begin_src emacs-lisp :tangle no
-	 (use-package counsel-projectile
-	   :ensure t
-	   :bind
-	   (:map
-	    my/projectile-map
-	    ("SPC" . counsel-projectile)
-	    ("b" . counsel-projectile-switch-to-buffer)
-	    ("f" . counsel-projectile-find-file)
-	    ("d" . counsel-projectile-find-dir)
-	    ("p" . counsel-projectile-switch-project)))
-
-       #+end_src
-**** ibuffer-projectile
-       #+BEGIN_SRC emacs-lisp :tangle no
-	 (use-package ibuffer-projectile
-	   :ensure t
-	   :config
-	   (ibuffer-projectile-set-filter-groups))
-       #+END_SRC
-** which-key
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package which-key
-	 :ensure t
-	 :init
-	 (add-hook 'after-init-hook 'which-key-mode))
-     #+END_SRC
-** move-text
-      #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package move-text
-	  :ensure t
-	  :init
-	  :bind
-	  (:map
-	   evil-normal-state-map
-	   ("[ e" . move-text-up)
-	   ("] e" . move-text-down)))
-      #+END_SRC
-** undo-tree
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package undo-tree
-       :ensure t)
-   #+END_SRC
-** expand-region
-      #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package expand-region
-	  :ensure t
-	  :config
-	  (setq expand-region-contract-fast-key "V"
-		expand-region-reset-fast-key "r"))
-      #+END_SRC
-** iedit
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package iedit
-	:ensure t)
-    #+END_SRC
-** visual split this
-   #+begin_src emacs-lisp :tangle no
-   (use-package hl-anything
-     :ensure t
-     :config
-     )
-(use-package hl-indent
-     :ensure t
-     :config
-     (add-hook 'prog-mode-hook 'hl-indent) ) (use-package hl-sentence
-     :ensure t
-     ) (use-package hl-todo
-     :ensure t
-     :config
-     (global-hl-todo-mode) ) (
-   #+END_SRC
-** completion
-*** yasnippet
- #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package yasnippet
-	 :ensure t
-	 :defer t
-	 :init
-	 (add-hook 'prog-mode-hook 'yas-minor-mode) (add-hook
-	 'org-mode-hook 'yas-minor-mode)
-	 :config
-	 (add-to-list 'hippie-expand-try-functions-list
-	 'yas-hippie-try-expand) (yas-reload-all)) (use-package
-	 yasnippet-snippets
-	 :ensure t
-	 :requires yasnippet)
- #+END_SRC
-
-*** flycheck
- #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package flycheck
-       :ensure t
-       :bind
-	(:map my/toggle-map
-	      ("f" . flycheck-mode))
-       (:map my/errors-map
-       ("." . spacemacs/error-transient-state/body)
-	("S" . flycheck-set-checker-executable)
-	("e" . flycheck-buffer)
-	("c" . flycheck-clear)
-	("h" . flycheck-describe-checker)
-	("l" . my/flycheck-toggle-error-list)
-	("s" . flycheck-select-checker)
-	("v" . flycheck-verify-setup)
-	("t" . flycheck-mode)
-	("x" . flycheck-explain-error-at-point)
-	("y" . flycheck-copy-errors-as-kill))
-       :config
-       (setq flycheck-display-errors-function nil)
-       (setq flycheck-idle-change-delay 4))
- #+END_SRC
-**** funcs
-     #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/flycheck-toggle-error-list () "Toggle flycheck's
-	 error list window" (interactive) (-if-let (window
-	 (flycheck-get-error-list-window)) (quit-window nil window)
-	 (flycheck-list-errors)))
-     #+END_SRC
-
-*** company
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package company
+      (use-package counsel
 	:ensure t
 	:bind
-	:config
-	(setq company-idle-delay 0.5)
-	(setq company-backends '((company-dabbrev-code
-				  company-gtags
-				  company-etags
-				  company-keywords)
-				 company-files
-				 company-dabbrev)))
-     #+END_SRC
+	(:map my/search-map ("k" . counsel-ack) ("g"
+	 . counsel-git-grep) ("s" . swiper) ("K" . ack) ("k"
+	 . counsel-ack) ("g" . counsel-git-grep) ("G" . vc-git-grep)
+	 ("a" . counsel-ag) ("A" . ag))
+	 :config
+	 (counsel-mode))
+    #+END_SRC
 
-** grep/ack/wgrep
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ag
-    :ensure t)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package ack
-    :ensure t)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package wgrep
-    :ensure t)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package wgrep-ack
-    :ensure t)
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package wgrep-ag
-    :ensure t)
-#+END_SRC
-
-** avy
-#+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package avy
-       :ensure t
-       :bind
-       (:map my/jump-join-map
-	     ("b" . pop-mark)
-	     ("w" . avy-goto-word-or-subword-1)
-	     ("j" . avy-goto-char)
-	     ("J" . avy-goto-char-2)
-	     ("T" . avy-goto-char-timer)
-	     ("b" . avy-pop-mark)
-	     ("l" . avy-goto-line))
-       :init
-       (setq avy-all-windows nil))
-#+END_SRC
-
-** link-hint
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package link-hint
-       :ensure t
-       :bind
-       (:map
-	my/jump-join-map
-	("H" . link-hint-open-link)
-	("h" . link-hint-open-link-at-point)))
-   #+END_SRC
-** windows and buffers
-*** winum-mode
+*** occur
+**** vars
  #+BEGIN_SRC emacs-lisp :tangle yes
-   (use-package winum
-     :ensure t
-     :config
-     (winum-mode))
+   (defvar-local my/occur-function-regex "[a-z]+ \\([A-Za-z]+::\\)?[A-Za-z]+() {")
  #+END_SRC
-
-** magit
-*** magit
+**** funcs
  #+BEGIN_SRC emacs-lisp :tangle yes
-   (use-package magit
-     :ensure t
-     :bind
-     (:map my/git-map
-      ("s" . magit-status)
-      ("A" . magit-cherry-pick-popup)
-      ("b" . magit-branch-popup)
-      ("b" . magit-bisect-popup)
-      ("c" . magit-commit-popup)
-      ("d" . magit-diff-popup)
-      ("f" . magit-fetch-popup)
-      ("F" . magit-pull-popup)
-      ("l" . magit-log-popup)
-      ("P" . magit-pushing-popup)
-      ("r" . magit-rebase-popup)
-      ("t" . magit-tag-popup)
-      ("T" . magit-notes-popup)
-      ("_" . magit-revert-popup)
-      ("O" . magit-revert-popup)
-      ("z" . magit-stash-popup)
-      ("!" . magit-run-popup)
-      :map my/git-file-map
-      ("f" . magit-find-file)
-      ("d" . magit-diff-buffer-file-popup)
-      ("f" . magit-find-file)
-      ("l" . magit-log-buffer-file)))
+   (defun my/occur-fail ()
+     (interactive)
+     (occur "fail"))
+
+   (defun my/occur-cout ()
+     (interactive)
+     (occur "\\(cout\\|cerr\\)"))
+
+   (defun my/occur-defun-function ()
+     (interactive)
+     (occur my/occur-function-regex))
+
+   (defun my/delete-occur-window  ()
+     (interactive)
+     (let ((window (get-buffer-window "*Occur*")))
+       (when window
+	 (delete-window window))))
+
+   (defun my/occur-or-toggle-window (arg)
+     (interactive "p")
+     (let* ((buffer (get-buffer "*Occur*"))
+	    (window (get-buffer-window "*Occur*")))
+       (cond
+	(window (delete-window window))
+	(buffer (display-buffer buffer))
+	(t (call-interactively #'occur)))))
  #+END_SRC
-*** evil-magit
+**** keybindings
+*** ack grep etc
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package evil-magit
-	:after evil
-	:ensure t
-	:init
-	:config
-	(evil-magit-init))
-    #+END_SRC
-** hydra
-   #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package hydra
-    :ensure t)
-   #+END_SRC
-** shell
-*** vars
-    #+BEGIN_SRC emacs-lisp :tangle yes
-       (defcustom my-shell-program
-		 "/bin/bash"
-		 "Path to shell binary for shell opened by `my-shell-toggle-shell'"
-		 :group 'my-shell)
-
-       (defcustom my-shell-buffer-name-regex
-		 "^\\*shell-.*\\*$"
-		 "Regexp used to identify if the current window is a shell buffer"
-		 :group 'my-shell)
+      (defun my-counsel-ack-in-dir (arg)
+      "Read directory with completion and call counsel-ack"
+	(interactive "P")
+	(let ((default-directory (my-read-expanded-filename))
+	      (initial-input ""))
+	      (when arg
+		(setq initial-input (word-at-point)))
+	      (counsel-ack initial-input)))
     #+END_SRC
 
-*** funcs
-    #+BEGIN_SRC emacs-lisp :tangle yes
-	(defun my-shell-toggle-shell(shell-buffer-name)
-		  "Toggle a window and run program defined in `my-shell-program'
-	If a buffer SHELL-BUFFER-NAME reuse, else start a new shell process"
-		  (if (string-match "^\\*shell-.*\\*$" (buffer-name))
-	      (delete-window)
-	    (select-window (split-window-below))
-	    (let ((buffer (get-buffer shell-buffer-name)))
-	      (if buffer
-		  (switch-to-buffer buffer)
-		(term my-shell-program)
-		(rename-buffer shell-buffer-name)))))
-    #+END_SRC
-
-    #+BEGIN_SRC emacs-lisp :tangle yes
-	(defun my/main-shell ()
-		  "Toggle the main shell"
-		  (interactive)
-		  (my-shell-toggle-shell "*shell-main*"))
-
-	(defun my/buffer-shell ()
-		  "Toggle a buffer local shell"
-		  (interactive)
-		  (my-shell-toggle-shell (concat "*shell-" (buffer-name) "*")))
-
-	(provide 'my-shell)
-	;;; my-shell.el ends here
-    #+END_SRC
-
-*** keys
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map-set-keys my/base-map
-	"'" 'my/main-shell
-	"/" 'my/buffer-shell)
-    #+END_SRC
-*** help-highlight
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (bind-map my/help-highlight-map
-	:keys ((my/make-emacs-prefix "h"))
-	:evil-keys ((my/make-evil-prefix "h"))
-	:evil-states (normal motion visual)
-	:prefix-cmd help-highlight)
-    #+END_SRC
-** ediff
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package ediff
-      :config
-     (setq ediff-merge-split-window-function 'split-window-horizontally)
-     (setq ediff-split-window-function 'split-window-horizontally))
-   #+END_SRC
-** vlf
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package vlf
-       :ensure t
-       :config
-       (evil-define-key '(normal visual) 'vlf-occur-mode-map
-	 (kbd "C-m") 'vlf-occur-visit))
-   #+END_SRC
-** counsel-spotify
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package counsel-spotify
-       :ensure t
-       :bind
-       (:map my/search-map
-	("p a" . counsel-spotify-search-artist)
-	("p A" . counsel-spotify-search-album)
-	("p s" . counsel-spotify-search-track)
-	("p n" . counsel-spotify-next)
-	("p P" . counsel-spotify-previous)
-	("p p" . counsel-spotify-toggle-play-pause)))
-   #+END_SRC
-** google-translate
-  #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package google-translate
-      :ensure t)
-  #+END_SRC
-** linum-relative
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package linum-relative
-       :ensure t
-       :config
-       (add-hook 'prog-mode-hook 'linum-relative-mode))
-   #+END_SRC
-** plantuml-mode
-	** plantuml-mode
-   #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package plantuml-mode
-       :ensure t
-       :config
-       (add-to-list 'auto-mode-alist '("\\.dox\\'" . plantuml-mode))
-      (defun my/plantuml-preview-current-block ()
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun my-counsel-git-grep-in-dir ()
 	(interactive)
-	(plantuml-preview-current-block 16))
+	(let ((path (my-read-expanded-filename)))
+	  (counsel-git-grep nil (concat " -- " path " ")))
+    #+END_SRC
 
-     (defun my/plantuml-preview-region()
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun my-counesl-grep-in-dir (arg)
+	"Read directory with completion and call counsel-grep"
+	(interactive"P")
+	(let ((default-directory (my-read-expanded-filename)))
+	  (counsel-grep)))
+    #+END_SRC
+
+    #+BEGIN_SRC emacs-lisp :tangle no
+      (defun my-counsel-ag-in-dir (arg)
+      "Read directory with completion and call counsel-grep"
+      (let ((default-directory (my-read-expanded-filename)))
+	(let ((default-directory (expand-file-name
+				(read-file-name "Starting directory: "))))
+	(counsel-grep)))
+    #+end_src
+
+    #+begin_src emacs-lisp :tangle no
+      (defvar my-imenu-function #'imenu
+	"Function called interctively by `my-imenu-or-similar'
+	automatically buffer local when set ")
+
+      (defun my-imenu-or-similar ()
+	"Call the function defined in `my-imenu-function'"
 	(interactive)
-	(plantuml-preview-region 16))
+	(call-interactively my-imenu-function))
 
-     (defun my/plantuml-preview()
-	(interactive)
-	(plantuml-preview 16))
+    #+END_SRC
+    #+BEGIN_SRC emacs-lisp :tangle no
+   (defun my-counsel-git-grep-in-dir ()
 
-      (bind-map-for-major-mode plantuml-mode
-	:keys (my/emacs-mode-leader-key)
-	:evil-keys (my/evil-mode-leader-key)
-	:evil-states (normal motion visual)
-	:prefix rtags
-	:bindings
-	("p B" 'plantuml-preview-current-block
-	 "p R" 'plantuml-preview-region
-	 "p P" 'plantuml-preview
-	 "p b" 'my/plantuml-preview-current-block
-	 "p r" 'my/plantuml-preview-region
-	 "p p" 'my/plantuml-preview)))
-   #+END_SRC
-** markdown-mode
-  #+BEGIN_SRC emacs-lisp :tangle yes
-  (use-package markdown-mode
-    :ensure t
-    :config)
-  #+END_SRC
-** Org-mode
-*** org-mode
+
+    #+END_SRC
+*** projectile
+	#+BEGIN_SRC emacs-lisp :tangle yes
+	  (use-package projectile
+	    :init
+	    (add-hook 'after-init-hook 'projectile-mode)
+	    :config
+	    (setq projectile-enable-caching t)
+	    (setq projectile-completion-system 'ivy)
+	    :ensure t
+	    :after evil
+	    :bind
+	    (:map
+	     my/projectile-map
+	     ("!" . projectile-run-shell-command-in-root)
+	     ("%" . projectile-replace-regexp)
+	     ("&" . projectile-run-async-shell-command-in-root)
+	     ("d" . projectile-dired)
+	     ("D" . projectile-dired-other-window)
+	     ("F" . projectile-find-file-dwim)
+	     ("G" . projectile-regenerate-tags)
+	     ("I" . projectile-invalidate-cache)
+	     ("R" . projectile-replace)
+	     ("T" . projectile-test-project)
+	     ("a" . projectile-toggle-between-implementation-and-test)
+	     ("c" . projectile-compile-project)
+	     ("e" . projectile-edit-dir-locals)
+	     ("g" . projectile-find-tag)
+	     ("k" . projectile-kill-buffers)
+	     ("v" . projectile-vc)
+	     ("b" . projectile-switch-to-buffer)
+	     ("B" . projectile-ibuffer)
+	     ("f" . projectile-find-file)
+	     ("p" . projectile-switch-project)
+	     ("r" . projectile-recentf)))
+	#+END_SRC
+*** counsel-projectile
+	#+begin_src emacs-lisp :tangle no
+	  (use-package counsel-projectile
+	    :ensure t
+	    :bind
+	    (:map
+	     my/projectile-map
+	     ("SPC" . counsel-projectile)
+	     ("b" . counsel-projectile-switch-to-buffer)
+	     ("f" . counsel-projectile-find-file)
+	     ("d" . counsel-projectile-find-dir)
+	     ("p" . counsel-projectile-switch-project)))
+	#+end_src
+
+*** ibuffer-projectile
+	#+BEGIN_SRC emacs-lisp :tangle no
+	  (use-package ibuffer-projectile
+	    :ensure t
+	    :config
+	    (ibuffer-projectile-set-filter-groups))
+	#+END_SRC
+
+*** which-key
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package which-key
+	  :ensure t
+	  :init
+	  (add-hook 'after-init-hook 'which-key-mode))
+      #+END_SRC
+
+*** move-text
+       #+BEGIN_SRC emacs-lisp :tangle yes
+	 (use-package move-text
+	   :ensure t
+	   :init
+	   :bind
+	   (:map
+	    evil-normal-state-map
+	    ("[ e" . move-text-up)
+	    ("] e" . move-text-down)))
+       #+END_SRC
+
+*** undo-tree
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package undo-tree
+	:ensure t)
+    #+END_SRC
+
+*** expand-region
+       #+BEGIN_SRC emacs-lisp :tangle yes
+	 (use-package expand-region
+	   :ensure t
+	   :config
+	   (setq expand-region-contract-fast-key "V"
+		 expand-region-reset-fast-key "r"))
+       #+END_SRC
+
+*** iedit
      #+BEGIN_SRC emacs-lisp :tangle yes
-    (use-package org
-      :ensure t
-      :init
-      (setq org-src-fontify-natively t)
-      :config
-	(defun my/org-mode-hooks ()
-	  (setq my/imenu-function #'counsel-org-goto))
-	(add-hook 'org-mode-hook 'my/org-mode-hooks)
-	(bind-map-for-major-mode org-mode
-	  :keys (my/emacs-mode-leader-key)
-	  :evil-keys (my/evil-mode-leader-key)
-	  :evil-states (normal motion visual)
-	  :override-minor-modes t
-	  :bindings
-	  ("<tab>" 'org-indent-block
-	   " RET" 'org-ctrl-c-ret
-	   "#" 'org-update-statistics-cookies
-	   "'" 'org-edit-special
-	   "g" 'org-ctrl-c-star
-	   "," 'org-ctrl-c-ctrl-c
-	   "-" 'org-ctrl-c-minus
-	   "A" 'org-attach
-	   "H" 'org-shiftleft
-	   "J" 'org-shiftdown
-	   "K" 'org-shiftup
-	   "L" 'org-shiftright
-	   "a" 'org-agenda
-	   "c" 'org-capture
-	   "C-S-h" 'org-shiftcontrolleft
-	   "C-S-j" 'org-shiftcontroldown
-	   "C-S-k" 'org-shiftcontrolup
-	   "C-S-l" 'org-shiftcontrolright
-	   "x b" 'spacemacs/org-bold
-	   "x c" 'spacemacs/org-code
-	   "x i" 'spacemacs/org-italic
-	   "x o" 'org-open-at-point
-	   "x r" 'spacemacs/org-clear
-	   "x s" 'spacemacs/org-strike-through
-	   "x u" 'spacemacs/org-underline
-	   "x v" 'spacemacs/org-verbatim
-	   "i H" 'org-insert-heading-after-current
-	   "i K" 'spacemacs/insert-keybinding-org
-	   "i d" 'org-insert-drawer
-	   "i e" 'org-set-effort
-	   "i f" 'org-footnote-new
-	   "i h" 'org-insert-heading
-	   "i l" 'org-insert-link
-	   "i n" 'org-add-note
-	   "i p" 'org-set-property
-	   "i s" 'org-insert-subheading
-	   "i t" 'org-set-tags
-	   "M-RET" 'org-meta-return
-	   "b ." 'spacemacs/org-babel-transient-state/body
-	   "b I" 'org-babel-view-src-block-info
-	   "b Z" 'org-babel-switch-to-session-with-code
-	   "b a" 'org-babel-sha1-hash
-	   "b b" 'org-babel-execute-src-block
-	   "b B" 'org-babel-execute-buffer
-	   "b c" 'org-babel-check-src-block
-	   "b d" 'org-babel-demarcate-block
-	   "b e" 'org-babel-execute-maybe
-	   "b f" 'org-babel-tangle-file
-	   "b g" 'org-babel-goto-named-src-block
-	   "b i" 'org-babel-lob-ingest
-	   "b j" 'org-babel-insert-header-arg
-	   "b l" 'org-babel-load-in-session
-	   "b n" 'org-babel-next-src-block
-	   "b o" 'org-babel-open-src-block-result
-	   "b p" 'org-babel-previous-src-block
-	   "b r" 'org-babel-goto-named-result
-	   "b s" 'org-babel-execute-subtree
-	   "b t" 'org-babel-tangle
-	   "b u" 'org-babel-goto-src-block-head
-	   "b v" 'org-babel-expand-src-block
-	   "b x" 'org-babel-do-key-sequence-in-edit-buffer
-	   "b z" 'org-babel-switch-to-session
-	   "s A" 'org-archive-subtree
-	   "s N" 'widen
-	   "s S" 'org-sort
-	   "s a" 'org-toggle-archive-tag
-	   "s b" 'org-tree-to-indirect-buffer
-	   "s h" 'org-promote-subtree
-	   "s j" 'org-move-subtree-down
-	   "s k" 'org-move-subtree-up
-	   "s l" 'org-demote-subtree
-	   "s n" 'org-narrow-to-subtree
-	   "s r" 'org-refile
-	   "s s" 'org-sparse-tree
-	   "T T" 'org-todo
-	   "T V" 'space-doc-mode
-	   "T c" 'org-toggle-checkbox
-	   "T e" 'org-toggle-pretty-entities
-	   "T i" 'org-toggle-inline-images
-	   "T l" 'org-toggle-link-display
-	   "T t" 'org-show-todo-tree
-	   "T x" 'org-toggle-latex-fragment
-	   "f i" 'org-feed-goto-inbox
-	   "f u" 'org-feed-update-all
-	   "e e" 'org-export-dispatch
-	   "e m" 'org-mime-org-buffer-htmlize
-	   "d T" 'org-time-stamp-inactive
-	   "d d" 'org-deadline
-	   "d s" 'org-schedule
-	   "d t" 'org-time-stamp
-	   "C c" 'org-clock-cancel
-	   "C i" 'org-clock-in
-	   "C o" 'org-clock-out
-	   "C p" 'org-pomodoro
-	   "C r" 'org-resolve-clocks
-	   "t E" 'org-table-export
-	   "t H" 'org-table-move-column-left
-	   "t I" 'org-table-import
-	   "t J" 'org-table-move-row-down
-	   "t K" 'org-table-move-row-up
-	   "t L" 'org-table-move-column-right
-	   "t N" 'org-table-create-with-table.el
-	   "t a" 'org-table-align
-	   "t b" 'org-table-blank-field
-	   "t c" 'org-table-convert
-	   "t e" 'org-table-eval-formula
-	   "t h" 'org-table-previous-field
-	   "t j" 'org-table-next-row
-	   "t l" 'org-table-next-field
-	   "t n" 'org-table-create
-	   "t p" 'org-plot/gnuplot
-	   "t r" 'org-table-recalculate
-	   "t s" 'org-table-sort-lines
-	   "t w" 'org-table-wrap-region
-	   "i D s" 'org-download-screenshot
-	   "i D y" 'org-download-yank
-	   "t t f" 'org-table-toggle-formula-debugger
-	   "t t o" 'org-table-toggle-coordinate-overlays
-	   "t i H" 'org-table-hline-and-move
-	   "t i c" 'org-table-insert-column
-	   "t i h" 'org-table-insert-hline
-	   "t i r" 'org-table-insert-row
-	   "t d c" 'org-table-delete-column
-	   "t d r" 'org-table-kill-row)))
-
+       (use-package iedit
+	 :ensure t)
      #+END_SRC
+
+*** hl-anything
+    #+begin_src emacs-lisp :tangle no
+    (use-package hl-anything
+      :ensure t
+      :config)
+    #+end_src
+
+*** hl-indent
+    #+begin_src emacs-lisp :tangle no
+      (use-package hl-indent
+	   :ensure t
+	   :config
+	   (add-hook 'prog-mode-hook 'hl-indent) )
+    #+end_src
+
+*** hl-sentence
+ #+begin_src emacs-lisp :tangle no
+ (use-package hl-sentence
+		:ensure t)
+ #+end_src
+
+*** hl-todo
+    #+begin_src emacs-lisp :tangle no
+      (use-package hl-todo
+		:ensure t
+		:config
+		(global-hl-todo-mode) ) (
+    #+END_SRC
+*** completion
+*** grep/ack/wgrep
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package ag
+     :ensure t)
+ #+END_SRC
+
+
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package ack
+     :ensure t)
+ #+END_SRC
+
+
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package wgrep
+     :ensure t)
+ #+END_SRC
+
+
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package wgrep-ack
+     :ensure t)
+ #+END_SRC
+
+
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package wgrep-ag
+     :ensure t)
+ #+END_SRC
+
+*** avy
+ #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package avy
+	:ensure t
+	:bind
+	(:map my/jump-join-map
+	      ("b" . pop-mark)
+	      ("w" . avy-goto-word-or-subword-1)
+	      ("j" . avy-goto-char)
+	      ("J" . avy-goto-char-2)
+	      ("T" . avy-goto-char-timer)
+	      ("b" . avy-pop-mark)
+	      ("l" . avy-goto-line))
+	:init
+	(setq avy-all-windows nil))
+ #+END_SRC
+
+*** link-hint
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package link-hint
+	:ensure t
+	:bind
+	(:map
+	 my/jump-join-map
+	 ("H" . link-hint-open-link)
+	 ("h" . link-hint-open-link-at-point)))
+    #+END_SRC
+*** winum-mode
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package winum
+      :ensure t
+      :config
+      (winum-mode))
+  #+END_SRC
+
+*** magit
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (use-package magit
+      :ensure t
+      :bind
+      (:map my/git-map
+       ("s" . magit-status)
+       ("A" . magit-cherry-pick-popup)
+       ("b" . magit-branch-popup)
+       ("b" . magit-bisect-popup)
+       ("c" . magit-commit-popup)
+       ("d" . magit-diff-popup)
+       ("f" . magit-fetch-popup)
+       ("F" . magit-pull-popup)
+       ("l" . magit-log-popup)
+       ("P" . magit-pushing-popup)
+       ("r" . magit-rebase-popup)
+       ("t" . magit-tag-popup)
+       ("T" . magit-notes-popup)
+       ("_" . magit-revert-popup)
+       ("O" . magit-revert-popup)
+       ("z" . magit-stash-popup)
+       ("!" . magit-run-popup)
+       :map my/git-file-map
+       ("f" . magit-find-file)
+       ("d" . magit-diff-buffer-file-popup)
+       ("f" . magit-find-file)
+       ("l" . magit-log-buffer-file)))
+  #+END_SRC
+*** evil-magit
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package evil-magit
+	 :after evil
+	 :ensure t
+	 :init
+	 :config
+	 (evil-magit-init))
+     #+END_SRC
+*** hydra
+    #+BEGIN_SRC emacs-lisp :tangle yes
+   (use-package hydra
+     :ensure t)
+    #+END_SRC
+*** shell
+**** vars
+     #+BEGIN_SRC emacs-lisp :tangle yes
+	(defcustom my-shell-program
+		  "/bin/bash"
+		  "Path to shell binary for shell opened by `my-shell-toggle-shell'"
+		  :group 'my-shell)
+
+	(defcustom my-shell-buffer-name-regex
+		  "^\\*shell-.*\\*$"
+		  "Regexp used to identify if the current window is a shell buffer"
+		  :group 'my-shell)
+     #+END_SRC
+
+**** funcs
+     #+BEGIN_SRC emacs-lisp :tangle yes
+	 (defun my-shell-toggle-shell(shell-buffer-name)
+		   "Toggle a window and run program defined in `my-shell-program'
+	 If a buffer SHELL-BUFFER-NAME reuse, else start a new shell process"
+		   (if (string-match "^\\*shell-.*\\*$" (buffer-name))
+	       (delete-window)
+	     (select-window (split-window-below))
+	     (let ((buffer (get-buffer shell-buffer-name)))
+	       (if buffer
+		   (switch-to-buffer buffer)
+		 (term my-shell-program)
+		 (rename-buffer shell-buffer-name)))))
+     #+END_SRC
+
+     #+BEGIN_SRC emacs-lisp :tangle yes
+	 (defun my/main-shell ()
+		   "Toggle the main shell"
+		   (interactive)
+		   (my-shell-toggle-shell "*shell-main*"))
+
+	 (defun my/buffer-shell ()
+		   "Toggle a buffer local shell"
+		   (interactive)
+		   (my-shell-toggle-shell (concat "*shell-" (buffer-name) "*")))
+
+	 (provide 'my-shell)
+	 ;;; my-shell.el ends here
+     #+END_SRC
+
+**** keys
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map-set-keys my/base-map
+	 "'" 'my/main-shell
+	 "/" 'my/buffer-shell)
+     #+END_SRC
+**** help-highlight
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (bind-map my/help-highlight-map
+	 :keys ((my/make-emacs-prefix "h"))
+	 :evil-keys ((my/make-evil-prefix "h"))
+	 :evil-states (normal motion visual)
+	 :prefix-cmd help-highlight)
+     #+END_SRC
+*** ediff
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package ediff
+       :config
+      (setq ediff-merge-split-window-function 'split-window-horizontally)
+      (setq ediff-split-window-function 'split-window-horizontally))
+    #+END_SRC
+*** counsel-spotify
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package counsel-spotify
+	:ensure t
+	:bind
+	(:map my/search-map
+	 ("p a" . counsel-spotify-search-artist)
+	 ("p A" . counsel-spotify-search-album)
+	 ("p s" . counsel-spotify-search-track)
+	 ("p n" . counsel-spotify-next)
+	 ("p P" . counsel-spotify-previous)
+	 ("p p" . counsel-spotify-toggle-play-pause)))
+    #+END_SRC
+*** google-translate
+   #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package google-translate
+       :ensure t)
+   #+END_SRC
+** Text-mode
+*** Markdown-mode
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package markdown-mode
+	:ensure t
+	:config)
+    #+END_SRC
+** Org-mode
+*** vars
+*** funcs
+*** setup
+    #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package org
+       :ensure t
+       :init
+       (setq org-src-fontify-natively t)
+       :config
+	 (defun my/org-mode-hooks ()
+	   (setq my/imenu-function #'counsel-org-goto))
+	 (add-hook 'org-mode-hook 'my/org-mode-hooks)
+	 (bind-map-for-major-mode org-mode
+	   :keys (my/emacs-mode-leader-key)
+	   :evil-keys (my/evil-mode-leader-key)
+	   :evil-states (normal motion visual)
+	   :override-minor-modes t
+	   :bindings
+	   ("<tab>" 'org-indent-block
+	    " RET" 'org-ctrl-c-ret
+	    "#" 'org-update-statistics-cookies
+	    "'" 'org-edit-special
+	    "g" 'org-ctrl-c-star
+	    "," 'org-ctrl-c-ctrl-c
+	    "-" 'org-ctrl-c-minus
+	    "A" 'org-attach
+	    "H" 'org-shiftleft
+	    "J" 'org-shiftdown
+	    "K" 'org-shiftup
+	    "L" 'org-shiftright
+	    "a" 'org-agenda
+	    "c" 'org-capture
+	    "C-S-h" 'org-shiftcontrolleft
+	    "C-S-j" 'org-shiftcontroldown
+	    "C-S-k" 'org-shiftcontrolup
+	    "C-S-l" 'org-shiftcontrolright
+	    "x b" 'spacemacs/org-bold
+	    "x c" 'spacemacs/org-code
+	    "x i" 'spacemacs/org-italic
+	    "x o" 'org-open-at-point
+	    "x r" 'spacemacs/org-clear
+	    "x s" 'spacemacs/org-strike-through
+	    "x u" 'spacemacs/org-underline
+	    "x v" 'spacemacs/org-verbatim
+	    "i H" 'org-insert-heading-after-current
+	    "i K" 'spacemacs/insert-keybinding-org
+	    "i d" 'org-insert-drawer
+	    "i e" 'org-set-effort
+	    "i f" 'org-footnote-new
+	    "i h" 'org-insert-heading
+	    "i l" 'org-insert-link
+	    "i n" 'org-add-note
+	    "i p" 'org-set-property
+	    "i s" 'org-insert-subheading
+	    "i t" 'org-set-tags
+	    "M-RET" 'org-meta-return
+	    "b ." 'spacemacs/org-babel-transient-state/body
+	    "b I" 'org-babel-view-src-block-info
+	    "b Z" 'org-babel-switch-to-session-with-code
+	    "b a" 'org-babel-sha1-hash
+	    "b b" 'org-babel-execute-src-block
+	    "b B" 'org-babel-execute-buffer
+	    "b c" 'org-babel-check-src-block
+	    "b d" 'org-babel-demarcate-block
+	    "b e" 'org-babel-execute-maybe
+	    "b f" 'org-babel-tangle-file
+	    "b g" 'org-babel-goto-named-src-block
+	    "b i" 'org-babel-lob-ingest
+	    "b j" 'org-babel-insert-header-arg
+	    "b l" 'org-babel-load-in-session
+	    "b n" 'org-babel-next-src-block
+	    "b o" 'org-babel-open-src-block-result
+	    "b p" 'org-babel-previous-src-block
+	    "b r" 'org-babel-goto-named-result
+	    "b s" 'org-babel-execute-subtree
+	    "b t" 'org-babel-tangle
+	    "b u" 'org-babel-goto-src-block-head
+	    "b v" 'org-babel-expand-src-block
+	    "b x" 'org-babel-do-key-sequence-in-edit-buffer
+	    "b z" 'org-babel-switch-to-session
+	    "s A" 'org-archive-subtree
+	    "s N" 'widen
+	    "s S" 'org-sort
+	    "s a" 'org-toggle-archive-tag
+	    "s b" 'org-tree-to-indirect-buffer
+	    "s h" 'org-promote-subtree
+	    "s j" 'org-move-subtree-down
+	    "s k" 'org-move-subtree-up
+	    "s l" 'org-demote-subtree
+	    "s n" 'org-narrow-to-subtree
+	    "s r" 'org-refile
+	    "s s" 'org-sparse-tree
+	    "T T" 'org-todo
+	    "T V" 'space-doc-mode
+	    "T c" 'org-toggle-checkbox
+	    "T e" 'org-toggle-pretty-entities
+	    "T i" 'org-toggle-inline-images
+	    "T l" 'org-toggle-link-display
+	    "T t" 'org-show-todo-tree
+	    "T x" 'org-toggle-latex-fragment
+	    "f i" 'org-feed-goto-inbox
+	    "f u" 'org-feed-update-all
+	    "e e" 'org-export-dispatch
+	    "e m" 'org-mime-org-buffer-htmlize
+	    "d T" 'org-time-stamp-inactive
+	    "d d" 'org-deadline
+	    "d s" 'org-schedule
+	    "d t" 'org-time-stamp
+	    "C c" 'org-clock-cancel
+	    "C i" 'org-clock-in
+	    "C o" 'org-clock-out
+	    "C p" 'org-pomodoro
+	    "C r" 'org-resolve-clocks
+	    "t E" 'org-table-export
+	    "t H" 'org-table-move-column-left
+	    "t I" 'org-table-import
+	    "t J" 'org-table-move-row-down
+	    "t K" 'org-table-move-row-up
+	    "t L" 'org-table-move-column-right
+	    "t N" 'org-table-create-with-table.el
+	    "t a" 'org-table-align
+	    "t b" 'org-table-blank-field
+	    "t c" 'org-table-convert
+	    "t e" 'org-table-eval-formula
+	    "t h" 'org-table-previous-field
+	    "t j" 'org-table-next-row
+	    "t l" 'org-table-next-field
+	    "t n" 'org-table-create
+	    "t p" 'org-plot/gnuplot
+	    "t r" 'org-table-recalculate
+	    "t s" 'org-table-sort-lines
+	    "t w" 'org-table-wrap-region
+	    "i D s" 'org-download-screenshot
+	    "i D y" 'org-download-yank
+	    "t t f" 'org-table-toggle-formula-debugger
+	    "t t o" 'org-table-toggle-coordinate-overlays
+	    "t i H" 'org-table-hline-and-move
+	    "t i c" 'org-table-insert-column
+	    "t i h" 'org-table-insert-hline
+	    "t i r" 'org-table-insert-row
+	    "t d c" 'org-table-delete-column
+	    "t d r" 'org-table-kill-row)))
+
+    #+END_SRC
 **** org-projectile
      #+BEGIN_SRC emacs-lisp :tangle no
 	(use-package org-projectile
@@ -2102,62 +2014,166 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
      #+END_SRC
 
 ** Prog-mode
-*** prog-mode
-**** hooks
+*** vars
+*** funcs
+*** setup
    #+BEGIN_SRC emacs-lisp :tangle yes
      (defun my/prog-mode-hooks ()
        (add-hook 'before-save-hook 'whitespace-cleanup))
      (add-hook 'prog-mode-hook 'my/prog-mode-hooks)
    #+END_SRC
-*** highlight-symbol
+*** keybindings
+*** packages
+**** highlight-symbol
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package highlight-symbol
+	 :ensure t
+	 :bind
+	 (:map my/toggle-map
+	       ("h" . evil-mc-mode))
+	 (:map
+	  my/help-highlight-map
+	  ("t" . highlight-symbol-mode)
+	  ("s" . highlight-symbol)
+	  ("n" . highlight-symbol-nav-mode)
+	  ("o" . highlight-symbol-occur)
+	  ("l" . highlight-symbol-list-all)
+	  ("C" . highlight-symbol-remove-all)
+	  ("c" . highlight-symbol-remove-all)
+	  ("r" . highlight-symbol-query-replace))
+	 :config
+	 (setq highlight-symbol-color "white")
+	 (face-spec-set 'highlight-symbol-face
+			'((t :weight ultra-bold))
+			'face-override-spec)
+	 (add-hook 'prog-mode-hook 'highlight-symbol-mode))
+     #+end_src
+**** indent-guide
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package indent-guide
+	 :ensure t
+	 :config
+	 (add-hook 'prog-mode-hook 'indent-guide-mode))
+     #+END_SRC
+**** highlight-parentheses
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package highlight-parentheses
+	 :ensure t
+	 :config
+	 (add-hook 'prog-mode-hook 'highlight-parentheses-mode))
+
+     #+END_SRC
+**** highlight-changes
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun my/setup-highlight-changes ()
+	 (highlight-changes-mode 1)
+	 (highlight-changes-visible-mode 0)
+
+	 (bind-map-set-keys my/help-highlight-map
+	   "c" 'highlight-changes-visible-mode))
+
+       (add-hook 'prog-mode-hook 'my/setup-highlight-changes)
+     #+END_SRC
+**** linum-relative
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package highlight-symbol
+      (use-package linum-relative
+	:ensure t
+	:config
+	(add-hook 'prog-mode-hook 'linum-relative-mode))
+    #+END_SRC
+**** yasnippet
+  #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package yasnippet
+	  :ensure t
+	  :defer t
+	  :init
+	  (add-hook 'prog-mode-hook 'yas-minor-mode) (add-hook
+	  'org-mode-hook 'yas-minor-mode)
+	  :config
+	  (add-to-list 'hippie-expand-try-functions-list
+	  'yas-hippie-try-expand) (yas-reload-all)) (use-package
+	  yasnippet-snippets
+	  :ensure t
+	  :requires yasnippet)
+  #+END_SRC
+
+**** flycheck
+  #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package flycheck
 	:ensure t
 	:bind
-	(:map my/toggle-map
-	      ("h" . evil-mc-mode))
-	(:map
-	 my/help-highlight-map
-	 ("t" . highlight-symbol-mode)
-	 ("s" . highlight-symbol)
-	 ("n" . highlight-symbol-nav-mode)
-	 ("o" . highlight-symbol-occur)
-	 ("l" . highlight-symbol-list-all)
-	 ("C" . highlight-symbol-remove-all)
-	 ("c" . highlight-symbol-remove-all)
-	 ("r" . highlight-symbol-query-replace))
+	 (:map my/toggle-map
+	       ("f" . flycheck-mode))
+	(:map my/errors-map
+	("." . spacemacs/error-transient-state/body)
+	 ("S" . flycheck-set-checker-executable)
+	 ("e" . flycheck-buffer)
+	 ("c" . flycheck-clear)
+	 ("h" . flycheck-describe-checker)
+	 ("l" . my/flycheck-toggle-error-list)
+	 ("s" . flycheck-select-checker)
+	 ("v" . flycheck-verify-setup)
+	 ("t" . flycheck-mode)
+	 ("x" . flycheck-explain-error-at-point)
+	 ("y" . flycheck-copy-errors-as-kill))
 	:config
-	(setq highlight-symbol-color "white")
-	(face-spec-set 'highlight-symbol-face
-		       '((t :weight ultra-bold))
-		       'face-override-spec)
-	(add-hook 'prog-mode-hook 'highlight-symbol-mode))
-    #+end_src
-*** indent-guide
+	(setq flycheck-display-errors-function nil)
+	(setq flycheck-idle-change-delay 4))
+  #+END_SRC
+***** funcs
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(defun my/flycheck-toggle-error-list () "Toggle flycheck's
+	  error list window" (interactive) (-if-let (window
+	  (flycheck-get-error-list-window)) (quit-window nil window)
+	  (flycheck-list-errors)))
+      #+END_SRC
+
+**** company
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package company
+	 :ensure t
+	 :bind
+	 :config
+	 (setq company-idle-delay 0.5)
+	 (setq company-backends '((company-dabbrev-code
+				   company-gtags
+				   company-etags
+				   company-keywords)
+				  company-files
+				  company-dabbrev)))
+      #+END_SRC
+
+*** Plantuml-mode
     #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package indent-guide
+      (use-package plantuml-mode
 	:ensure t
 	:config
-	(add-hook 'prog-mode-hook 'indent-guide-mode))
-    #+END_SRC
-*** highlight-parentheses
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package highlight-parentheses
-	:ensure t
-	:config
-	(add-hook 'prog-mode-hook 'highlight-parentheses-mode))
+	(add-to-list 'auto-mode-alist '("\\.dox\\'" . plantuml-mode))
 
-    #+END_SRC
-*** highlight-changes
-    #+BEGIN_SRC emacs-lisp :tangle yes
-      (defun my/setup-highlight-changes ()
-	(highlight-changes-mode 1)
-	(highlight-changes-visible-mode 0)
+       (defun my/plantuml-preview-current-block ()
+	 (interactive)
+	 (plantuml-preview-current-block 16))
 
-	(bind-map-set-keys my/help-highlight-map
-	  "c" 'highlight-changes-visible-mode))
+      (defun my/plantuml-preview-region()
+	 (interactive)
+	 (plantuml-preview-region 16))
 
-      (add-hook 'prog-mode-hook 'my/setup-highlight-changes)
+      (defun my/plantuml-preview()
+	 (interactive)
+	 (plantuml-preview 16))
+
+       (bind-map-for-major-mode plantuml-mode
+	 :keys (my/emacs-mode-leader-key)
+	 :evil-keys (my/evil-mode-leader-key)
+	 :evil-states (normal motion visual)
+	 :prefix rtags
+	 :bindings
+	 ("p B" 'plantuml-preview-current-block
+	  "p R" 'plantuml-preview-region
+	  "p P" 'plantuml-preview
+	  "p b" 'my/plantuml-preview-current-block
+	  "p r" 'my/plantuml-preview-region
+	  "p p" 'my/plantuml-preview)))
     #+END_SRC
 *** Emacs-lisp-mode
 **** emacs-lisp-mode
@@ -2568,6 +2584,14 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 	    "e s" 'python-shell-send-string)))
      #+END_SRC
 
+** Vlf
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package vlf
+	:ensure t
+	:config
+	(evil-define-key '(normal visual) 'vlf-occur-mode-map
+	  (kbd "C-m") 'vlf-occur-visit))
+    #+END_SRC
 * Todos
 ** DONE ivy resume bindings
    # ** TODO bindings for evil nerd commenter
@@ -2606,3 +2630,4 @@ https://emacs.stackexchange.com/questions/62/hide-compilation-window
 ** TODO compile that close, test that doesnt
 
 ** TODO rtags reindex functions
+s
