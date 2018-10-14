@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ $1 = "--help" ]]; then
+    printf 'Usage: emacsclient [OPTIONS] FILE...\n'
+    printf 'Run emacsclient -nw\n\n'
+    emacsclient --help
+else
+    emacsclient -nw
+fi

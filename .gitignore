@@ -1,14 +1,16 @@
 # First, ignore everything
 *
-# Now, whitelist anything that's a directory
+# then whitelist
 !config.org
 !packages
 !packages/*
+!bin
+!bin/*
 !submodules
 !submodules/*
 !snippets
 !snippets/**/*
-
 !.gitmodules
 !LICENCE
 !README.md
+!install.sh

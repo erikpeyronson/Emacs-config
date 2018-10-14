@@ -1,0 +1,8 @@
+#!/bin/bash
+if [[ $1 = "--help" ]]; then
+    printf 'Usage: emacsclient [OPTIONS] FILE...\n'
+    printf 'Run emacsclient -c in the background  detatch it from the terminal.\n\n'
+    emacsclient --help
+else
+    emacsclient $1 -c $2 </dev/null &>/dev/null & disown
+fi
