@@ -306,6 +306,12 @@
       (shell-command
        (expand-file-name "bin/emacsc" user-emacs-directory)))
   #+END_SRC
+  #+BEGIN_SRC emacs-lisp :tangle yes
+    (defun my/delete-other-window ()
+      (interactive )
+      (other-window 1)
+      (delete-window))
+  #+END_SRC
 *** spacemacs
 **** info/copyright
     This is a set of functions and commands copied from spacemacs
@@ -855,7 +861,7 @@
 	 "_" 'spacemacs/maximize-horizontally
 	 "b" 'spacemacs/switch-to-minibuffer-window
 	 "d" 'spacemacs/delete-window
-	 "D" 'my/delete-frame-with-prompt
+	 "D" 'my/delete-other-window
 	 "m" 'spacemacs/toggle-maximize-buffer
 	 "r" 'spacemacs/rotate-windows-forward
 	 "=" 'balance-windows
@@ -1129,6 +1135,7 @@
 	 :prefix-cmd occuring
 	 :bindings
  ("o" 'occur
+ "O" 'my/occur-at-point
  "t" 'my/occur-or-toggle-window
  "g" 'cp/gtest-occur
  "F" 'my/occur-fail
@@ -1378,6 +1385,11 @@
 	(window (delete-window window))
 	(buffer (display-buffer buffer))
 	(t (call-interactively #'occur)))))
+
+    (defun my/occur-at-point  ()
+    (interactive)
+    (occur (word-at-point)))
+
  #+END_SRC
 **** keybindings
 *** ack grep etc
@@ -2068,7 +2080,15 @@
    #+END_SRC
 *** keybindings
 *** packages
-**** highlight-symbol
+**** aggressive-indent
+     #+BEGIN_SRC emacs-lisp :tangle yes
+     (use-package aggressive-indent :ensure t
+     :config
+     :bind
+     (:map my/toggle-map
+     ("i" . aggressive-indent-mode)))
+     #+END_SRC
+u**** highlight-symbol
      #+BEGIN_SRC emacs-lisp :tangle yes
        (use-package highlight-symbol
 	 :ensure t
@@ -2161,7 +2181,7 @@
 	 ("x" . flycheck-explain-error-at-point)
 	 ("y" . flycheck-copy-errors-as-kill))
 	:config
-	(setq flycheck-display-errors-function nil)
+;;	(setq flycheck-display-errors-function nil)
 	(setq flycheck-idle-change-delay 4))
   #+END_SRC
 ***** funcs
@@ -2279,6 +2299,8 @@
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
        (defun my/setup-c++-mode ()
+;;       (flycheck-mode)
+       (aggressive-indent-mode 1)
 	 (subword-mode))
      #+END_SRC
 
@@ -2318,7 +2340,9 @@
 	  :ensure t
 	  :init
 	  (defun my/setup-rtags-hooks ()
-	    (setq my/imenu-function #'rtags-imenu))
+	  (rtags-activate-imenu)
+	    ;;(setq my/imenu-function #'rtags-imenu)
+	    )
 
 	  (add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
 	  (defhydra hydra/rtags-nav (:hint nil :color pink )
@@ -2341,6 +2365,16 @@
 	    ("L"  rtags-taglist)
 	    ("q"  nil :color blue))
 	  :config
+ (evil-add-command-properties #'rtags-find-symbol-at-point :jump t)
+ (evil-add-command-properties #'rtags-find-symbol :jump t)
+ (evil-add-command-properties #'rtags-find-references-at-point :jump t)
+ (evil-add-command-properties #'rtags-find-references :jump t)
+ (evil-add-command-properties #'rtags-find-file :jump t)
+ (evil-add-command-properties #'rtags-find-virtuals-at-point :jump t)
+ (evil-add-command-properties #'rtags-find-member-function :jump t)
+ (evil-add-command-properties #'my/imenu :jump t)
+
+
 	  (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
 	  (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
 	  (setq rtags-display-result-backend 'default)
@@ -2363,7 +2397,7 @@
 	     "g F"  'rtags-find-file
 	     "g v"  'rtags-find-virtuals-at-point
 	     "g m"  'rtags-find-member-function
-	     "g l"  'hydra/rtags-nav/rtags-list-results
+	     "g l"  'rtags-list-results
 	     "g L"  'hydra/rtags-nav/rtags-taglist
 	     "g c"  'rtags-close-taglist
 	     "g h"  'rtags-print-class-hierarchy
@@ -2372,6 +2406,7 @@
 	     "g f"  'hydra/rtags-nav/rtags-location-stack-forward
 	     "g b"    'hydra/rtags-nav/rtags-location-stack-forward
 	     "g i"    'rtags-symbol-info
+	     "j i"    'rtags-imenu
 	     "g t"    'rtags-symbol-type
 	     "g d"  'rtags-dependency-tree
 	     "g s"  'rtags-display-summary
@@ -2413,6 +2448,11 @@
 	  ;;  (my/toggle-rtags-idle-summary)
 	  ) ;; end use-package rtags
       #+END_SRC
+****** bindings
+       #+BEGIN_SRC emacs-lisp :tangle yes
+       (evil-define-key 'normal  'c++-mode-map
+       (kbd "g d")  'rtags-find-symbol-at-point)
+       #+END_SRC
 ****** company-rtags
        #+BEGIN_SRC emacs-lisp :tangle yes
 	 (use-package company-rtags
@@ -2426,6 +2466,7 @@
 	     (kbd "C-SPC") 'company-rtags))
 
        #+END_SRC
+
 ****** flycheck-rtags
        #+BEGIN_SRC emacs-lisp :tangle no
 	(use-package flycheck-rtags
