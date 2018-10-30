@@ -305,6 +305,9 @@
       "Opens a new emacsclient using a wrapper script"
       (shell-command
        (expand-file-name "bin/emacsc" user-emacs-directory)))
+    (defun my/make-frame ()
+      (interactive)
+      (make-frame '((width . 120)(height . 80))))
   #+END_SRC
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/delete-other-window ()
@@ -862,7 +865,7 @@
 	 "m" 'spacemacs/toggle-maximize-buffer
 	 "r" 'spacemacs/rotate-windows-forward
 	 "=" 'balance-windows
-	 "F" 'make-frame
+	 "F" 'my/make-frame
 	 "h" 'evil-window-left
 	 "j" 'evil-window-down
 	 "k" 'evil-window-up
