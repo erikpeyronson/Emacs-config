@@ -772,7 +772,7 @@
 	  "B" 'ibuffer
 	  "N" 'spacemacs/new-empty-buffer
 	  "P" 'spacemacs/copy-clipboard-to-whole-buffer
-	  "R" 'spacemacs/safe-revert-buffer
+	  "r" 'spacemacs/safe-revert-buffer
 	  "Y" 'spacemacs/copy-whole-buffer-to-clipboard
 	  "b" 'switch-to-buffer
 	  "d" 'spacemacs/kill-this-buffer
@@ -783,7 +783,8 @@
 	  "p" 'hydra/prev-next-buffer/previous-buffer
 	  "s" 'spacemacs/switch-to-scratch-buffer
 	  "w" 'read-only-mode
-	  "." 'hydra-cycle-buffer))
+	  "." 'hydra-cycle-buffer
+	  "c" 'clone-indirect-buffer))
      #+END_SRC
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
