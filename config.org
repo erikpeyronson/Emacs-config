@@ -208,9 +208,9 @@
 
 	(add-hook 'after-change-major-mode-hook 'my/setup-mode-line)
 
-    (set-face-background 'mode-line "CadetBlue4")
+    (set-face-background 'mode-line "dark gray")
     (set-face-foreground 'mode-line "white")
-    (set-face-background 'mode-line-inactive "light steel blue")
+    (set-face-background 'mode-line-inactive "light gray")
     (set-face-foreground 'mode-line-inactive "black")
 
   #+END_SRC
@@ -811,9 +811,7 @@
 	("u" winner-undo "undo")
 	("U" winner-redo "redo")
 	("w" other-window "other window")
-	("d" delete-window "delete")
 	("o" other-frame "other frame")
-	("D" delete-frame "delete")
 	("q" nil "quit"))
 
       (defhydra hydra/other-window (:foreign-keys nil)
@@ -829,8 +827,6 @@
 	("o" other-frame "other-frame")
 	("w" other-window "other-window")
 	("W" my/other-window-reverse "other-window-rev")
-	("d" spacemacs/delete-window"delete-window")
-	("D" my/delete-frame-with-prompt "delete-frame")
 	("m" spacemacs/toggle-maximize-buffer "maximize/minimize")
 	("q" nil "exit"))
       (defhydra hydra/winner-repeat (:foreign-keys nil)
@@ -844,6 +840,7 @@
 	:prefix-cmd windows
 	:bindings
 	("." 'hydra/window-navigation/body
+	"f" 'fit-window-to-buffer
 	 "w" 'hydra/other-window/other-window
 	 "W" 'hydra/other-window/my/other-window-reverse
 	 "o" 'hydra/other-window/other-frame
@@ -865,7 +862,7 @@
 	 "m" 'spacemacs/toggle-maximize-buffer
 	 "r" 'spacemacs/rotate-windows-forward
 	 "=" 'balance-windows
-	 "F" 'my/make-detatched-frame
+	 "F" 'make-frame
 	 "h" 'evil-window-left
 	 "j" 'evil-window-down
 	 "k" 'evil-window-up
@@ -1123,6 +1120,7 @@
 	 :prefix-cmd toggling
 	 :bindings
  ("l" 'toggle-truncate-lines)
+ ("w" 'whitespace-mode)
  )
      #+END_SRC
 
@@ -1134,8 +1132,9 @@
 	 :evil-states (normal motion visual)
 	 :prefix-cmd occuring
 	 :bindings
- ("o" 'occur
- "O" 'my/occur-at-point
+ ("O" 'occur
+ "o" 'my/occur-symbol-at-point
+ "w" 'my/occur-word-at-point
  "t" 'my/occur-or-toggle-window
  "g" 'cp/gtest-occur
  "F" 'my/occur-fail
@@ -1386,9 +1385,14 @@
 	(buffer (display-buffer buffer))
 	(t (call-interactively #'occur)))))
 
-    (defun my/occur-at-point  ()
+    (defun my/occur-word-at-point  ()
     (interactive)
-    (occur (word-at-point)))
+    (occur (thing-at-point 'word)))
+
+    (defun my/occur-symbol-at-point  ()
+    (interactive)
+    (occur (thing-at-point 'symbol)))
+
 
  #+END_SRC
 **** keybindings
@@ -1615,7 +1619,7 @@
 	      ("b" . avy-pop-mark)
 	      ("l" . avy-goto-line))
 	:init
-	(setq avy-all-windows nil))
+	(setq avy-all-windows t))
  #+END_SRC
 
 *** link-hint
@@ -2307,6 +2311,7 @@ u**** highlight-symbol
 **** config
      #+BEGIN_SRC emacs-lisp :tangle yes
        (require 'find-file)
+       (add-hook 'c++-mode-hook 'evil-mc-mode)
        (add-hook 'c++-mode-hook 'my/setup-c++-mode)
        (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
        (add-to-list  'cc-search-directories "../inc")
@@ -2491,6 +2496,13 @@ u**** highlight-symbol
 	  (font-lock-default-fontify-region
 	   (point-min) (point-max) nil)
 	  (buffer-string)))
+
+  (defun rtags-eldoc-function ()
+    (let* ((symbol (rtags-symbol-info-internal :location (or (rtags-target-declaration-first) (rtags-current-location)) :silent t))
+	   (symbol-text (cdr (assoc 'contents (rtags-get-file-contents :info symbol :maxlines (or 1 5))))))
+      (when symbol
+	(message symbol-text))))
+
     (defun rtags-eldoc-function ()
       (let ((summary (rtags-get-summary-text)))
 	(and summary
@@ -2501,8 +2513,13 @@ u**** highlight-symbol
 		(lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
 		(split-string summary "\r?\n")
 		" "))
-	      major-mode))))
+		major-mode))))
 
+(defun rtags-eldoc-mode ()
+    (interactive)
+    (setq-local eldoc-documentation-function #'rtags-eldoc-function)
+    (eldoc-mode 1))
+    (add-hook 'c++-mode 'rtags-eldoc-mode)
        #+END_SRC
 ***** flycheck
       #+BEGIN_SRC emacs-lisp :tangle yes
