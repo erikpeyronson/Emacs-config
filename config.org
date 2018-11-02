@@ -177,14 +177,32 @@
    #+END_SRC
 * theme and faces
  #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package solarized-theme
-       :config
-       :ensure t)
+	   (use-package solarized-theme
+	     :config
+	     :ensure t)
 
-(load-theme 'adwaita t)
-(require 'hl-line)
-(set-face-background hl-line-face "light gray")
-(set-face-foreground hl-line-face "black")
+      (load-theme 'solarized-dark t)
+      (require 'hl-line)
+      (defun my/dark-theme ()
+      (interactive)
+      (load-theme 'solarized-dark t)
+      (set-cursor-color "white")
+       (set-face-foreground 'mode-line "#fdf6e3")
+       (set-face-background 'mode-line "#268bd2")
+       (set-face-background 'mode-line-inactive "#2aa198")
+       (set-face-foreground 'mode-line-inactive "#fdf6e3"))
+
+      (defun my/light-theme ()
+      (interactive)
+      (load-theme 'solarized-light t)
+       (set-face-background 'mode-line "dim gray")
+       (set-face-foreground 'mode-line "white")
+       (set-face-background 'mode-line-inactive "light blue")
+       (set-face-foreground 'mode-line-inactive "black"))
+
+
+      ;; (set-face-background hl-line-face "light gray")
+      ;; (set-face-foreground hl-line-face "black")
    #+END_SRC
 * mode-line
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -208,10 +226,10 @@
 
 	(add-hook 'after-change-major-mode-hook 'my/setup-mode-line)
 
-    (set-face-background 'mode-line "dark gray")
-    (set-face-foreground 'mode-line "white")
-    (set-face-background 'mode-line-inactive "light gray")
-    (set-face-foreground 'mode-line-inactive "black")
+    ;; (set-face-background 'mode-line "dim gray")
+    ;; (set-face-foreground 'mode-line "white")
+    ;; (set-face-background 'mode-line-inactive "light blue")
+    ;; (set-face-foreground 'mode-line-inactive "black")
 
   #+END_SRC
 * Fundamental-mode
