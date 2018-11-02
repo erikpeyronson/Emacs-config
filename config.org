@@ -288,6 +288,14 @@
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
+    (defun my/clone-indirect-buffer-below ()
+	(interactive)
+      (with-selected-window (split-window-below)
+       (switch-to-buffer
+	(clone-indirect-buffer (generate-new-buffer-name (concat (buffer-file-name) "-<clone>")) nil))))
+  #+END_SRC
+
+  #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/-set-font-size-globally ()
       (interactive)
       (set-face-attribute 'default nil :height (string-to-number (read-from-minibuffer "font size: "))))
@@ -354,6 +362,20 @@
       ;; our own implementation of kill-this-buffer from menu-bar.el
     #+END_SRC
 **** commands
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun spacemacs/ace-delete-window (&optional arg)
+	 "Ace delete window.
+       If the universal prefix argument is used then kill the buffer too."
+	 (interactive "P")
+	 (require 'ace-window)
+	 (aw-select
+	  " Ace - Delete Window"
+	  (lambda (window)
+	    (when (equal '(4) arg)
+	      (with-selected-window window
+		(spacemacs/kill-this-buffer arg)))
+	    (aw-delete-window window))))
+     #+END_SRC
      #+BEGIN_SRC emacs-lisp :tangle yes
        (defun spacemacs/kill-this-buffer (&optional arg)
 	 "Kill the current buffer.
@@ -802,7 +824,7 @@
 	  "s" 'spacemacs/switch-to-scratch-buffer
 	  "w" 'read-only-mode
 	  "." 'hydra-cycle-buffer
-	  "c" 'clone-indirect-buffer))
+	  "c" 'my/clone-indirect-buffer-below))
      #+END_SRC
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1154,8 +1176,8 @@
 	 :evil-states (normal motion visual)
 	 :prefix-cmd occuring
 	 :bindings
- ("O" 'occur
- "o" 'my/occur-symbol-at-point
+ ("o" 'occur
+ "O" 'my/occur-symbol-at-point
  "w" 'my/occur-word-at-point
  "t" 'my/occur-or-toggle-window
  "g" 'cp/gtest-occur
@@ -1644,6 +1666,20 @@
 	(setq avy-all-windows t))
  #+END_SRC
 
+*** ace-window
+ #+BEGIN_SRC emacs-lisp :tangle yes
+
+  (use-package ace-window
+    :ensure t
+    :bind
+    (:map my/windows-map
+	("D" . ace-delete-window)
+	("S" . ace-swap-window)
+	("W" . ace-window)))
+
+     (defhydra hydra/ace-delete-window (:pre (ace-delete-window))
+	 ("q" nil))
+ #+END_SRC
 *** link-hint
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package link-hint
@@ -1751,9 +1787,9 @@
 
 **** keys
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map-set-keys my/base-map
+     (bind-map-set-keys my/base-map
 	 "'" 'my/main-shell
-	 "/" 'my/buffer-shell)
+	 "\"" 'my/buffer-shell)
      #+END_SRC
 **** help-highlight
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2541,7 +2577,7 @@ u**** highlight-symbol
     (interactive)
     (setq-local eldoc-documentation-function #'rtags-eldoc-function)
     (eldoc-mode 1))
-    (add-hook 'c++-mode 'rtags-eldoc-mode)
+    ;;(remove-hook 'c++-mode 'rtags-eldoc-mode)
        #+END_SRC
 ***** flycheck
       #+BEGIN_SRC emacs-lisp :tangle yes
