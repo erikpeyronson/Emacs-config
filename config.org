@@ -1755,7 +1755,10 @@
        ("f" . magit-find-file)
        ("d" . magit-diff-buffer-file-popup)
        ("f" . magit-find-file)
-       ("l" . magit-log-buffer-file)))
+       ("l" . magit-log-buffer-file))
+       :config
+       (add-to-list 'display-buffer-alist
+       '("magit: " (display-buffer-same-window ))))
   #+END_SRC
 *** evil-magit
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2394,6 +2397,9 @@ u**** highlight-symbol
 ;;       (flycheck-mode)
        (aggressive-indent-mode 1)
 	 (subword-mode))
+      ;;  stop emacs from consantly opening new windows
+      (add-to-list 'display-buffer-alist
+	     '(".*.cc" (display-buffer-same-window )))
      #+END_SRC
 
 **** config
@@ -2466,7 +2472,7 @@ u**** highlight-symbol
  (evil-add-command-properties #'rtags-find-virtuals-at-point :jump t)
  (evil-add-command-properties #'rtags-find-member-function :jump t)
  (evil-add-command-properties #'my/imenu :jump t)
-
+ (setq rtags-jump-to-first-match nil)
 
 	  (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
 	  (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
