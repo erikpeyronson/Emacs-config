@@ -296,9 +296,24 @@
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
-    (defun my/-set-font-size-globally ()
+
+    (defvar my/global-font-size 100)
+
+    (defun my/global-set-text-scale (&optional arg)
       (interactive)
-      (set-face-attribute 'default nil :height (string-to-number (read-from-minibuffer "font size: "))))
+      (let ((new-size (if arg arg
+			(string-to-number (read-from-minibuffer "font size: ")))))
+	    (setq my/global-font-size new-size)
+	    (set-face-attribute 'default nil :height new-size)))
+
+    (defun my/global-text-scale-increase ()
+      (interactive)
+      (my/global-set-text-scale (+ my/global-font-size 10 )))
+
+
+    (defun my/global-text-scale-decrease ()
+      (interactive)
+      (my/global-set-text-scale (- my/global-font-size 10 )))
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
