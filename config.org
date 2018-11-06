@@ -1204,6 +1204,21 @@
  "p" 'previous-error))
       #+END_SRC
 ** packages
+*** ibuffer
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (setq ibuffer-formats
+	   '((mark modified read-only " "
+		   (name 40 40 :left :elide) ; change: 30s were originally 18s
+		   " "
+		   (size 9 -1 :right)
+		   " "
+		   (mode 16 16 :left :elide)
+		   " " filename-and-process)
+	     (mark " "
+		   (name 16 -1)
+		   " " filename)))
+
+    #+END_SRC
 *** tramp
 **** doc
 **** vars
