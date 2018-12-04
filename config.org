@@ -200,6 +200,7 @@
        (set-face-background 'mode-line-inactive "light blue")
        (set-face-foreground 'mode-line-inactive "black"))
 
+       (my/dark-theme)
 
       ;; (set-face-background hl-line-face "light gray")
       ;; (set-face-foreground hl-line-face "black")
@@ -743,6 +744,9 @@
     (global-hl-line-mode)
     (setq initial-major-mode 'text-mode)
     (winner-mode 1)
+
+(add-to-list 'display-buffer-alist
+       '(".log" (display-buffer-same-window )))
    #+END_SRC
 ** keys
 *** base-map
@@ -2393,13 +2397,13 @@ u**** highlight-symbol
 **** vars
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (defun my/setup-c++-mode ()
-;;       (flycheck-mode)
-       (aggressive-indent-mode 1)
-	 (subword-mode))
-      ;;  stop emacs from consantly opening new windows
-      (add-to-list 'display-buffer-alist
-	     '(".*.cc" (display-buffer-same-window )))
+	      (defun my/setup-c++-mode ()
+	     (flycheck-mode)
+	      ;; (aggressive-indent-mode 1)
+		(subword-mode))
+	     ;;  stop emacs from consantly opening new windows
+	     (add-to-list 'display-buffer-alist
+		    '(".*.cc" (display-buffer-same-window )))
      #+END_SRC
 
 **** config
@@ -2549,8 +2553,7 @@ u**** highlight-symbol
       #+END_SRC
 ****** bindings
        #+BEGIN_SRC emacs-lisp :tangle yes
-       (evil-define-key 'normal  'c++-mode-map
-       (kbd "g d")  'rtags-find-symbol-at-point)
+
        #+END_SRC
 ****** company-rtags
        #+BEGIN_SRC emacs-lisp :tangle yes
