@@ -200,7 +200,7 @@
        (set-face-background 'mode-line-inactive "light blue")
        (set-face-foreground 'mode-line-inactive "black"))
 
-       (my/dark-theme)
+       (add-hook 'after-init-hook 'my/dark-theme)
 
       ;; (set-face-background hl-line-face "light gray")
       ;; (set-face-foreground hl-line-face "black")
@@ -744,8 +744,9 @@
     (global-hl-line-mode)
     (setq initial-major-mode 'text-mode)
     (winner-mode 1)
+    (setq truncate-partial-width-windows 100)
 
-(add-to-list 'display-buffer-alist
+    (add-to-list 'display-buffer-alist
        '(".log" (display-buffer-same-window )))
    #+END_SRC
 ** keys
@@ -2418,22 +2419,22 @@ u**** highlight-symbol
      Setup keybindings
 **** keys
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (bind-map-for-major-mode c++-mode
-	 :keys (my/emacs-mode-leader-key)
-	 :evil-keys (my/evil-mode-leader-key)
-	 :evil-states (normal motion visual)
-	 :prefix rtags
-	 :bindings
-	 ("t o" 'cp/gtest-occur
-	  "c T" 'cp/compile-gtest-suite-at-point
-	  "c t" 'cp/compile-gtest-test-at-point
-	  "c g" 'my/compile-and-gcov
-	  "c c" 'cp/compile
-	  "g a" 'ff-find-other-file))
+	 (bind-map-for-major-mode c++-mode
+	   :keys (my/emacs-mode-leader-key)
+	   :evil-keys (my/evil-mode-leader-key)
+	   :evil-states (normal motion visual)
+	   :prefix rtags
+	   :bindings
+	   ("t o" 'cp/gtest-occur
+	    "c T" 'cp/compile-gtest-suite-at-point
+	    "c t" 'cp/compile-gtest-test-at-point
+	    "c g" 'my/compile-and-gcov
+	    "c c" 'cp/compile
+	    "g a" 'ff-find-other-file))
 
-       (bind-map-for-major-mode my/compile-comment-map c++-mode
-	 :bindings
-	 ("t" cp/compile-gtest-test-at-point))
+	 (bind-map-for-major-mode my/compile-comment-map c++-mode
+	   :bindings
+	   ("t" cp/compile-gtest-test-at-point))
      #+END_SRC
 **** packages
 ***** rtags
@@ -2553,7 +2554,8 @@ u**** highlight-symbol
       #+END_SRC
 ****** bindings
        #+BEGIN_SRC emacs-lisp :tangle yes
-
+       (evil-define-key '(normal) c++-mode-map
+       (kbd "gd") 'rtags-find-symbol-at-point)
        #+END_SRC
 ****** company-rtags
        #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2658,7 +2660,15 @@ u**** highlight-symbol
 	      (when (locate-dominating-file (buffer-file-name) ".clang-format")
 		(clang-format-buffer))))
 
-	  (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+
+	(defun my/enable-clang-format-on-save ()
+	  (interactive)
+	  (add-hook 'before-save-hook 'my/clang-format-if-file-exists))
+
+	(defun my/disable-clang-format-on-save ()
+	  (interactive)
+	  (remove-hook 'before-save-hook 'my/clang-format-if-file-exists))
 	      #+end_src
 ***** flycheck
       #+BEGIN_SRC emacs-lisp :tangle yes
