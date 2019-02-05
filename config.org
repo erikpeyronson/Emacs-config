@@ -177,61 +177,48 @@
    #+END_SRC
 * theme and faces
  #+BEGIN_SRC emacs-lisp :tangle yes
-	   (use-package solarized-theme
-	     :config
-	     :ensure t)
+   (use-package solarized-theme
+     :config
+     :ensure t)
 
-      (load-theme 'solarized-dark t)
-      (require 'hl-line)
-      (defun my/dark-theme ()
-      (interactive)
-      (load-theme 'solarized-dark t)
-      (set-cursor-color "white")
-       (set-face-foreground 'mode-line "#fdf6e3")
-       (set-face-background 'mode-line "#268bd2")
-       (set-face-background 'mode-line-inactive "#2aa198")
-       (set-face-foreground 'mode-line-inactive "#fdf6e3"))
+   (load-theme 'solarized-dark t)
+   (require 'hl-line)
+   (defun my/dark-theme ()
+     (interactive)
+     (load-theme 'solarized-dark t)
+     (set-cursor-color "white")
+     (set-face-foreground 'mode-line "#fdf6e3")
+     (set-face-background 'mode-line "slate gray")
+     ;; (set-face-background 'mode-line-inactive "#2aa198")
+     ;; (set-face-foreground 'mode-line-inactive "#fdf6e3")
+     )
 
-      (defun my/light-theme ()
-      (interactive)
-      (load-theme 'solarized-light t)
-       (set-face-background 'mode-line "dim gray")
-       (set-face-foreground 'mode-line "white")
-       (set-face-background 'mode-line-inactive "light blue")
-       (set-face-foreground 'mode-line-inactive "black"))
+   (defun my/light-theme ()
+     (interactive)
+     (load-theme 'solarized-light t)
+     ;; (set-face-background 'mode-line "dim gray")
+     ;; (set-face-foreground 'mode-line "white")
+     ;; (set-face-background 'mode-line-inactive "light blue")
+     ;; (set-face-foreground 'mode-line-inactive "black")
+     )
 
-       (add-hook 'after-init-hook 'my/dark-theme)
+   (add-hook 'after-init-hook 'my/dark-theme)
 
-      ;; (set-face-background hl-line-face "light gray")
-      ;; (set-face-foreground hl-line-face "black")
+   ;; (set-face-background hl-line-face "light gray")
+   ;; (set-face-foreground hl-line-face "black")
    #+END_SRC
 * mode-line
   #+BEGIN_SRC emacs-lisp :tangle yes
-	(defun my/setup-mode-line ()
-	  (setq mode-line-format '("%e"
-				   (:eval
-				    (winum-get-number-string))
-				   mode-line-front-space
-				   mode-line-mule-info
-				   mode-line-client
-				   mode-line-modified
-				   mode-line-remote
-				   mode-line-frame-identification
-				   mode-line-buffer-identification
-				   "   "
-				   mode-line-position
-				   evil-mode-line-tag
-				   (vc-mode vc-mode)
-				   "  " mode-line-misc-info
-				   mode-line-end-spaces)))
-
-	(add-hook 'after-change-major-mode-hook 'my/setup-mode-line)
-
-    ;; (set-face-background 'mode-line "dim gray")
-    ;; (set-face-foreground 'mode-line "white")
-    ;; (set-face-background 'mode-line-inactive "light blue")
-    ;; (set-face-foreground 'mode-line-inactive "black")
-
+    (use-package moody
+      :ensure t
+      :config
+      (setq x-underline-at-descent-line t)
+      (moody-replace-mode-line-buffer-identification)
+      (moody-replace-vc-mode))
+    (use-package minions
+      :ensure t
+      :config
+      (minions-mode 1))
   #+END_SRC
 * Fundamental-mode
 ** vars
@@ -1230,7 +1217,7 @@
 **** funcs
 **** setup
    #+BEGIN_SRC emacs-lisp :tangle yes
-   (setq tramp-default-method "ssh")
+     ;; (setq tramp-default-method "ssh")
    #+END_SRC
 **** keys
 *** evil
@@ -1267,17 +1254,6 @@
 	  :bind
 	  :config
 	  (evil-collection-init))
-      #+END_SRC
-**** keys
-*** evil-rsi
-**** doc
-**** vars
-**** funcs
-**** setup
-      #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package evil-rsi
-	  :ensure t
-	  :requires evil)
       #+END_SRC
 **** keys
 *** evil-iedit-state
@@ -1733,7 +1709,7 @@
       (winum-mode))
   #+END_SRC
 
-*** magit
+*** COMMENT magit
   #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package magit
       :ensure t
@@ -1763,7 +1739,7 @@
        ("l" . magit-log-buffer-file))
        :config
        (add-to-list 'display-buffer-alist
-       '("magit: " (display-buffer-same-window ))))
+       '("magit: " (display-buffer-pop-up-frame))))
   #+END_SRC
 *** evil-magit
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2398,12 +2374,18 @@ u**** highlight-symbol
 **** vars
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
-	      (defun my/setup-c++-mode ()
-	     (flycheck-mode)
-	      ;; (aggressive-indent-mode 1)
-		(subword-mode))
-	     ;;  stop emacs from consantly opening new windows
-	     (add-to-list 'display-buffer-alist
+       (defun my/setup-c++-mode ()
+	 (flycheck-mode)
+	 ;; (aggressive-indent-mode 1)
+	 (subword-mode))
+       ;;  stop emacs from consantly opening new windows
+       (add-to-list 'display-buffer-alist
+		    '(".*.h" (display-buffer-same-window )))
+       (add-to-list 'display-buffer-alist
+		    '(".*.cpp" (display-buffer-same-window )))
+       (add-to-list 'display-buffer-alist
+		    '(".*.hpp" (display-buffer-same-window )))
+       (add-to-list 'display-buffer-alist
 		    '(".*.cc" (display-buffer-same-window )))
      #+END_SRC
 
@@ -2444,19 +2426,19 @@ u**** highlight-symbol
 	  :ensure t
 	  :init
 	  (defun my/setup-rtags-hooks ()
-	  (rtags-activate-imenu)
+	    (rtags-activate-imenu)
 	    ;;(setq my/imenu-function #'rtags-imenu)
 	    )
 
 	  (add-hook 'c++-mode-hook 'my/setup-rtags-hooks)
 	  (defhydra hydra/rtags-nav (:hint nil :color pink )
 	    "
-	  Rtags Naviagion
-	  --------------------------------------------------------------------
-	  _g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
-	  _i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
-	  --------------------------------------------------------------------
-	  "
+		 Rtags Naviagion
+		 --------------------------------------------------------------------
+		 _g_:find symbol  _r_:references   _p_:previous  _f_:forward    _v_:visualize
+		 _i_:symbol-info  _n_:next         _b_:back      _l_:resultlist _L_:taglist  _q_:exit
+		 --------------------------------------------------------------------
+		 "
 	    ("r"  rtags-find-references-at-point)
 	    ("v" rtags-location-stack-visualize)
 	    ("g"  rtags-find-symbol-at-point)
@@ -2469,15 +2451,15 @@ u**** highlight-symbol
 	    ("L"  rtags-taglist)
 	    ("q"  nil :color blue))
 	  :config
- (evil-add-command-properties #'rtags-find-symbol-at-point :jump t)
- (evil-add-command-properties #'rtags-find-symbol :jump t)
- (evil-add-command-properties #'rtags-find-references-at-point :jump t)
- (evil-add-command-properties #'rtags-find-references :jump t)
- (evil-add-command-properties #'rtags-find-file :jump t)
- (evil-add-command-properties #'rtags-find-virtuals-at-point :jump t)
- (evil-add-command-properties #'rtags-find-member-function :jump t)
- (evil-add-command-properties #'my/imenu :jump t)
- (setq rtags-jump-to-first-match nil)
+	  (evil-add-command-properties #'rtags-find-symbol-at-point :jump t)
+	  (evil-add-command-properties #'rtags-find-symbol :jump t)
+	  (evil-add-command-properties #'rtags-find-references-at-point :jump t)
+	  (evil-add-command-properties #'rtags-find-references :jump t)
+	  (evil-add-command-properties #'rtags-find-file :jump t)
+	  (evil-add-command-properties #'rtags-find-virtuals-at-point :jump t)
+	  (evil-add-command-properties #'rtags-find-member-function :jump t)
+	  (evil-add-command-properties #'my/imenu :jump t)
+	  (setq rtags-jump-to-first-match nil)
 
 	  (add-to-list 'evil-overriding-maps '(rtags-dependency-tree-mode-map))
 	  (add-to-list 'evil-overriding-maps '(rtags-references-tree-mode-map))
@@ -2524,7 +2506,7 @@ u**** highlight-symbol
 	  (defun run-with-local-idle-timer (secs repeat function &rest args)
 	    "Like `run-with-idle-timer', but always runs in the `current-buffer'.
 
-	      Cancels itself, if this buffer was killed."
+		     Cancels itself, if this buffer was killed."
 	    (let* (;; Chicken and egg problem.
 		   (fns (make-symbol "local-idle-timer"))
 		   (timer (apply 'run-with-idle-timer secs repeat fns args))
@@ -2793,6 +2775,12 @@ u**** highlight-symbol
 	    "e s" 'python-shell-send-string)))
      #+END_SRC
 
+*** js-mode
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package company-tern
+
+	:ensure t)
+    #+END_SRC
 ** Vlf
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package vlf
@@ -2806,7 +2794,7 @@ u**** highlight-symbol
    # ** TODO bindings for evil nerd commenter
 ** DONE fix ivy-occur
 ** TODO cursor color for state
-** TODO modeline
+** DONE modeline
 ** TODO smartparens
    spc j s sp split sexp
 ** TODO dumb-jump
@@ -2816,8 +2804,8 @@ u**** highlight-symbol
 ** TODO snippets
 ** TODO h cc file keybindings
 ** DONE camelCaseMotion
-** TODO clang-format hook
-** TODO expand region reverse
+** DONE clang-format hook
+** DONE expand region reverse
 ** TODO ace-windows (hydra?)	#+END_SRC
 ** DONE ivy resume bindings
    # ** TODO bindings for evil nerd commenter
