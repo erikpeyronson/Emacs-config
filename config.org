@@ -41,34 +41,34 @@
    #+name: section-structure
    #+BEGIN_SRC ditaa
      +Fundamental-mode
-       +--Major-mode
-       |  +--doc
-       |  +--vars
-       |  +--funcs
-       |  +--setup
-       |  +--keys
-       |  |
-       |  +--packages
-       |  |  +--package
-       |  |     +--doc
-       |  |     +--vars
-       |  |     +--funcs
-       |  |     +--setup
-       |  |     +--keys
-       |  |
-       |  +---Major-mode
-       |     +--doc
-       |     +--vars
-       |     +--funcs
-       |     +--setup
-       |     +--keys
-       |     |
-       |     +--packages
-       |     ...
-       |
-       +--Major-mode
-       |  +--doc
-       ...
+     +--Major-mode
+     |  +--doc
+     |  +--vars
+     |  +--funcs
+     |  +--setup
+     |  +--keys
+     |  |
+     |  +--packages
+     |  |  +--package
+     |  |     +--doc
+     |  |     +--vars
+     |  |     +--funcs
+     |  |     +--setup
+     |  |     +--keys
+     |  |
+     |  +---Major-mode
+     |     +--doc
+     |     +--vars
+     |     +--funcs
+     |     +--setup
+     |     +--keys
+     |     |
+     |     +--packages
+     |     ...
+     |
+     +--Major-mode
+     |  +--doc
+     ...
      #+END_SRC
 
      | subheadings | contains                                       |
@@ -95,8 +95,8 @@
        "Directory to put backup files. Changes require restart to take effect")
 
      (defvar my/auto-saves-dir (expand-file-name ".backups"
-					     user-emacs-directory))
-       "Directory to put auto-save files. Changes require restart to take effect"
+						 user-emacs-directory))
+     "Directory to put auto-save files. Changes require restart to take effect"
    #+END_SRC
 ** funcs
    Close compilation window on sucessful compilation from:
@@ -149,9 +149,9 @@
    Keep custom variables in a separate gitignored file to allow local customizations
    using customize
    #+BEGIN_SRC emacs-lisp :tangle yes
-   (let ((path (concat user-emacs-directory "custom.el")))
-   (unless (file-exists-p path) (write-region "" nil path))
-   (setq custom-file path))
+     (let ((path (concat user-emacs-directory "custom.el")))
+       (unless (file-exists-p path) (write-region "" nil path))
+       (setq custom-file path))
    #+END_SRC
 * initialize package
  We start by adding package repos and load paths and initialize package
@@ -169,9 +169,9 @@
     manage packages and keybindings throughout the config.
 #+BEGIN_SRC emacs-lisp :tangle yes
   (dolist (package '(dash use-package bind-map hydra)) nil
-    (unless (package-installed-p package)
-      (package-refresh-contents)
-      (package-install package)))
+	  (unless (package-installed-p package)
+	    (package-refresh-contents)
+	    (package-install package)))
   (require 'use-package)
   (require 'bind-map)
    #+END_SRC
@@ -266,21 +266,21 @@
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my/remove-trailing-whitespace ()
-       (interactive)
-       (save-excursion
-	 (goto-char (point-min))
-	 (while (re-search-forward "[ \t]+$" nil t)
-	   (replace-match "" nil nil)))
-       nil)
+    (defun my/remove-trailing-whitespace ()
+      (interactive)
+      (save-excursion
+	(goto-char (point-min))
+	(while (re-search-forward "[ \t]+$" nil t)
+	  (replace-match "" nil nil)))
+      nil)
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/clone-indirect-buffer-below ()
-	(interactive)
+      (interactive)
       (with-selected-window (split-window-below)
-       (switch-to-buffer
-	(clone-indirect-buffer (generate-new-buffer-name (concat (buffer-file-name) "-<clone>")) nil))))
+	(switch-to-buffer
+	 (clone-indirect-buffer (generate-new-buffer-name (concat (buffer-file-name) "-<clone>")) nil))))
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
@@ -291,8 +291,8 @@
       (interactive)
       (let ((new-size (if arg arg
 			(string-to-number (read-from-minibuffer "font size: ")))))
-	    (setq my/global-font-size new-size)
-	    (set-face-attribute 'default nil :height new-size)))
+	(setq my/global-font-size new-size)
+	(set-face-attribute 'default nil :height new-size)))
 
     (defun my/global-text-scale-increase ()
       (interactive)
@@ -305,32 +305,32 @@
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
-     (defun my-read-expanded-filename ()
-       "Read a directory with completion and return the expanded filename"
-       (expand-file-name
-	(read-file-name "dir:" )))
+    (defun my-read-expanded-filename ()
+      "Read a directory with completion and return the expanded filename"
+      (expand-file-name
+       (read-file-name "dir:" )))
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
-   (defun my/trim-string (string) ;; TODO move to utils or similar
-     "Remove white spaces in beginning and ending of STRING.
-	 White space here is any of: space, tab, emacs newline (line feed, ASCII 10).
+    (defun my/trim-string (string) ;; TODO move to utils or similar
+      "Remove white spaces in beginning and ending of STRING.
+	  White space here is any of: space, tab, emacs newline (line feed, ASCII 10).
 
-	 From http://ergoemacs.org/emacs/modernization_elisp_lib_problem.html
-	 "
-     (replace-regexp-in-string "\\`[ \t\n]*" "" (replace-regexp-in-string "[ \t\n]*\\'" "" string)))
+	  From http://ergoemacs.org/emacs/modernization_elisp_lib_problem.html
+	  "
+      (replace-regexp-in-string "\\`[ \t\n]*" "" (replace-regexp-in-string "[ \t\n]*\\'" "" string)))
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/delete-frame-with-prompt ()
       (interactive)
       (when (y-or-n-p "Really delete frame?")
-      (delete-frame)))
+	(delete-frame)))
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp :tangle yes
     (defun my/make-detatched-frame ()
-    (interactive)
+      (interactive)
       "Opens a new emacsclient using a wrapper script"
       (shell-command
        (expand-file-name "bin/emacsc" user-emacs-directory)))
@@ -725,16 +725,16 @@
 ** setup
    Activate built in global minor modes
    #+BEGIN_SRC emacs-lisp :tangle yes
-    (menu-bar-mode 0)
-    (tool-bar-mode 0)
-    (scroll-bar-mode 0)
-    (global-hl-line-mode)
-    (setq initial-major-mode 'text-mode)
-    (winner-mode 1)
-    (setq truncate-partial-width-windows 100)
+     (menu-bar-mode 0)
+     (tool-bar-mode 0)
+     (scroll-bar-mode 0)
+     (global-hl-line-mode)
+     (setq initial-major-mode 'text-mode)
+     (winner-mode 1)
+     (setq truncate-partial-width-windows 100)
 
-    (add-to-list 'display-buffer-alist
-       '(".log" (display-buffer-same-window )))
+     (add-to-list 'display-buffer-alist
+		  '(".log" (display-buffer-same-window )))
    #+END_SRC
 ** keys
 *** base-map
@@ -777,7 +777,7 @@
 **** hydras
      #+BEGIN_SRC emacs-lisp :tangle yes
        (defhydra hydra-cycle-buffer (:foreign-keys nil :hint nil)
-	"
+	 "
        [_1_-_9_]:buffer-to [n]
        "
 	 ("1" buffer-to-window-1)
@@ -794,9 +794,9 @@
 	 ("d" spacemacs/kill-this-buffer "kill")
 	 ("q" nil))
 
-	(defhydra hydra/prev-next-buffer (:foreign-keys nil)
-	  ("n" next-buffer "next")
-	  ("p" previous-buffer "previous"))
+       (defhydra hydra/prev-next-buffer (:foreign-keys nil)
+	 ("n" next-buffer "next")
+	 ("p" previous-buffer "previous"))
      #+END_SRC
 **** map
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -836,22 +836,22 @@
 *** errors
     #+BEGIN_SRC emacs-lisp :tangle yes
       (bind-map my/errors-map
-	    :keys ((my/make-emacs-prefix "e"))
-	    :evil-keys ((my/make-evil-prefix "e"))
-	    :evil-states (normal motion visual)
-	    :override-mode-name buffer-keys
-	    :prefix-cmd errors
-	    :bindings
-	    ("n" 'next-error
-	    "p" 'previous-error))
+	:keys ((my/make-emacs-prefix "e"))
+	:evil-keys ((my/make-evil-prefix "e"))
+	:evil-states (normal motion visual)
+	:override-mode-name buffer-keys
+	:prefix-cmd errors
+	:bindings
+	("n" 'next-error
+	 "p" 'previous-error))
     #+END_SRC
 
 *** Windows
     #+BEGIN_SRC emacs-lisp :tangle yes
-(defun my/other-window-reverse ()
-(interactive)
-(other-window -1))
-       (defhydra hydra/window-navigation (:foreign-keys nil :exit nil)
+      (defun my/other-window-reverse ()
+	(interactive)
+	(other-window -1))
+      (defhydra hydra/window-navigation (:foreign-keys nil :exit nil)
 	("h" evil-window-left "left")
 	("j" evil-window-down "down")
 	("k" evil-window-up "up")
@@ -891,7 +891,7 @@
 	:prefix-cmd windows
 	:bindings
 	("." 'hydra/window-navigation/body
-	"f" 'fit-window-to-buffer
+	 "f" 'fit-window-to-buffer
 	 "w" 'hydra/other-window/other-window
 	 "W" 'hydra/other-window/my/other-window-reverse
 	 "o" 'hydra/other-window/other-frame
@@ -974,30 +974,30 @@
 
 *** Project
    #+BEGIN_SRC emacs-lisp :tangle yes
-	  (bind-map my/projectile-map
-	    :keys ((my/make-emacs-prefix "p"))
-	    :evil-keys ((my/make-evil-prefix "p"))
-	    :evil-states (normal motion visual)
-	    :prefix-cmd projectile
-	    :bindings
-	    (
-     ;;"SPC" 'counsel-projectile
-	     ;; "!" 'projectile-run-shell-command-in-root
-	     ;; "%" 'projectile-replace-regexp
-	     ;; "&" 'projectile-run-async-shell-command-in-root
-	     ;; "D" 'projectile-dired
-	     ;; "F" 'projectile-find-file-dwim
-	     ;; "G" 'projectile-regenerate-tags
-	     ;; "I" 'projectile-invalidate-cache
-	     ;; "R" 'projectile-replace
-	     ;; "T" 'projectile-test-project
-	     ;; "a" 'projectile-toggle-between-implementation-and-test
-	     ;; "c" 'projectile-compile-project
-	     ;; "e" 'projectile-edit-dir-locals
-	     ;; "g" 'projectile-find-tag
-	     ;; "k" 'projectile-kill-buffers
-	     ;; "r" 'projectile-recentf
-     ))
+     (bind-map my/projectile-map
+       :keys ((my/make-emacs-prefix "p"))
+       :evil-keys ((my/make-evil-prefix "p"))
+       :evil-states (normal motion visual)
+       :prefix-cmd projectile
+       :bindings
+       (
+	;;"SPC" 'counsel-projectile
+	;; "!" 'projectile-run-shell-command-in-root
+	;; "%" 'projectile-replace-regexp
+	;; "&" 'projectile-run-async-shell-command-in-root
+	;; "D" 'projectile-dired
+	;; "F" 'projectile-find-file-dwim
+	;; "G" 'projectile-regenerate-tags
+	;; "I" 'projectile-invalidate-cache
+	;; "R" 'projectile-replace
+	;; "T" 'projectile-test-project
+	;; "a" 'projectile-toggle-between-implementation-and-test
+	;; "c" 'projectile-compile-project
+	;; "e" 'projectile-edit-dir-locals
+	;; "g" 'projectile-find-tag
+	;; "k" 'projectile-kill-buffers
+	;; "r" 'projectile-recentf
+	))
    #+END_SRC
 
 *** search
@@ -1046,7 +1046,7 @@
 	  "q" 'dumb-jump-quick-look
 	  "s" 'sp-split-sexp
 	  "v" 'find-variable
- ))
+	  ))
      #+END_SRC
 
 *** insert
@@ -1170,9 +1170,9 @@
 	 :evil-states (normal motion visual)
 	 :prefix-cmd toggling
 	 :bindings
- ("l" 'toggle-truncate-lines)
- ("w" 'whitespace-mode)
- )
+	 ("l" 'toggle-truncate-lines)
+	 ("w" 'whitespace-mode)
+	 )
      #+END_SRC
 
 **** occur
@@ -1183,32 +1183,32 @@
 	 :evil-states (normal motion visual)
 	 :prefix-cmd occuring
 	 :bindings
- ("o" 'occur
- "O" 'my/occur-symbol-at-point
- "w" 'my/occur-word-at-point
- "t" 'my/occur-or-toggle-window
- "g" 'cp/gtest-occur
- "F" 'my/occur-fail
- "f" 'my/occur-function
- "c" 'my/occur-cout
- "d" 'my/delete-occur-window
- "n" 'occur-next-error
- "p" 'previous-error))
+	 ("o" 'occur
+	  "O" 'my/occur-symbol-at-point
+	  "w" 'my/occur-word-at-point
+	  "t" 'my/occur-or-toggle-window
+	  "g" 'cp/gtest-occur
+	  "F" 'my/occur-fail
+	  "f" 'my/occur-function
+	  "c" 'my/occur-cout
+	  "d" 'my/delete-occur-window
+	  "n" 'occur-next-error
+	  "p" 'previous-error))
       #+END_SRC
 ** packages
 *** ibuffer
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq ibuffer-formats
-	   '((mark modified read-only " "
-		   (name 40 40 :left :elide) ; change: 30s were originally 18s
-		   " "
-		   (size 9 -1 :right)
-		   " "
-		   (mode 16 16 :left :elide)
-		   " " filename-and-process)
-	     (mark " "
-		   (name 16 -1)
-		   " " filename)))
+	    '((mark modified read-only " "
+		    (name 40 40 :left :elide) ; change: 30s were originally 18s
+		    " "
+		    (size 9 -1 :right)
+		    " "
+		    (mode 16 16 :left :elide)
+		    " " filename-and-process)
+	      (mark " "
+		    (name 16 -1)
+		    " " filename)))
 
     #+END_SRC
 *** tramp
@@ -1284,9 +1284,9 @@
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package evil-surround
 	  :ensure t
-	      :init
-	      (add-hook 'after-init-hook 'global-evil-surround-mode)
-	      :requires evil)
+	  :init
+	  (add-hook 'after-init-hook 'global-evil-surround-mode)
+	  :requires evil)
       #+END_SRC
 
 *** evil-exchange
@@ -1343,8 +1343,8 @@
 *** org-evil
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package org-evil
-	   :ensure t
-	   :requires evil)
+	  :ensure t
+	  :requires evil)
       #+END_SRC
 *** ivy
        #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1399,11 +1399,11 @@
 	:ensure t
 	:bind
 	(:map my/search-map ("k" . counsel-ack) ("g"
-	 . counsel-git-grep) ("s" . swiper) ("K" . ack) ("k"
-	 . counsel-ack) ("g" . counsel-git-grep) ("G" . vc-git-grep)
-	 ("a" . counsel-ag) ("A" . ag))
-	 :config
-	 (counsel-mode))
+						 . counsel-git-grep) ("s" . swiper) ("K" . ack) ("k"
+						 . counsel-ack) ("g" . counsel-git-grep) ("G" . vc-git-grep)
+						 ("a" . counsel-ag) ("A" . ag))
+	:config
+	(counsel-mode))
     #+END_SRC
 
 *** occur
@@ -1440,13 +1440,13 @@
 	(buffer (display-buffer buffer))
 	(t (call-interactively #'occur)))))
 
-    (defun my/occur-word-at-point  ()
-    (interactive)
-    (occur (thing-at-point 'word)))
+   (defun my/occur-word-at-point  ()
+     (interactive)
+     (occur (thing-at-point 'word)))
 
-    (defun my/occur-symbol-at-point  ()
-    (interactive)
-    (occur (thing-at-point 'symbol)))
+   (defun my/occur-symbol-at-point  ()
+     (interactive)
+     (occur (thing-at-point 'symbol)))
 
 
  #+END_SRC
@@ -1454,13 +1454,13 @@
 *** ack grep etc
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my-counsel-ack-in-dir (arg)
-      "Read directory with completion and call counsel-ack"
+	"Read directory with completion and call counsel-ack"
 	(interactive "P")
 	(let ((default-directory (my-read-expanded-filename))
 	      (initial-input ""))
-	      (when arg
-		(setq initial-input (word-at-point)))
-	      (counsel-ack initial-input)))
+	  (when arg
+	    (setq initial-input (word-at-point)))
+	  (counsel-ack initial-input)))
     #+END_SRC
 
     #+BEGIN_SRC emacs-lisp :tangle no
@@ -1480,11 +1480,11 @@
 
     #+BEGIN_SRC emacs-lisp :tangle no
       (defun my-counsel-ag-in-dir (arg)
-      "Read directory with completion and call counsel-grep"
-      (let ((default-directory (my-read-expanded-filename)))
-	(let ((default-directory (expand-file-name
-				(read-file-name "Starting directory: "))))
-	(counsel-grep)))
+	"Read directory with completion and call counsel-grep"
+	(let ((default-directory (my-read-expanded-filename)))
+	  (let ((default-directory (expand-file-name
+				    (read-file-name "Starting directory: "))))
+	    (counsel-grep)))
     #+end_src
 
     #+begin_src emacs-lisp :tangle no
@@ -1499,7 +1499,7 @@
 
     #+END_SRC
     #+BEGIN_SRC emacs-lisp :tangle no
-   (defun my-counsel-git-grep-in-dir ()
+      (defun my-counsel-git-grep-in-dir ()
 
 
     #+END_SRC
@@ -1603,31 +1603,31 @@
 
 *** hl-anything
     #+begin_src emacs-lisp :tangle no
-    (use-package hl-anything
-      :ensure t
-      :config)
+      (use-package hl-anything
+	:ensure t
+	:config)
     #+end_src
 
 *** hl-indent
     #+begin_src emacs-lisp :tangle no
       (use-package hl-indent
-	   :ensure t
-	   :config
-	   (add-hook 'prog-mode-hook 'hl-indent) )
+	:ensure t
+	:config
+	(add-hook 'prog-mode-hook 'hl-indent) )
     #+end_src
 
 *** hl-sentence
  #+begin_src emacs-lisp :tangle no
- (use-package hl-sentence
-		:ensure t)
+   (use-package hl-sentence
+     :ensure t)
  #+end_src
 
 *** hl-todo
     #+begin_src emacs-lisp :tangle no
       (use-package hl-todo
-		:ensure t
-		:config
-		(global-hl-todo-mode) ) (
+	:ensure t
+	:config
+	(global-hl-todo-mode) ) (
     #+END_SRC
 *** completion
 *** grep/ack/wgrep
@@ -1663,33 +1663,33 @@
 *** avy
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package avy
-	:ensure t
-	:bind
-	(:map my/jump-join-map
-	      ("b" . pop-mark)
-	      ("w" . avy-goto-word-or-subword-1)
-	      ("j" . avy-goto-char)
-	      ("J" . avy-goto-char-2)
-	      ("T" . avy-goto-char-timer)
-	      ("b" . avy-pop-mark)
-	      ("l" . avy-goto-line))
-	:init
-	(setq avy-all-windows t))
+     :ensure t
+     :bind
+     (:map my/jump-join-map
+	   ("b" . pop-mark)
+	   ("w" . avy-goto-word-or-subword-1)
+	   ("j" . avy-goto-char)
+	   ("J" . avy-goto-char-2)
+	   ("T" . avy-goto-char-timer)
+	   ("b" . avy-pop-mark)
+	   ("l" . avy-goto-line))
+     :init
+     (setq avy-all-windows t))
  #+END_SRC
 
 *** ace-window
  #+BEGIN_SRC emacs-lisp :tangle yes
 
-  (use-package ace-window
-    :ensure t
-    :bind
-    (:map my/windows-map
-	("D" . ace-delete-window)
-	("S" . ace-swap-window)
-	("W" . ace-window)))
+   (use-package ace-window
+     :ensure t
+     :bind
+     (:map my/windows-map
+	   ("D" . ace-delete-window)
+	   ("S" . ace-swap-window)
+	   ("W" . ace-window)))
 
-     (defhydra hydra/ace-delete-window (:pre (ace-delete-window))
-	 ("q" nil))
+   (defhydra hydra/ace-delete-window (:pre (ace-delete-window))
+     ("q" nil))
  #+END_SRC
 *** link-hint
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1709,37 +1709,37 @@
       (winum-mode))
   #+END_SRC
 
-*** COMMENT magit
+*** magit
   #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package magit
       :ensure t
       :bind
       (:map my/git-map
-       ("s" . magit-status)
-       ("A" . magit-cherry-pick-popup)
-       ("b" . magit-branch-popup)
-       ("b" . magit-bisect-popup)
-       ("c" . magit-commit-popup)
-       ("d" . magit-diff-popup)
-       ("f" . magit-fetch-popup)
-       ("F" . magit-pull-popup)
-       ("l" . magit-log-popup)
-       ("P" . magit-pushing-popup)
-       ("r" . magit-rebase-popup)
-       ("t" . magit-tag-popup)
-       ("T" . magit-notes-popup)
-       ("_" . magit-revert-popup)
-       ("O" . magit-revert-popup)
-       ("z" . magit-stash-popup)
-       ("!" . magit-run-popup)
-       :map my/git-file-map
-       ("f" . magit-find-file)
-       ("d" . magit-diff-buffer-file-popup)
-       ("f" . magit-find-file)
-       ("l" . magit-log-buffer-file))
-       :config
-       (add-to-list 'display-buffer-alist
-       '("magit: " (display-buffer-pop-up-frame))))
+	    ("s" . magit-status)
+	    ("A" . magit-cherry-pick-popup)
+	    ("b" . magit-branch-popup)
+	    ("b" . magit-bisect-popup)
+	    ("c" . magit-commit-popup)
+	    ("d" . magit-diff-popup)
+	    ("f" . magit-fetch-popup)
+	    ("F" . magit-pull-popup)
+	    ("l" . magit-log-popup)
+	    ("P" . magit-pushing-popup)
+	    ("r" . magit-rebase-popup)
+	    ("t" . magit-tag-popup)
+	    ("T" . magit-notes-popup)
+	    ("_" . magit-revert-popup)
+	    ("O" . magit-revert-popup)
+	    ("z" . magit-stash-popup)
+	    ("!" . magit-run-popup)
+	    :map my/git-file-map
+	    ("f" . magit-find-file)
+	    ("d" . magit-diff-buffer-file-popup)
+	    ("f" . magit-find-file)
+	    ("l" . magit-log-buffer-file))
+      :config
+      (add-to-list 'display-buffer-alist
+		   '("magit: " (display-buffer-pop-up-frame))))
   #+END_SRC
 *** evil-magit
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1752,56 +1752,56 @@
      #+END_SRC
 *** hydra
     #+BEGIN_SRC emacs-lisp :tangle yes
-   (use-package hydra
-     :ensure t)
+      (use-package hydra
+	:ensure t)
     #+END_SRC
 *** shell
 **** vars
      #+BEGIN_SRC emacs-lisp :tangle yes
-	(defcustom my-shell-program
-		  "/bin/bash"
-		  "Path to shell binary for shell opened by `my-shell-toggle-shell'"
-		  :group 'my-shell)
+       (defcustom my-shell-program
+	 "/bin/bash"
+	 "Path to shell binary for shell opened by `my-shell-toggle-shell'"
+	 :group 'my-shell)
 
-	(defcustom my-shell-buffer-name-regex
-		  "^\\*shell-.*\\*$"
-		  "Regexp used to identify if the current window is a shell buffer"
-		  :group 'my-shell)
+       (defcustom my-shell-buffer-name-regex
+	 "^\\*shell-.*\\*$"
+	 "Regexp used to identify if the current window is a shell buffer"
+	 :group 'my-shell)
      #+END_SRC
 
 **** funcs
      #+BEGIN_SRC emacs-lisp :tangle yes
-	 (defun my-shell-toggle-shell(shell-buffer-name)
-		   "Toggle a window and run program defined in `my-shell-program'
-	 If a buffer SHELL-BUFFER-NAME reuse, else start a new shell process"
-		   (if (string-match "^\\*shell-.*\\*$" (buffer-name))
-	       (delete-window)
-	     (select-window (split-window-below))
-	     (let ((buffer (get-buffer shell-buffer-name)))
-	       (if buffer
-		   (switch-to-buffer buffer)
-		 (term my-shell-program)
-		 (rename-buffer shell-buffer-name)))))
+       (defun my-shell-toggle-shell(shell-buffer-name)
+	 "Toggle a window and run program defined in `my-shell-program'
+       If a buffer SHELL-BUFFER-NAME reuse, else start a new shell process"
+	 (if (string-match "^\\*shell-.*\\*$" (buffer-name))
+	     (delete-window)
+	   (select-window (split-window-below))
+	   (let ((buffer (get-buffer shell-buffer-name)))
+	     (if buffer
+		 (switch-to-buffer buffer)
+	       (term my-shell-program)
+	       (rename-buffer shell-buffer-name)))))
      #+END_SRC
 
      #+BEGIN_SRC emacs-lisp :tangle yes
-	 (defun my/main-shell ()
-		   "Toggle the main shell"
-		   (interactive)
-		   (my-shell-toggle-shell "*shell-main*"))
+       (defun my/main-shell ()
+	 "Toggle the main shell"
+	 (interactive)
+	 (my-shell-toggle-shell "*shell-main*"))
 
-	 (defun my/buffer-shell ()
-		   "Toggle a buffer local shell"
-		   (interactive)
-		   (my-shell-toggle-shell (concat "*shell-" (buffer-name) "*")))
+       (defun my/buffer-shell ()
+	 "Toggle a buffer local shell"
+	 (interactive)
+	 (my-shell-toggle-shell (concat "*shell-" (buffer-name) "*")))
 
-	 (provide 'my-shell)
-	 ;;; my-shell.el ends here
+       (provide 'my-shell)
+       ;;; my-shell.el ends here
      #+END_SRC
 
 **** keys
      #+BEGIN_SRC emacs-lisp :tangle yes
-     (bind-map-set-keys my/base-map
+       (bind-map-set-keys my/base-map
 	 "'" 'my/main-shell
 	 "\"" 'my/buffer-shell)
      #+END_SRC
@@ -1816,9 +1816,9 @@
 *** ediff
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package ediff
-       :config
-      (setq ediff-merge-split-window-function 'split-window-horizontally)
-      (setq ediff-split-window-function 'split-window-horizontally))
+	:config
+	(setq ediff-merge-split-window-function 'split-window-horizontally)
+	(setq ediff-split-window-function 'split-window-horizontally))
     #+END_SRC
 *** counsel-spotify
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1826,12 +1826,12 @@
 	:ensure t
 	:bind
 	(:map my/search-map
-	 ("p a" . counsel-spotify-search-artist)
-	 ("p A" . counsel-spotify-search-album)
-	 ("p s" . counsel-spotify-search-track)
-	 ("p n" . counsel-spotify-next)
-	 ("p P" . counsel-spotify-previous)
-	 ("p p" . counsel-spotify-toggle-play-pause)))
+	      ("p a" . counsel-spotify-search-artist)
+	      ("p A" . counsel-spotify-search-album)
+	      ("p s" . counsel-spotify-search-track)
+	      ("p n" . counsel-spotify-next)
+	      ("p P" . counsel-spotify-previous)
+	      ("p p" . counsel-spotify-toggle-play-pause)))
     #+END_SRC
 *** google-translate
    #+BEGIN_SRC emacs-lisp :tangle yes
@@ -1850,171 +1850,21 @@
 *** funcs
 *** setup
     #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package org
-       :ensure t
-       :init
-       (setq org-src-fontify-natively t)
-       :config
-	 (defun my/org-mode-hooks ()
-	   (setq my/imenu-function #'counsel-org-goto))
-	 (add-hook 'org-mode-hook 'my/org-mode-hooks)
-	 (bind-map-for-major-mode org-mode
-	   :keys (my/emacs-mode-leader-key)
-	   :evil-keys (my/evil-mode-leader-key)
-	   :evil-states (normal motion visual)
-	   :override-minor-modes t
-	   :bindings
-	   ("<tab>" 'org-indent-block
-	    " RET" 'org-ctrl-c-ret
-	    "#" 'org-update-statistics-cookies
-	    "'" 'org-edit-special
-	    "g" 'org-ctrl-c-star
-	    "," 'org-ctrl-c-ctrl-c
-	    "-" 'org-ctrl-c-minus
-	    "A" 'org-attach
-	    "H" 'org-shiftleft
-	    "J" 'org-shiftdown
-	    "K" 'org-shiftup
-	    "L" 'org-shiftright
-	    "a" 'org-agenda
-	    "c" 'org-capture
-	    "C-S-h" 'org-shiftcontrolleft
-	    "C-S-j" 'org-shiftcontroldown
-	    "C-S-k" 'org-shiftcontrolup
-	    "C-S-l" 'org-shiftcontrolright
-	    "x b" 'spacemacs/org-bold
-	    "x c" 'spacemacs/org-code
-	    "x i" 'spacemacs/org-italic
-	    "x o" 'org-open-at-point
-	    "x r" 'spacemacs/org-clear
-	    "x s" 'spacemacs/org-strike-through
-	    "x u" 'spacemacs/org-underline
-	    "x v" 'spacemacs/org-verbatim
-	    "i H" 'org-insert-heading-after-current
-	    "i K" 'spacemacs/insert-keybinding-org
-	    "i d" 'org-insert-drawer
-	    "i e" 'org-set-effort
-	    "i f" 'org-footnote-new
-	    "i h" 'org-insert-heading
-	    "i l" 'org-insert-link
-	    "i n" 'org-add-note
-	    "i p" 'org-set-property
-	    "i s" 'org-insert-subheading
-	    "i t" 'org-set-tags
-	    "M-RET" 'org-meta-return
-	    "b ." 'spacemacs/org-babel-transient-state/body
-	    "b I" 'org-babel-view-src-block-info
-	    "b Z" 'org-babel-switch-to-session-with-code
-	    "b a" 'org-babel-sha1-hash
-	    "b b" 'org-babel-execute-src-block
-	    "b B" 'org-babel-execute-buffer
-	    "b c" 'org-babel-check-src-block
-	    "b d" 'org-babel-demarcate-block
-	    "b e" 'org-babel-execute-maybe
-	    "b f" 'org-babel-tangle-file
-	    "b g" 'org-babel-goto-named-src-block
-	    "b i" 'org-babel-lob-ingest
-	    "b j" 'org-babel-insert-header-arg
-	    "b l" 'org-babel-load-in-session
-	    "b n" 'org-babel-next-src-block
-	    "b o" 'org-babel-open-src-block-result
-	    "b p" 'org-babel-previous-src-block
-	    "b r" 'org-babel-goto-named-result
-	    "b s" 'org-babel-execute-subtree
-	    "b t" 'org-babel-tangle
-	    "b u" 'org-babel-goto-src-block-head
-	    "b v" 'org-babel-expand-src-block
-	    "b x" 'org-babel-do-key-sequence-in-edit-buffer
-	    "b z" 'org-babel-switch-to-session
-	    "s A" 'org-archive-subtree
-	    "s N" 'widen
-	    "s S" 'org-sort
-	    "s a" 'org-toggle-archive-tag
-	    "s b" 'org-tree-to-indirect-buffer
-	    "s h" 'org-promote-subtree
-	    "s j" 'org-move-subtree-down
-	    "s k" 'org-move-subtree-up
-	    "s l" 'org-demote-subtree
-	    "s n" 'org-narrow-to-subtree
-	    "s r" 'org-refile
-	    "s s" 'org-sparse-tree
-	    "T T" 'org-todo
-	    "T V" 'space-doc-mode
-	    "T c" 'org-toggle-checkbox
-	    "T e" 'org-toggle-pretty-entities
-	    "T i" 'org-toggle-inline-images
-	    "T l" 'org-toggle-link-display
-	    "T t" 'org-show-todo-tree
-	    "T x" 'org-toggle-latex-fragment
-	    "f i" 'org-feed-goto-inbox
-	    "f u" 'org-feed-update-all
-	    "e e" 'org-export-dispatch
-	    "e m" 'org-mime-org-buffer-htmlize
-	    "d T" 'org-time-stamp-inactive
-	    "d d" 'org-deadline
-	    "d s" 'org-schedule
-	    "d t" 'org-time-stamp
-	    "C c" 'org-clock-cancel
-	    "C i" 'org-clock-in
-	    "C o" 'org-clock-out
-	    "C p" 'org-pomodoro
-	    "C r" 'org-resolve-clocks
-	    "t E" 'org-table-export
-	    "t H" 'org-table-move-column-left
-	    "t I" 'org-table-import
-	    "t J" 'org-table-move-row-down
-	    "t K" 'org-table-move-row-up
-	    "t L" 'org-table-move-column-right
-	    "t N" 'org-table-create-with-table.el
-	    "t a" 'org-table-align
-	    "t b" 'org-table-blank-field
-	    "t c" 'org-table-convert
-	    "t e" 'org-table-eval-formula
-	    "t h" 'org-table-previous-field
-	    "t j" 'org-table-next-row
-	    "t l" 'org-table-next-field
-	    "t n" 'org-table-create
-	    "t p" 'org-plot/gnuplot
-	    "t r" 'org-table-recalculate
-	    "t s" 'org-table-sort-lines
-	    "t w" 'org-table-wrap-region
-	    "i D s" 'org-download-screenshot
-	    "i D y" 'org-download-yank
-	    "t t f" 'org-table-toggle-formula-debugger
-	    "t t o" 'org-table-toggle-coordinate-overlays
-	    "t i H" 'org-table-hline-and-move
-	    "t i c" 'org-table-insert-column
-	    "t i h" 'org-table-insert-hline
-	    "t i r" 'org-table-insert-row
-	    "t d c" 'org-table-delete-column
-	    "t d r" 'org-table-kill-row)))
-
-    #+END_SRC
-**** org-projectile
-     #+BEGIN_SRC emacs-lisp :tangle no
-	(use-package org-projectile
-	  :ensure t
-	  :bind
-	  (:map
-	   my/projectile-map
-	   ("o" . org-projectile/goto-todos)))
-     #+END_SRC
-**** company
-     #+BEGIN_SRC emacs-lisp :tangle yes
-	(defun my/org-company-setup ()
-	       (add-to-list 'company-backends 'company-capf)
-	       (company-mode))
-	     (add-hook 'org-mode-hook 'my/org-company-setup)
-     #+END_SRC
-**** keys
-     #+BEGIN_SRC emacs-lisp :tangle no
+      (use-package org
+	:ensure t
+	:init
+	(setq org-src-fontify-natively t)
+	:config
+	(defun my/org-mode-hooks ()
+	  (setq my/imenu-function #'counsel-org-goto))
+	(add-hook 'org-mode-hook 'my/org-mode-hooks)
 	(bind-map-for-major-mode org-mode
-		  :keys (my/emacs-mode-leader-key)
-		  :evil-keys (my/evil-mode-leader-key)
-		  :evil-states (normal motion visual)
-		  :override-minor-modes t
-		  :bindings
-		  ("<tab>" 'org-indent-block
+	  :keys (my/emacs-mode-leader-key)
+	  :evil-keys (my/evil-mode-leader-key)
+	  :evil-states (normal motion visual)
+	  :override-minor-modes t
+	  :bindings
+	  ("<tab>" 'org-indent-block
 	   " RET" 'org-ctrl-c-ret
 	   "#" 'org-update-statistics-cookies
 	   "'" 'org-edit-special
@@ -2040,12 +1890,12 @@
 	   "x s" 'spacemacs/org-strike-through
 	   "x u" 'spacemacs/org-underline
 	   "x v" 'spacemacs/org-verbatim
-	   "i h" 'org-insert-heading-after-current
-	   "i H" 'org-insert-heading
+	   "i H" 'org-insert-heading-after-current
 	   "i K" 'spacemacs/insert-keybinding-org
 	   "i d" 'org-insert-drawer
 	   "i e" 'org-set-effort
 	   "i f" 'org-footnote-new
+	   "i h" 'org-insert-heading
 	   "i l" 'org-insert-link
 	   "i n" 'org-add-note
 	   "i p" 'org-set-property
@@ -2137,7 +1987,157 @@
 	   "t i h" 'org-table-insert-hline
 	   "t i r" 'org-table-insert-row
 	   "t d c" 'org-table-delete-column
-	   "t d r" 'org-table-kill-row))
+	   "t d r" 'org-table-kill-row)))
+
+    #+END_SRC
+**** org-projectile
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (use-package org-projectile
+	 :ensure t
+	 :bind
+	 (:map
+	  my/projectile-map
+	  ("o" . org-projectile/goto-todos)))
+     #+END_SRC
+**** company
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun my/org-company-setup ()
+	 (add-to-list 'company-backends 'company-capf)
+	 (company-mode))
+       (add-hook 'org-mode-hook 'my/org-company-setup)
+     #+END_SRC
+**** keys
+     #+BEGIN_SRC emacs-lisp :tangle no
+       (bind-map-for-major-mode org-mode
+	 :keys (my/emacs-mode-leader-key)
+	 :evil-keys (my/evil-mode-leader-key)
+	 :evil-states (normal motion visual)
+	 :override-minor-modes t
+	 :bindings
+	 ("<tab>" 'org-indent-block
+	  " RET" 'org-ctrl-c-ret
+	  "#" 'org-update-statistics-cookies
+	  "'" 'org-edit-special
+	  "g" 'org-ctrl-c-star
+	  "," 'org-ctrl-c-ctrl-c
+	  "-" 'org-ctrl-c-minus
+	  "A" 'org-attach
+	  "H" 'org-shiftleft
+	  "J" 'org-shiftdown
+	  "K" 'org-shiftup
+	  "L" 'org-shiftright
+	  "a" 'org-agenda
+	  "c" 'org-capture
+	  "C-S-h" 'org-shiftcontrolleft
+	  "C-S-j" 'org-shiftcontroldown
+	  "C-S-k" 'org-shiftcontrolup
+	  "C-S-l" 'org-shiftcontrolright
+	  "x b" 'spacemacs/org-bold
+	  "x c" 'spacemacs/org-code
+	  "x i" 'spacemacs/org-italic
+	  "x o" 'org-open-at-point
+	  "x r" 'spacemacs/org-clear
+	  "x s" 'spacemacs/org-strike-through
+	  "x u" 'spacemacs/org-underline
+	  "x v" 'spacemacs/org-verbatim
+	  "i h" 'org-insert-heading-after-current
+	  "i H" 'org-insert-heading
+	  "i K" 'spacemacs/insert-keybinding-org
+	  "i d" 'org-insert-drawer
+	  "i e" 'org-set-effort
+	  "i f" 'org-footnote-new
+	  "i l" 'org-insert-link
+	  "i n" 'org-add-note
+	  "i p" 'org-set-property
+	  "i s" 'org-insert-subheading
+	  "i t" 'org-set-tags
+	  "M-RET" 'org-meta-return
+	  "b ." 'spacemacs/org-babel-transient-state/body
+	  "b I" 'org-babel-view-src-block-info
+	  "b Z" 'org-babel-switch-to-session-with-code
+	  "b a" 'org-babel-sha1-hash
+	  "b b" 'org-babel-execute-src-block
+	  "b B" 'org-babel-execute-buffer
+	  "b c" 'org-babel-check-src-block
+	  "b d" 'org-babel-demarcate-block
+	  "b e" 'org-babel-execute-maybe
+	  "b f" 'org-babel-tangle-file
+	  "b g" 'org-babel-goto-named-src-block
+	  "b i" 'org-babel-lob-ingest
+	  "b j" 'org-babel-insert-header-arg
+	  "b l" 'org-babel-load-in-session
+	  "b n" 'org-babel-next-src-block
+	  "b o" 'org-babel-open-src-block-result
+	  "b p" 'org-babel-previous-src-block
+	  "b r" 'org-babel-goto-named-result
+	  "b s" 'org-babel-execute-subtree
+	  "b t" 'org-babel-tangle
+	  "b u" 'org-babel-goto-src-block-head
+	  "b v" 'org-babel-expand-src-block
+	  "b x" 'org-babel-do-key-sequence-in-edit-buffer
+	  "b z" 'org-babel-switch-to-session
+	  "s A" 'org-archive-subtree
+	  "s N" 'widen
+	  "s S" 'org-sort
+	  "s a" 'org-toggle-archive-tag
+	  "s b" 'org-tree-to-indirect-buffer
+	  "s h" 'org-promote-subtree
+	  "s j" 'org-move-subtree-down
+	  "s k" 'org-move-subtree-up
+	  "s l" 'org-demote-subtree
+	  "s n" 'org-narrow-to-subtree
+	  "s r" 'org-refile
+	  "s s" 'org-sparse-tree
+	  "T T" 'org-todo
+	  "T V" 'space-doc-mode
+	  "T c" 'org-toggle-checkbox
+	  "T e" 'org-toggle-pretty-entities
+	  "T i" 'org-toggle-inline-images
+	  "T l" 'org-toggle-link-display
+	  "T t" 'org-show-todo-tree
+	  "T x" 'org-toggle-latex-fragment
+	  "f i" 'org-feed-goto-inbox
+	  "f u" 'org-feed-update-all
+	  "e e" 'org-export-dispatch
+	  "e m" 'org-mime-org-buffer-htmlize
+	  "d T" 'org-time-stamp-inactive
+	  "d d" 'org-deadline
+	  "d s" 'org-schedule
+	  "d t" 'org-time-stamp
+	  "C c" 'org-clock-cancel
+	  "C i" 'org-clock-in
+	  "C o" 'org-clock-out
+	  "C p" 'org-pomodoro
+	  "C r" 'org-resolve-clocks
+	  "t E" 'org-table-export
+	  "t H" 'org-table-move-column-left
+	  "t I" 'org-table-import
+	  "t J" 'org-table-move-row-down
+	  "t K" 'org-table-move-row-up
+	  "t L" 'org-table-move-column-right
+	  "t N" 'org-table-create-with-table.el
+	  "t a" 'org-table-align
+	  "t b" 'org-table-blank-field
+	  "t c" 'org-table-convert
+	  "t e" 'org-table-eval-formula
+	  "t h" 'org-table-previous-field
+	  "t j" 'org-table-next-row
+	  "t l" 'org-table-next-field
+	  "t n" 'org-table-create
+	  "t p" 'org-plot/gnuplot
+	  "t r" 'org-table-recalculate
+	  "t s" 'org-table-sort-lines
+	  "t w" 'org-table-wrap-region
+	  "i D s" 'org-download-screenshot
+	  "i D y" 'org-download-yank
+	  "t t f" 'org-table-toggle-formula-debugger
+	  "t t o" 'org-table-toggle-coordinate-overlays
+	  "t i H" 'org-table-hline-and-move
+	  "t i c" 'org-table-insert-column
+	  "t i h" 'org-table-insert-hline
+	  "t i r" 'org-table-insert-row
+	  "t d c" 'org-table-delete-column
+	  "t d r" 'org-table-kill-row))
      #+END_SRC
 *** packages
 **** htmlize
@@ -2158,11 +2158,11 @@
 *** packages
 **** aggressive-indent
      #+BEGIN_SRC emacs-lisp :tangle yes
-     (use-package aggressive-indent :ensure t
-     :config
-     :bind
-     (:map my/toggle-map
-     ("i" . aggressive-indent-mode)))
+       (use-package aggressive-indent :ensure t
+	 :config
+	 :bind
+	 (:map my/toggle-map
+	       ("i" . aggressive-indent-mode)))
      #+END_SRC
 u**** highlight-symbol
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2223,49 +2223,49 @@ u**** highlight-symbol
     #+END_SRC
 **** yasnippet
   #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package yasnippet
-	  :ensure t
-	  :defer t
-	  :init
-	  (add-hook 'prog-mode-hook 'yas-minor-mode) (add-hook
-	  'org-mode-hook 'yas-minor-mode)
-	  :config
-	  (add-to-list 'hippie-expand-try-functions-list
-	  'yas-hippie-try-expand) (yas-reload-all)) (use-package
-	  yasnippet-snippets
-	  :ensure t
-	  :requires yasnippet)
+    (use-package yasnippet
+      :ensure t
+      :defer t
+      :init
+      (add-hook 'prog-mode-hook 'yas-minor-mode) (add-hook
+						  'org-mode-hook 'yas-minor-mode)
+      :config
+      (add-to-list 'hippie-expand-try-functions-list
+		   'yas-hippie-try-expand) (yas-reload-all)) (use-package
+      yasnippet-snippets
+      :ensure t
+      :requires yasnippet)
   #+END_SRC
 
 **** flycheck
   #+BEGIN_SRC emacs-lisp :tangle yes
-      (use-package flycheck
-	:ensure t
-	:bind
-	 (:map my/toggle-map
-	       ("f" . flycheck-mode))
-	(:map my/errors-map
-	("." . spacemacs/error-transient-state/body)
-	 ("S" . flycheck-set-checker-executable)
-	 ("e" . flycheck-buffer)
-	 ("c" . flycheck-clear)
-	 ("h" . flycheck-describe-checker)
-	 ("l" . my/flycheck-toggle-error-list)
-	 ("s" . flycheck-select-checker)
-	 ("v" . flycheck-verify-setup)
-	 ("t" . flycheck-mode)
-	 ("x" . flycheck-explain-error-at-point)
-	 ("y" . flycheck-copy-errors-as-kill))
-	:config
-;;	(setq flycheck-display-errors-function nil)
-	(setq flycheck-idle-change-delay 4))
+    (use-package flycheck
+      :ensure t
+      :bind
+      (:map my/toggle-map
+	    ("f" . flycheck-mode))
+      (:map my/errors-map
+	    ("." . spacemacs/error-transient-state/body)
+	    ("S" . flycheck-set-checker-executable)
+	    ("e" . flycheck-buffer)
+	    ("c" . flycheck-clear)
+	    ("h" . flycheck-describe-checker)
+	    ("l" . my/flycheck-toggle-error-list)
+	    ("s" . flycheck-select-checker)
+	    ("v" . flycheck-verify-setup)
+	    ("t" . flycheck-mode)
+	    ("x" . flycheck-explain-error-at-point)
+	    ("y" . flycheck-copy-errors-as-kill))
+      :config
+      ;;	(setq flycheck-display-errors-function nil)
+      (setq flycheck-idle-change-delay 4))
   #+END_SRC
 ***** funcs
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(defun my/flycheck-toggle-error-list () "Toggle flycheck's
 	  error list window" (interactive) (-if-let (window
-	  (flycheck-get-error-list-window)) (quit-window nil window)
-	  (flycheck-list-errors)))
+						     (flycheck-get-error-list-window)) (quit-window nil window)
+					     (flycheck-list-errors)))
       #+END_SRC
 
 **** company
@@ -2290,30 +2290,30 @@ u**** highlight-symbol
 	:config
 	(add-to-list 'auto-mode-alist '("\\.dox\\'" . plantuml-mode))
 
-       (defun my/plantuml-preview-current-block ()
-	 (interactive)
-	 (plantuml-preview-current-block 16))
+	(defun my/plantuml-preview-current-block ()
+	  (interactive)
+	  (plantuml-preview-current-block 16))
 
-      (defun my/plantuml-preview-region()
-	 (interactive)
-	 (plantuml-preview-region 16))
+	(defun my/plantuml-preview-region()
+	  (interactive)
+	  (plantuml-preview-region 16))
 
-      (defun my/plantuml-preview()
-	 (interactive)
-	 (plantuml-preview 16))
+	(defun my/plantuml-preview()
+	  (interactive)
+	  (plantuml-preview 16))
 
-       (bind-map-for-major-mode plantuml-mode
-	 :keys (my/emacs-mode-leader-key)
-	 :evil-keys (my/evil-mode-leader-key)
-	 :evil-states (normal motion visual)
-	 :prefix rtags
-	 :bindings
-	 ("p B" 'plantuml-preview-current-block
-	  "p R" 'plantuml-preview-region
-	  "p P" 'plantuml-preview
-	  "p b" 'my/plantuml-preview-current-block
-	  "p r" 'my/plantuml-preview-region
-	  "p p" 'my/plantuml-preview)))
+	(bind-map-for-major-mode plantuml-mode
+	  :keys (my/emacs-mode-leader-key)
+	  :evil-keys (my/evil-mode-leader-key)
+	  :evil-states (normal motion visual)
+	  :prefix rtags
+	  :bindings
+	  ("p B" 'plantuml-preview-current-block
+	   "p R" 'plantuml-preview-region
+	   "p P" 'plantuml-preview
+	   "p b" 'my/plantuml-preview-current-block
+	   "p r" 'my/plantuml-preview-region
+	   "p p" 'my/plantuml-preview)))
     #+END_SRC
 *** Emacs-lisp-mode
 **** emacs-lisp-mode
@@ -2363,11 +2363,11 @@ u**** highlight-symbol
 **** company
     #+BEGIN_SRC emacs-lisp :tangle yes
       (with-eval-after-load 'emacs-lisp-mode
-       (add-to-list 'company-backends 'company-elisp))
+	(add-to-list 'company-backends 'company-elisp))
     #+END_SRC
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my-emacs-lisp-company-setup()
-       (company-mode 1))
+	(company-mode 1))
       (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-company-setup)
     #+END_SRC
 *** C++-mode
@@ -2401,22 +2401,22 @@ u**** highlight-symbol
      Setup keybindings
 **** keys
      #+BEGIN_SRC emacs-lisp :tangle yes
-	 (bind-map-for-major-mode c++-mode
-	   :keys (my/emacs-mode-leader-key)
-	   :evil-keys (my/evil-mode-leader-key)
-	   :evil-states (normal motion visual)
-	   :prefix rtags
-	   :bindings
-	   ("t o" 'cp/gtest-occur
-	    "c T" 'cp/compile-gtest-suite-at-point
-	    "c t" 'cp/compile-gtest-test-at-point
-	    "c g" 'my/compile-and-gcov
-	    "c c" 'cp/compile
-	    "g a" 'ff-find-other-file))
+       (bind-map-for-major-mode c++-mode
+	 :keys (my/emacs-mode-leader-key)
+	 :evil-keys (my/evil-mode-leader-key)
+	 :evil-states (normal motion visual)
+	 :prefix rtags
+	 :bindings
+	 ("t o" 'cp/gtest-occur
+	  "c T" 'cp/compile-gtest-suite-at-point
+	  "c t" 'cp/compile-gtest-test-at-point
+	  "c g" 'my/compile-and-gcov
+	  "c c" 'cp/compile
+	  "g a" 'ff-find-other-file))
 
-	 (bind-map-for-major-mode my/compile-comment-map c++-mode
-	   :bindings
-	   ("t" cp/compile-gtest-test-at-point))
+       (bind-map-for-major-mode my/compile-comment-map c++-mode
+	 :bindings
+	 ("t" cp/compile-gtest-test-at-point))
      #+END_SRC
 **** packages
 ***** rtags
@@ -2536,8 +2536,8 @@ u**** highlight-symbol
       #+END_SRC
 ****** bindings
        #+BEGIN_SRC emacs-lisp :tangle yes
-       (evil-define-key '(normal) c++-mode-map
-       (kbd "gd") 'rtags-find-symbol-at-point)
+	 (evil-define-key '(normal) c++-mode-map
+	   (kbd "gd") 'rtags-find-symbol-at-point)
        #+END_SRC
 ****** company-rtags
        #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2546,7 +2546,7 @@ u**** highlight-symbol
 	   :config
 	   (defun my/setup-company-rtags ()
 	     (add-to-list 'company-backends 'company-rtags))
-	     (add-hook 'c++-mode-hook 'my/setup-company-rtags)
+	   (add-hook 'c++-mode-hook 'my/setup-company-rtags)
 	   :init
 	   (evil-define-key '(normal insert) 'c++-mode-map
 	     (kbd "C-SPC") 'company-rtags))
@@ -2555,52 +2555,52 @@ u**** highlight-symbol
 
 ****** flycheck-rtags
        #+BEGIN_SRC emacs-lisp :tangle no
-	(use-package flycheck-rtags
-	  :ensure t
-	  :after (flycheck-mode rtags))
+	 (use-package flycheck-rtags
+	   :ensure t
+	   :after (flycheck-mode rtags))
        #+END_SRC
 ****** ivy-rtags
        #+BEGIN_SRC emacs-lisp :tangle no
-	(use-package ivy-rtags
-	  :ensure t
-	  :after (ivy rtags))
+	 (use-package ivy-rtags
+	   :ensure t
+	   :after (ivy rtags))
        #+END_SRC
 ****** eldoc
        #+BEGIN_SRC emacs-lisp :tangle yes
 
-  (defun fontify-string (str mode)
-    "Return STR fontified according to MODE."
-    (with-temp-buffer
-	  (insert str)
-	  (delay-mode-hooks (funcall mode))
-	  (font-lock-default-function mode)
-	  (font-lock-default-fontify-region
-	   (point-min) (point-max) nil)
-	  (buffer-string)))
+	 (defun fontify-string (str mode)
+	   "Return STR fontified according to MODE."
+	   (with-temp-buffer
+	     (insert str)
+	     (delay-mode-hooks (funcall mode))
+	     (font-lock-default-function mode)
+	     (font-lock-default-fontify-region
+	      (point-min) (point-max) nil)
+	     (buffer-string)))
 
-  (defun rtags-eldoc-function ()
-    (let* ((symbol (rtags-symbol-info-internal :location (or (rtags-target-declaration-first) (rtags-current-location)) :silent t))
-	   (symbol-text (cdr (assoc 'contents (rtags-get-file-contents :info symbol :maxlines (or 1 5))))))
-      (when symbol
-	(message symbol-text))))
+	 (defun rtags-eldoc-function ()
+	   (let* ((symbol (rtags-symbol-info-internal :location (or (rtags-target-declaration-first) (rtags-current-location)) :silent t))
+		  (symbol-text (cdr (assoc 'contents (rtags-get-file-contents :info symbol :maxlines (or 1 5))))))
+	     (when symbol
+	       (message symbol-text))))
 
-    (defun rtags-eldoc-function ()
-      (let ((summary (rtags-get-summary-text)))
-	(and summary
-	     (fontify-string
-	      (replace-regexp-in-string
-	       "{[^}]*$" ""
-	       (mapconcat
-		(lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
-		(split-string summary "\r?\n")
-		" "))
-		major-mode))))
+	 (defun rtags-eldoc-function ()
+	   (let ((summary (rtags-get-summary-text)))
+	     (and summary
+		  (fontify-string
+		   (replace-regexp-in-string
+		    "{[^}]*$" ""
+		    (mapconcat
+		     (lambda (str) (if (= 0 (length str)) "//" (string-trim str)))
+		     (split-string summary "\r?\n")
+		     " "))
+		   major-mode))))
 
-(defun rtags-eldoc-mode ()
-    (interactive)
-    (setq-local eldoc-documentation-function #'rtags-eldoc-function)
-    (eldoc-mode 1))
-    ;;(remove-hook 'c++-mode 'rtags-eldoc-mode)
+	 (defun rtags-eldoc-mode ()
+	   (interactive)
+	   (setq-local eldoc-documentation-function #'rtags-eldoc-function)
+	   (eldoc-mode 1))
+	 ;;(remove-hook 'c++-mode 'rtags-eldoc-mode)
        #+END_SRC
 ***** flycheck
       #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2620,7 +2620,7 @@ u**** highlight-symbol
 	(use-package google-c-style
 	  :ensure t
 	  :config
-	 (add-hook 'c++-mode-hook 'google-set-c-style))
+	  (add-hook 'c++-mode-hook 'google-set-c-style))
       #+END_SRC
 
 ***** clang-format
@@ -2634,13 +2634,13 @@ u**** highlight-symbol
 	    :prefix rtags
 	    :bindings
 	    ("f f" 'clang-format
-	    "f b" 'clang-format-buffer
+	     "f b" 'clang-format-buffer
 	     "f r" 'clang-format-region)))
 
-	  (defun my/clang-format-if-file-exists ()
-	    (when (eq major-mode 'c++-mode)
-	      (when (locate-dominating-file (buffer-file-name) ".clang-format")
-		(clang-format-buffer))))
+	(defun my/clang-format-if-file-exists ()
+	  (when (eq major-mode 'c++-mode)
+	    (when (locate-dominating-file (buffer-file-name) ".clang-format")
+	      (clang-format-buffer))))
 
 	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
 
@@ -2670,7 +2670,7 @@ u**** highlight-symbol
 	(use-package google-c-style
 	  :ensure t
 	  :config
-	 (add-hook 'c++-mode-hook 'google-set-c-style))
+	  (add-hook 'c++-mode-hook 'google-set-c-style))
       #+END_SRC
 
 ***** clang-format
@@ -2684,15 +2684,15 @@ u**** highlight-symbol
 	    :prefix rtags
 	    :bindings
 	    ("f f" 'clang-format
-	    "f b" 'clang-format-buffer
+	     "f b" 'clang-format-buffer
 	     "f r" 'clang-format-region)))
 
-	  (defun my/clang-format-if-file-exists ()
-	    (when (eq major-mode 'c++-mode)
-	      (when (locate-dominating-file (buffer-file-name) ".clang-format")
-		(clang-format-buffer))))
+	(defun my/clang-format-if-file-exists ()
+	  (when (eq major-mode 'c++-mode)
+	    (when (locate-dominating-file (buffer-file-name) ".clang-format")
+	      (clang-format-buffer))))
 
-	  (add-hook 'before-save-hook 'my/clang-format-if-file-exists)
+	(add-hook 'before-save-hook 'my/clang-format-if-file-exists)
 	      #+end_src
 *** Python-mode
 **** python-mode
@@ -2711,13 +2711,13 @@ u**** highlight-symbol
        (defun my/python-shell-send-line ()
 	 (interactive)
 	 (save-excursion
-	 ;; (beginning-of-line-text)
-	 ;; (push-mark)
-	 ;; (end-of-line)
-	 (let ((mark-active t)
-	       (start (progn (beginning-of-line-text) (point)))
-	       (end (progn (end-of-line) (point))))
-	   (python-shell-send-region start end))))
+	   ;; (beginning-of-line-text)
+	   ;; (push-mark)
+	   ;; (end-of-line)
+	   (let ((mark-active t)
+		 (start (progn (beginning-of-line-text) (point)))
+		 (end (progn (end-of-line) (point))))
+	     (python-shell-send-region start end))))
      #+END_SRC
 ***** keys
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2726,11 +2726,11 @@ u**** highlight-symbol
 **** anaconda-mode
 ***** anaconda-mode
       #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package anaconda-mode
-	 :init
-	 (add-hook 'python-mode-hook 'anaconda-mode)
-	 (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-	 :ensure t)
+	(use-package anaconda-mode
+	  :init
+	  (add-hook 'python-mode-hook 'anaconda-mode)
+	  (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+	  :ensure t)
       #+END_SRC
 
       #+BEGIN_SRC emacs-lisp :tangle yes

@@ -1,7 +1,7 @@
 BIN_DIR="$HOME/.emacs.d/bin"
 INSTALL_DIR="$HOME/.local/bin"
 EXECUTABLES="$(ls $BIN_DIR)"
-set -x
+
 if [ ! -d $INSTALL_DIR ]; then
    printf "Creating directory $INSTALL_DIR"
    mkdir -p $INSTALL_DIR
