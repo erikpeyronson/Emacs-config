@@ -2781,6 +2781,40 @@ u**** highlight-symbol
 
 	:ensure t)
     #+END_SRC
+*** go-mode
+****  vars
+**** funcs
+**** config
+**** packages
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (use-package go-mode
+	 :ensure t
+	 :config
+	 (setq gofmt-command "goimports")
+	 (add-hook 'before-save-hook 'gofmt-before-save))
+
+       (use-package company-go
+	 :ensure t
+	 :config
+	 (add-hook 'go-mode-hook (lambda ()
+				   (setq tab-width 2)
+				   (add-to-list 'company-backends 'company-go)
+				   (company-mode))))
+
+       (use-package go-imenu
+	 :ensure t)
+
+       (use-package go-eldoc
+	 :ensure t
+	 :config
+	 (go-eldoc-setup)
+	 (add-hook 'go-mode-hook 'eldoc-mode))
+
+       (use-package flycheck-gometalinter
+	 :ensure t
+	 :config
+	 (add-hook 'go-mode-hook 'flycheck-mode))
+     #+END_SRC
 ** Vlf
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package vlf
