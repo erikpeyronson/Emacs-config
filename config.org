@@ -1639,7 +1639,9 @@
 
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package ack
-     :ensure t)
+     :ensure t
+     :config
+     (add-hook 'ack-mode-hook 'subword-mode))
  #+END_SRC
 
 
