@@ -1838,6 +1838,20 @@
      (use-package google-translate
        :ensure t)
    #+END_SRC
+*** lsp-mode
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package lsp-mode
+	:ensure t)
+      (use-package lsp-ui
+	:requires lsp-mode
+	:ensure t)
+    #+END_SRC
+*** company-lsp
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package company-lsp
+	:requires company lsp-mode
+	:ensure t)
+    #+END_SRC
 ** Text-mode
 *** Markdown-mode
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2781,6 +2795,47 @@ u**** highlight-symbol
 
 	:ensure t)
     #+END_SRC
+*** haskell-mode
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (use-package haskell-mode
+	:ensure t)
+    #+END_SRC
+**** vars
+**** funcs
+**** config
+     #+BEGIN_SRC emacs-lisp :tangle yes
+       (defun my-haskell-setup ()
+	 (subword-mode)
+	 (flycheck-mode)
+	 (company-mode))
+
+       (add-hook 'haskell-mode-hook 'my-haskell-setup)
+     #+END_SRC
+**** keys
+**** packages
+***** haskell-snippets
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package haskell-snippets
+	  :ensure t)
+      #+END_SRC
+***** intero
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package intero
+	  :init
+	  (remove-hook 'haskell-mode-hook 'intero-mode)
+	  :ensure t)
+      #+END_SRC
+*****  lsp-haskell
+      #+BEGIN_SRC emacs-lisp :tangle yes
+	(use-package lsp-haskell
+	  :requires lsp-mode
+	  :config
+	  (add-hook 'haskell-mode-hook #'lsp)
+	  ;; (add-hook 'haskell-mode-hook 'lsp-ui-mode)
+	  (add-hook 'haskell-mode-hook (lambda () (push 'company-lsp company-backends)))
+	  :ensure t)
+      #+END_SRC
+*****
 *** go-mode
 ****  vars
 **** funcs
