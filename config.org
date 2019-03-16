@@ -1739,9 +1739,7 @@
 	    ("d" . magit-diff-buffer-file-popup)
 	    ("f" . magit-find-file)
 	    ("l" . magit-log-buffer-file))
-      :config
-      (add-to-list 'display-buffer-alist
-		   '("magit: " (display-buffer-pop-up-frame))))
+      :config)
   #+END_SRC
 *** evil-magit
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2394,15 +2392,6 @@ u**** highlight-symbol
 	 (flycheck-mode)
 	 ;; (aggressive-indent-mode 1)
 	 (subword-mode))
-       ;;  stop emacs from consantly opening new windows
-       (add-to-list 'display-buffer-alist
-		    '(".*.h" (display-buffer-same-window )))
-       (add-to-list 'display-buffer-alist
-		    '(".*.cpp" (display-buffer-same-window )))
-       (add-to-list 'display-buffer-alist
-		    '(".*.hpp" (display-buffer-same-window )))
-       (add-to-list 'display-buffer-alist
-		    '(".*.cc" (display-buffer-same-window )))
      #+END_SRC
 
 **** config
@@ -2508,10 +2497,12 @@ u**** highlight-symbol
 	     "g f"  'hydra/rtags-nav/rtags-location-stack-forward
 	     "g b"    'hydra/rtags-nav/rtags-location-stack-forward
 	     "g i"    'rtags-symbol-info
+	     "g s"    'rtags-summary
 	     "j i"    'rtags-imenu
 	     "g t"    'rtags-symbol-type
 	     "g d"  'rtags-dependency-tree
-	     "g s"  'rtags-display-summary
+	     "g s"  'rtags-start-process-unless-running
+	     "g q"  'rtags-quit-rdm
 	     "g S"  'rtags-display-summary-as-message
 	     "g e f"  'rtags-fix-fixit-at-point
 	     "g e F"  'rtags-fixit
