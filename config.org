@@ -202,9 +202,10 @@
      ;; (set-face-foreground 'mode-line-inactive "black")
      )
 
-   (add-hook 'after-init-hook 'my/dark-theme)
-
-   ;; (set-face-background hl-line-face "light gray")
+   ;; (add-hook 'after-init-hook 'my/dark-theme)
+   ;; (my/dark-theme)
+   ;;
+   (set-face-background hl-line-face "light gray")
    ;; (set-face-foreground hl-line-face "black")
    #+END_SRC
 * mode-line
@@ -1334,8 +1335,8 @@
 	     (kbd "g r k") 'evil-mc-make-cursor-move-prev-line
 	     (kbd "g r l") 'evil-mc-make-and-goto-last-cursor
 	     (kbd "g r m") 'evil-mc-make-all-cursors
-	     (kbd "g r n") 'evil-mc-skip-and-goto-next-match
-	     (kbd "g r p") 'evil-mc-skip-and-goto-prev-match
+	     (kbd "g r n") 'evil-mc-make-and-goto-next-match
+	     (kbd "g r p") 'evil-mc-make-and-goto-prev-match
 	     (kbd "g r r") 'evil-mc-resume-cursors
 	     (kbd "g r s") 'evil-mc-pause-cursors
 	     (kbd "g r u") 'evil-mc-undo-all-cursors))
@@ -1722,7 +1723,7 @@
 	    ("b" . magit-branch-popup)
 	    ("b" . magit-bisect-popup)
 	    ("c" . magit-commit-popup)
-	    ("d" . magit-diff-popup)
+	    ("d" . magit-diff)
 	    ("f" . magit-fetch-popup)
 	    ("F" . magit-pull-popup)
 	    ("l" . magit-log-popup)
@@ -1736,7 +1737,7 @@
 	    ("!" . magit-run-popup)
 	    :map my/git-file-map
 	    ("f" . magit-find-file)
-	    ("d" . magit-diff-buffer-file-popup)
+	    ("D" . magit-diff-buffer-file)
 	    ("f" . magit-find-file)
 	    ("l" . magit-log-buffer-file))
       :config)
@@ -2293,7 +2294,6 @@ u**** highlight-symbol
 				   company-gtags
 				   company-etags
 				   company-keywords)
-				  company-files
 				  company-dabbrev)))
       #+END_SRC
 
@@ -2428,7 +2428,7 @@ u**** highlight-symbol
 ****** rtags
       #+BEGIN_SRC emacs-lisp :tangle yes
 	(use-package rtags
-	  :ensure t
+	  ;; :ensure t
 	  :init
 	  (defun my/setup-rtags-hooks ()
 	    (rtags-activate-imenu)
@@ -2497,13 +2497,13 @@ u**** highlight-symbol
 	     "g f"  'hydra/rtags-nav/rtags-location-stack-forward
 	     "g b"    'hydra/rtags-nav/rtags-location-stack-forward
 	     "g i"    'rtags-symbol-info
-	     "g s"    'rtags-summary
+	     "g S"    'rtags-start-process-unless-running
 	     "j i"    'rtags-imenu
 	     "g t"    'rtags-symbol-type
 	     "g d"  'rtags-dependency-tree
-	     "g s"  'rtags-start-process-unless-running
+	     "g S"  'rtags-start-process-unless-running
 	     "g q"  'rtags-quit-rdm
-	     "g S"  'rtags-display-summary-as-message
+	     "g s"  'rtags-display-summary
 	     "g e f"  'rtags-fix-fixit-at-point
 	     "g e F"  'rtags-fixit
 	     "g e r"  'rtags-rename-symbol
