@@ -2500,6 +2500,7 @@ u**** highlight-symbol
 	  (setq rtags-autostart-diagnostics nil)
 	  (setq rtags-completions-enabled nil)
 	  (setq rtags-enable-unsaved-reparsing t)
+	  (add-hook 'rtags-mode-hook #'(lambda () (setq truncte-lines nil)))
 
 	  (bind-map-for-major-mode c++-mode
 	    :keys (my/emacs-mode-leader-key)
@@ -2897,6 +2898,16 @@ u**** highlight-symbol
 	:config
 	(evil-define-key '(normal visual) 'vlf-occur-mode-map
 	  (kbd "C-m") 'vlf-occur-visit))
+    #+END_SRC
+*** Erlang
+    #+BEGIN_SRC emacs-lisp :tangle yes
+      (evil-define-key '(normal) erlang-mode-map
+      (kbd "gd") 'edts-find-source-under-point)
+      (defun my/erlang-setup ()
+	(evil-mc-mode)
+	(linum-relative-mode))
+      (add-hook 'erlang-mode-hook 'my/erlang-setup)
+      (evil-add-command-properties #'edts-find-source-under-point :jump t)
     #+END_SRC
 * Todos
 ** DONE ivy resume bindings
