@@ -1756,7 +1756,7 @@
 	    ("l" . magit-log-popup)
 	    ("P" . magit-pushing-popup)
 	    ("r" . magit-rebase-popup)
-	    ("t" . magit-tag-popup)
+	    ("t" . git-timemachine)
 	    ("T" . magit-notes-popup)
 	    ("_" . magit-revert-popup)
 	    ("O" . magit-revert-popup)
@@ -1845,8 +1845,11 @@
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package ediff
 	:config
+
 	(setq ediff-merge-split-window-function 'split-window-horizontally)
-	(setq ediff-split-window-function 'split-window-horizontally))
+	(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+	;; (setq ediff-split-window-function 'split-window-horizontally)
+	)
     #+END_SRC
 *** counsel-spotify
     #+BEGIN_SRC emacs-lisp :tangle yes
