@@ -1648,13 +1648,11 @@
 	:config
 	(global-hl-todo-mode))
     #+END_SRC
-*** completion
 *** grep/ack/wgrep
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package ag
      :ensure t)
  #+END_SRC
-
 
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package ack
@@ -1663,18 +1661,15 @@
      (add-hook 'ack-mode-hook 'subword-mode))
  #+END_SRC
 
-
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package wgrep
      :ensure t)
  #+END_SRC
 
-
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package wgrep-ack
      :ensure t)
  #+END_SRC
-
 
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package wgrep-ag
