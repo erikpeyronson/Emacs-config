@@ -1642,11 +1642,11 @@
  #+end_src
 
 *** hl-todo
-    #+begin_src emacs-lisp :tangle no
+    #+begin_src emacs-lisp :tangle yes
       (use-package hl-todo
 	:ensure t
 	:config
-	(global-hl-todo-mode) ) (
+	(global-hl-todo-mode))
     #+END_SRC
 *** completion
 *** grep/ack/wgrep
