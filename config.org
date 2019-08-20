@@ -213,27 +213,18 @@
    (defun my/dark-theme ()
      (interactive)
      (load-theme 'solarized-dark t)
+     (my/solarized-dark-tweaks))
+
+   (defun my/solarized-dark-tweaks ()
      (set-cursor-color "white")
      (set-face-foreground 'mode-line "#fdf6e3")
-     (set-face-background 'mode-line "slate gray")
-     ;; (set-face-background 'mode-line-inactive "#2aa198")
-     ;; (set-face-foreground 'mode-line-inactive "#fdf6e3")
-     )
+     (set-face-background 'mode-line "slate gray"))
 
    (defun my/light-theme ()
      (interactive)
-     (load-theme 'solarized-light t)
-     ;; (set-face-background 'mode-line "dim gray")
-     ;; (set-face-foreground 'mode-line "white")
-     ;; (set-face-background 'mode-line-inactive "light blue")
-     ;; (set-face-foreground 'mode-line-inactive "black")
-     )
+     (load-theme 'solarized-light t))
 
-   ;; (add-hook 'after-init-hook 'my/dark-theme)
-   ;; (my/dark-theme)
-   ;;
-   (set-face-background hl-line-face "light gray")
-   ;; (set-face-foreground hl-line-face "black")
+   (add-hook 'after-init-hook 'my/dark-theme)
    #+END_SRC
 * mode-line
   #+BEGIN_SRC emacs-lisp :tangle yes
