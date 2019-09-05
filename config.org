@@ -984,8 +984,8 @@
        :evil-states (normal motion visual)
        :prefix-cmd compile-comment
        :bindings
-       ("c" 'cp/compile
-	"C" 'cp/compile-in-project-with-read
+       ("C" 'cp/compile
+	"c" 'compile
 	"r" 'recompile
 	"k" 'kill-compilation
 	"l" 'my-comment-or-uncomment-region-or-line))
@@ -2847,24 +2847,50 @@ u**** highlight-symbol
       #+END_SRC
 *****
 *** go-mode
-****  vars
-**** funcs
-**** config
-**** packages
      #+BEGIN_SRC emacs-lisp :tangle yes
-       (use-package go-mode
-	 :ensure t
-	 :config
-	 (setq gofmt-command "goimports")
-	 (add-hook 'before-save-hook 'gofmt-before-save))
+	      (use-package go-mode
+		:ensure t
+		:config
+		(setq gofmt-command "goimports")
+		(add-hook 'before-save-hook 'gofmt-before-save)
+
+		(bind-map-for-major-mode go-mode
+		  :keys (my/emacs-mode-leader-key)
+		  :evil-keys (my/evil-mode-leader-key)
+		  :evil-states (normal motion visual)
+		  :bindings
+		  ("f f" 'gofmt
+		   "f b" 'gofmt
+		   "d d" 'godoc-at-point
+		   "d D" 'godoc
+		   "g a" 'go-goto-arguments
+		   "g d" 'go-goto-docstring
+		   "g f" 'go-goto-function
+		   "g n" 'go-goto-function-name
+		   "g i" 'go-goto-imports
+		   "g R" 'go-goto-method-receiver
+		   "g r" 'go-goto-return-values
+		   ))
+
+	  (evil-add-command-properties #'rtags-find-symbol-at-point :jump t)
+	  (evil-add-command-properties #'go-goto-arguments :jump t)
+	  (evil-add-command-properties #'go-goto-docstring :jump t)
+	  (evil-add-command-properties #'go-goto-function :jump t)
+	  (evil-add-command-properties #'go-goto-function-name :jump t)
+	  (evil-add-command-properties #'go-goto-imports :jump t)
+	  (evil-add-command-properties #'go-goto-method-receiver :jump t)
+	  (evil-add-command-properties #'go-goto-return-values :jump t)
+		(defun my/go-mode-hook ()
+		  (setq tab-width 2))
+		(add-hook 'go-mode-hook 'my/go-mode-hook))
 
        (use-package company-go
 	 :ensure t
 	 :config
 	 (add-hook 'go-mode-hook (lambda ()
-				   (setq tab-width 2)
 				   (add-to-list 'company-backends 'company-go)
 				   (company-mode))))
+
 
        (use-package go-imenu
 	 :ensure t)

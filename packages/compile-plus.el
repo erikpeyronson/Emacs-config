@@ -1,7 +1,7 @@
 (defvar-local cp/compile-program "make"
   "Program used when when calling `my-compile'")
 
-(defvar-local cp/compile-flags "-j8 test"
+(defvar-local cp/compile-flags "-j8"
   "Flags passed to `cp/make-program' when calling `my-compile'")
 
 (defvar-local cp/compile-command-func #'cp//create-make-command
