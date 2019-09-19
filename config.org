@@ -2305,7 +2305,7 @@ u**** highlight-symbol
 	 :ensure t
 	 :bind
 	 :config
-	 (setq company-idle-delay 0.5)
+	 (setq company-idle-delay 1)
 	 (setq company-backends '((company-dabbrev-code
 				   company-gtags
 				   company-etags
@@ -2313,6 +2313,18 @@ u**** highlight-symbol
 				  company-dabbrev)))
       #+END_SRC
 
+****  string-inflection
+     #+begin_src emacs-lisp :tangle yes
+		     (use-package string-inflection
+		       :ensure t
+		       :bind
+		       (:map my/errors-map
+			("i i" . string-inflection-all-cycle)
+			("i C" . string-inflection-camelcase)
+			("i c" . string-inflection-lower-camelcase)
+			("i U" . string-inflection-underscore)
+			("i u" . string-inflection-lower-underscore)))
+     #+end_src
 *** Plantuml-mode
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package plantuml-mode
@@ -2848,64 +2860,111 @@ u**** highlight-symbol
 *****
 *** go-mode
      #+BEGIN_SRC emacs-lisp :tangle yes
-	      (use-package go-mode
+		     (use-package go-mode
+		       :ensure t
+		       :config
+		       (setq gofmt-command "goimports")
+		       (add-hook 'before-save-hook 'gofmt-before-save)
+
+		       (bind-map-for-major-mode go-mode
+			 :keys (my/emacs-mode-leader-key)
+			 :evil-keys (my/evil-mode-leader-key)
+			 :evil-states (normal motion visual)
+			 :bindings
+			 ("f f" 'gofmt
+			  "f b" 'gofmt
+			  "d d" 'godoc-at-point
+			  "d D" 'godoc
+			  "g a" 'go-goto-arguments
+			  "g d" 'go-goto-docstring
+			  "g f" 'go-goto-function
+			  "g n" 'go-goto-function-name
+			  "g i" 'go-goto-imports
+			  "g R" 'go-goto-method-receiver
+			  "g r" 'go-goto-return-values
+			  ))
+
+		 (evil-add-command-properties #'godef-jump :jump t)
+		 (evil-add-command-properties #'go-goto-arguments :jump t)
+		 (evil-add-command-properties #'go-goto-docstring :jump t)
+		 (evil-add-command-properties #'go-goto-function :jump t)
+		 (evil-add-command-properties #'go-goto-function-name :jump t)
+		 (evil-add-command-properties #'go-goto-imports :jump t)
+		 (evil-add-command-properties #'go-goto-method-receiver :jump t)
+		 (evil-add-command-properties #'go-goto-return-values :jump t)
+		 (defun my/go-mode-hook ()
+		 (evil-mc-mode)
+		 (subword-mode)
+		 (setq tab-width 2)
+		 ;; (setq company-idle-delay 0.3)
+       )
+
+		 (add-hook 'go-mode-hook 'my/go-mode-hook)
+
+		 (evil-define-key '(normal insert) 'go-mode-map
+		  (kbd "C-SPC") 'company-complete)
+
+		 (add-to-list 'display-buffer-alist
+		 '("godoc*" (display-buffer-same-window ))))
+
+	      (use-package company-go
 		:ensure t
 		:config
-		(setq gofmt-command "goimports")
-		(add-hook 'before-save-hook 'gofmt-before-save)
+		(add-hook 'go-mode-hook (lambda ()
 
-		(bind-map-for-major-mode go-mode
-		  :keys (my/emacs-mode-leader-key)
-		  :evil-keys (my/evil-mode-leader-key)
-		  :evil-states (normal motion visual)
-		  :bindings
-		  ("f f" 'gofmt
-		   "f b" 'gofmt
-		   "d d" 'godoc-at-point
-		   "d D" 'godoc
-		   "g a" 'go-goto-arguments
-		   "g d" 'go-goto-docstring
-		   "g f" 'go-goto-function
-		   "g n" 'go-goto-function-name
-		   "g i" 'go-goto-imports
-		   "g R" 'go-goto-method-receiver
-		   "g r" 'go-goto-return-values
-		   ))
+		(setq company-backends '(( company-go )))
+					  (company-mode))))
 
-	  (evil-add-command-properties #'rtags-find-symbol-at-point :jump t)
-	  (evil-add-command-properties #'go-goto-arguments :jump t)
-	  (evil-add-command-properties #'go-goto-docstring :jump t)
-	  (evil-add-command-properties #'go-goto-function :jump t)
-	  (evil-add-command-properties #'go-goto-function-name :jump t)
-	  (evil-add-command-properties #'go-goto-imports :jump t)
-	  (evil-add-command-properties #'go-goto-method-receiver :jump t)
-	  (evil-add-command-properties #'go-goto-return-values :jump t)
-		(defun my/go-mode-hook ()
-		  (setq tab-width 2))
-		(add-hook 'go-mode-hook 'my/go-mode-hook))
+	      (use-package go-snippets
+		:ensure t
+		:config
+		(add-hook 'go-mode-hook 'yas-minor-mode))
 
-       (use-package company-go
-	 :ensure t
-	 :config
-	 (add-hook 'go-mode-hook (lambda ()
-				   (add-to-list 'company-backends 'company-go)
-				   (company-mode))))
+	      (use-package go-imenu
+		:ensure t)
 
+	      (use-package go-eldoc
+		:ensure t
+		:config
+		(go-eldoc-setup)
+		(add-hook 'go-mode-hook 'eldoc-mode))
 
-       (use-package go-imenu
-	 :ensure t)
-
-       (use-package go-eldoc
-	 :ensure t
-	 :config
-	 (go-eldoc-setup)
-	 (add-hook 'go-mode-hook 'eldoc-mode))
-
-       (use-package flycheck-gometalinter
-	 :ensure t
-	 :config
-	 (add-hook 'go-mode-hook 'flycheck-mode))
+	      (use-package flycheck-gometalinter
+		:ensure t
+		:config
+		(add-hook 'go-mode-hook 'flycheck-mode))
      #+END_SRC
+*** yaml-mode
+    #+begin_src emacs-lisp :tangle yes
+      (use-package yaml-mode
+	:ensure t)
+    #+end_src
+*** docker
+#+begin_src emacs-lisp :tangle yes
+  (use-package docker-api
+      :ensure t)
+  (use-package dockerfile-mode
+     :ensure t)
+  (use-package docker-compose-mode
+    :ensure t)
+#+end_src
+*** json-mode
+   #+begin_src emacs-lisp :tangle yes
+     (use-package flymake-json
+       :ensure t
+       :config
+       (require 'flymake-json)
+       (add-hook 'json-mode-hook 'flymake-json-load)
+       (add-hook 'json-mode-hook 'flymake-mode)
+       )
+     (use-package json-mode
+       :ensure t)
+   #+end_src
+*** protobuff-mode
+    #+begin_src emacs-lisp :tangle yes
+      (use-package protobuf-mode
+	:ensure t)
+    #+end_src
 ** Vlf
     #+BEGIN_SRC emacs-lisp :tangle yes
       (use-package vlf
