@@ -1724,7 +1724,14 @@
       :config
       (winum-mode))
   #+END_SRC
-
+*** git-timemachine
+    #+begin_src emacs-lisp :tangle yes
+      (use-package git-timemachine
+	:ensure t
+	:bind
+	(:map  my/git-map
+	       ("t" . git-timemachine)))
+    #+end_src
 *** magit
   #+BEGIN_SRC emacs-lisp :tangle yes
     (use-package magit
