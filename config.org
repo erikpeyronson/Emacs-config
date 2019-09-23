@@ -148,7 +148,7 @@
    #+END_SRC
 
    Keep temporary files in a backup-directory in emacs directory
-   #+BEGIN_SRC emacs-lisp :tangle yes
+   #+BEGIN_SRC emacs-lisp :tangle no
      (defvar my//tramp-backup-directory-alist)
      (defvar my//tramp-auto-save-directory)
 
@@ -1215,6 +1215,11 @@
 	  "p" 'previous-error))
       #+END_SRC
 ** packages
+*** eldoc-overlay
+    #+begin_src emacs-lisp :tangle yes
+      (use-package eldoc-overlay
+	:ensure t)
+    #+end_src
 *** ibuffer
     #+BEGIN_SRC emacs-lisp :tangle yes
       (setq ibuffer-formats
@@ -1642,7 +1647,7 @@
  #+end_src
 
 *** hl-todo
-    #+begin_src emacs-lisp :tangle yes
+    #+begin_src emacs-lisp :tangle no
       (use-package hl-todo
 	:ensure t
 	:config
@@ -1749,7 +1754,6 @@
 	    ("l" . magit-log-popup)
 	    ("P" . magit-pushing-popup)
 	    ("r" . magit-rebase-popup)
-	    ("t" . git-timemachine)
 	    ("T" . magit-notes-popup)
 	    ("_" . magit-revert-popup)
 	    ("O" . magit-revert-popup)
@@ -2866,81 +2870,100 @@ u**** highlight-symbol
       #+END_SRC
 *****
 *** go-mode
+**** Main package
      #+BEGIN_SRC emacs-lisp :tangle yes
-		     (use-package go-mode
-		       :ensure t
-		       :config
-		       (setq gofmt-command "goimports")
-		       (add-hook 'before-save-hook 'gofmt-before-save)
+       (use-package go-mode
+	 :ensure t
+	 :config
+	 (setq gofmt-command "goimports")
+	 (add-hook 'before-save-hook 'gofmt-before-save)
 
-		       (bind-map-for-major-mode go-mode
-			 :keys (my/emacs-mode-leader-key)
-			 :evil-keys (my/evil-mode-leader-key)
-			 :evil-states (normal motion visual)
-			 :bindings
-			 ("f f" 'gofmt
-			  "f b" 'gofmt
-			  "d d" 'godoc-at-point
-			  "d D" 'godoc
-			  "g a" 'go-goto-arguments
-			  "g d" 'go-goto-docstring
-			  "g f" 'go-goto-function
-			  "g n" 'go-goto-function-name
-			  "g i" 'go-goto-imports
-			  "g R" 'go-goto-method-receiver
-			  "g r" 'go-goto-return-values
-			  ))
+	 (bind-map-for-major-mode go-mode
+	   :keys (my/emacs-mode-leader-key)
+	   :evil-keys (my/evil-mode-leader-key)
+	   :evil-states (normal motion visual)
+	   :bindings
+	   ("f f" 'gofmt
+	    "d d" 'godoc-at-point
+	    "d D" 'godoc
+	    "g a" 'go-goto-arguments
+	    "g d" 'go-goto-docstring
+	    "g f" 'go-goto-function
+	    "g n" 'go-goto-function-name
+	    "g i" 'go-goto-imports
+	    "g R" 'go-goto-method-receiver
+	    "g r" 'go-goto-return-values
+	    ))
+	 (defun my/go-format-with-imports ()
+	   (interactive
+	    (let ((gofmt-command "goimports"))
+	      (gofmt))))
 
-		 (evil-add-command-properties #'godef-jump :jump t)
-		 (evil-add-command-properties #'go-goto-arguments :jump t)
-		 (evil-add-command-properties #'go-goto-docstring :jump t)
-		 (evil-add-command-properties #'go-goto-function :jump t)
-		 (evil-add-command-properties #'go-goto-function-name :jump t)
-		 (evil-add-command-properties #'go-goto-imports :jump t)
-		 (evil-add-command-properties #'go-goto-method-receiver :jump t)
-		 (evil-add-command-properties #'go-goto-return-values :jump t)
-		 (defun my/go-mode-hook ()
-		 (evil-mc-mode)
-		 (subword-mode)
-		 (setq tab-width 2)
-		 ;; (setq company-idle-delay 0.3)
-       )
+	   (evil-add-command-properties #'godef-jump :jump t)
+	   (evil-add-command-properties #'go-goto-arguments :jump t)
+	   (evil-add-command-properties #'go-goto-docstring :jump t)
+	   (evil-add-command-properties #'go-goto-function :jump t)
+	   (evil-add-command-properties #'go-goto-function-name :jump t)
+	   (evil-add-command-properties #'go-goto-imports :jump t)
+	   (evil-add-command-properties #'go-goto-method-receiver :jump t)
+	   (evil-add-command-properties #'go-goto-return-values :jump t)
+	   (defun my/go-mode-hook ()
+	     (go-eldoc-setup)
+	     (evil-mc-mode)
+	     (subword-mode)
+	     (setq tab-width 2)
+	     ;; (setq company-idle-delay 0.3)
+	     )
 
-		 (add-hook 'go-mode-hook 'my/go-mode-hook)
+	   (add-hook 'go-mode-hook 'my/go-mode-hook)
 
-		 (evil-define-key '(normal insert) 'go-mode-map
-		  (kbd "C-SPC") 'company-complete)
+	   (evil-define-key '(normal insert) 'go-mode-map
+	     (kbd "C-SPC") 'company-complete)
 
-		 (add-to-list 'display-buffer-alist
-		 '("godoc*" (display-buffer-same-window ))))
+	   (add-to-list 'display-buffer-alist
+			'("godoc*" (display-buffer-same-window ))))
 
-	      (use-package company-go
-		:ensure t
-		:config
-		(add-hook 'go-mode-hook (lambda ()
+	 (use-package company-go
+	   :ensure t
+	   :config
+	   (add-hook 'go-mode-hook (lambda ()
 
-		(setq company-backends '(( company-go )))
-					  (company-mode))))
+				     (setq company-backends '(( company-go )))
+				     (company-mode))))
 
-	      (use-package go-snippets
-		:ensure t
-		:config
-		(add-hook 'go-mode-hook 'yas-minor-mode))
+	 (use-package go-snippets
+	   :ensure t
+	   :config
+	   (add-hook 'go-mode-hook 'yas-minor-mode))
 
-	      (use-package go-imenu
-		:ensure t)
+	 (use-package go-imenu
+	   :ensure t)
 
-	      (use-package go-eldoc
-		:ensure t
-		:config
-		(go-eldoc-setup)
-		(add-hook 'go-mode-hook 'eldoc-mode))
+	 (use-package go-eldoc
+	   :ensure t
+	   :config
+	   (go-eldoc-setup)
+	   (add-hook 'go-mode-hook 'eldoc-mode))
 
-	      (use-package flycheck-gometalinter
-		:ensure t
-		:config
-		(add-hook 'go-mode-hook 'flycheck-mode))
+	 (use-package flycheck-gometalinter
+	   :ensure t
+	   :config
+	   (add-hook 'go-mode-hook 'flycheck-mode))
      #+END_SRC
+**** godoctor
+     #+begin_src emacs-lisp :tangle no
+       (use-package godoctor
+	 :ensure t)
+     #+end_src
+**** go-projectile
+     #+begin_src emacs-lisp :tangle yes
+       (use-package go-projectile
+	 :ensure t)
+     #+end_src
+     #+begin_src emacs-lisp :tangle yes
+       (use-package go-tag
+	 :ensure t)
+     #+end_src
 *** yaml-mode
     #+begin_src emacs-lisp :tangle yes
       (use-package yaml-mode
