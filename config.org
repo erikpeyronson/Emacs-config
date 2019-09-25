@@ -784,8 +784,8 @@
 	"SPC" 'counsel-M-x
 	"u" 'universal-argument
 	"d" 'dired
-	"'" 'my/main-shell
-	"/" 'my/buffer-shell))
+	"/" 'my/main-shell
+	"'" 'my/buffer-shell))
      (bind-map my/mode-leader-map
        :evil-keys (my/evil-mode-leader-key)
        :evil-keys (my/emacs-mode-leader-key)
@@ -1535,6 +1535,8 @@
 	    :config
 	    (setq projectile-enable-caching t)
 	    (setq projectile-completion-system 'ivy)
+	    (setq projectile-project-compilation-cmd "make")
+	    (add-to-list 'projectile-project-root-files-bottom-up "Makefile")
 	    :ensure t
 	    :after evil
 	    :bind
