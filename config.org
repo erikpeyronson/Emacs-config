@@ -2908,7 +2908,7 @@ u**** highlight-symbol
 	   (evil-add-command-properties #'go-goto-method-receiver :jump t)
 	   (evil-add-command-properties #'go-goto-return-values :jump t)
 	   (defun my/go-mode-hook ()
-	     (go-eldoc-setup)
+	     ;; (go-eldoc-setup)
 	     (evil-mc-mode)
 	     (subword-mode)
 	     (setq tab-width 2)
@@ -2942,8 +2942,9 @@ u**** highlight-symbol
 	 (use-package go-eldoc
 	   :ensure t
 	   :config
-	   (go-eldoc-setup)
-	   (add-hook 'go-mode-hook 'eldoc-mode))
+	   ;; (go-eldoc-setup)
+	   ;; (add-hook 'go-mode-hook 'eldoc-mode)
+	   )
 
 	 (use-package flycheck-gometalinter
 	   :ensure t
@@ -2955,11 +2956,7 @@ u**** highlight-symbol
        (use-package godoctor
 	 :ensure t)
      #+end_src
-**** go-projectile
-     #+begin_src emacs-lisp :tangle yes
-       (use-package go-projectile
-	 :ensure t)
-     #+end_src
+**** go-tag
      #+begin_src emacs-lisp :tangle yes
        (use-package go-tag
 	 :ensure t)
