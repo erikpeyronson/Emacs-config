@@ -980,7 +980,8 @@
 	 "y" 'spacemacs/show-and-copy-buffer-filename
 	 "vd" 'add-dir-local-variable
 	 "vf" 'add-file-local-variable
-	 "vp" 'add-file-local-variable-prop-line))
+	 "vp" 'add-file-local-variable-prop-line
+	 "o" 'ff-find-other-file))
     #+END_SRC
 
 *** compile/comment
