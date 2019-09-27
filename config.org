@@ -1234,6 +1234,11 @@
 		    (name 16 -1)
 		    " " filename)))
 
+      (defun my/ibuffer-mode-hook ()
+	(interactive)
+	(ibuffer-set-filter-groups-by-mode))
+
+      (add-hook 'ibuffer-mode-hook 'my/ibuffer-mode-hook)
     #+END_SRC
 *** tramp
 **** doc
@@ -1801,14 +1806,14 @@
        (defun my-shell-toggle-shell(shell-buffer-name)
 	 "Toggle a window and run program defined in `my-shell-program'
        If a buffer SHELL-BUFFER-NAME reuse, else start a new shell process"
-	 (if (string-match "^\\*shell-.*\\*$" (buffer-name))
-	     (delete-window)
-	   (select-window (split-window-below))
+	 ;; (if (string-match "^\\*shell-.*\\*$" (buffer-name))
+	 ;;     (delete-window)
+	   ;; (select-window (split-window-below))
 	   (let ((buffer (get-buffer shell-buffer-name)))
 	     (if buffer
 		 (switch-to-buffer buffer)
 	       (term my-shell-program)
-	       (rename-buffer shell-buffer-name)))))
+	       (rename-buffer shell-buffer-name))))
      #+END_SRC
 
      #+BEGIN_SRC emacs-lisp :tangle yes
