@@ -256,6 +256,13 @@
 	"Function called interactively by `my/imenu'")
     #+END_SRC
 ** funcs
+   #+begin_src emacs-lisp :tangle yes
+     (defun my/select-compilation-window ()
+       (interactive)
+       (let ((window (get-buffer-window "*compilation*")))
+	 (if window
+	     (select-window window))))
+   #+end_src
     #+BEGIN_SRC emacs-lisp :tangle yes
       (defun my/make-emacs-prefix (key)
 	"create a key sequence ending with KEY, use together with
@@ -909,7 +916,8 @@
 	:evil-states (normal motion visual)
 	:prefix-cmd windows
 	:bindings
-	("." 'hydra/window-navigation/body
+	("c" 'my/select-compilation-window
+	"." 'hydra/window-navigation/body
 	 "f" 'fit-window-to-buffer
 	 "w" 'hydra/other-window/other-window
 	 "W" 'hydra/other-window/my/other-window-reverse
