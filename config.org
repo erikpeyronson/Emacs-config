@@ -790,9 +790,7 @@
 	":" 'evilnc-comment-and-copy-operator
 	"SPC" 'counsel-M-x
 	"u" 'universal-argument
-	"d" 'dired
-	"/" 'my/main-shell
-	"'" 'my/buffer-shell))
+	"d" 'dired))
      (bind-map my/mode-leader-map
        :evil-keys (my/evil-mode-leader-key)
        :evil-keys (my/emacs-mode-leader-key)
@@ -1843,8 +1841,8 @@
 **** keys
      #+BEGIN_SRC emacs-lisp :tangle yes
        (bind-map-set-keys my/base-map
-	 "'" 'my/main-shell
-	 "\"" 'my/buffer-shell)
+	 "/" 'my/main-shell
+	 "'" 'my/buffer-shell)
      #+END_SRC
 **** help-highlight
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2332,7 +2330,7 @@ u**** highlight-symbol
 	 :ensure t
 	 :bind
 	 :config
-	 (setq company-idle-delay 1)
+	 (setq company-idle-delay 0.5)
 	 (setq company-backends '((company-dabbrev-code
 				   company-gtags
 				   company-etags
