@@ -148,7 +148,7 @@
    #+END_SRC
 
    Keep temporary files in a backup-directory in emacs directory
-   #+BEGIN_SRC emacs-lisp :tangle no
+   #+BEGIN_SRC emacs-lisp :tangle yes
      (defvar my//tramp-backup-directory-alist)
      (defvar my//tramp-auto-save-directory)
 
@@ -1230,6 +1230,13 @@
 	  "p" 'previous-error))
       #+END_SRC
 ** packages
+*** origami-mode
+    #+begin_src emacs-lisp :tangle yes
+      (use-package origami
+	:ensure t
+	:config
+	(global-origami-mode))
+    #+end_src
 *** eldoc-overlay
     #+begin_src emacs-lisp :tangle yes
       (use-package eldoc-overlay
@@ -1557,6 +1564,8 @@
 	    (setq projectile-completion-system 'ivy)
 	    (setq projectile-project-compilation-cmd "make")
 	    (add-to-list 'projectile-project-root-files-bottom-up "Makefile")
+	    ;; Workaround for git submodule bug
+	    (setq projectile-git-submodule-command nil)
 	    :ensure t
 	    :after evil
 	    :bind
@@ -2900,6 +2909,13 @@ u**** highlight-symbol
 	 (setq gofmt-command "goimports")
 	 (add-hook 'before-save-hook 'gofmt-before-save)
 
+	 (bind-map-for-major-mode godoc-mode
+	   :keys (my/emacs-mode-leader-key)
+	   :evil-keys (my/evil-mode-leader-key)
+	   :evil-states (normal motion visual)
+	   :bindings
+	   ("d d" 'godoc-at-point
+	    "d D" 'godoc))
 	 (bind-map-for-major-mode go-mode
 	   :keys (my/emacs-mode-leader-key)
 	   :evil-keys (my/evil-mode-leader-key)
@@ -3003,8 +3019,7 @@ u**** highlight-symbol
        :ensure t
        :config
        (require 'flymake-json)
-       (add-hook 'json-mode-hook 'flymake-json-load)
-       (add-hook 'json-mode-hook 'flymake-mode)
+       (add-hook 'json-mode-hook 'flycheck-mode)
        )
      (use-package json-mode
        :ensure t)
