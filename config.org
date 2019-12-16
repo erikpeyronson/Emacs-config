@@ -769,6 +769,9 @@
 
      (add-to-list 'display-buffer-alist
 		  '(".log" (display-buffer-same-window )))
+
+     (setq scroll-step            0
+	   scroll-conservatively  10000)
    #+END_SRC
 ** keys
 *** base-map
@@ -1228,6 +1231,8 @@
 	  "d" 'my/delete-occur-window
 	  "n" 'occur-next-error
 	  "p" 'previous-error))
+       (define-key occur-mode-map (kbd "C-c C-p") 'wgrep-change-to-wgrep-mode)
+       (add-hook 'occur-mode-hook 'evil-mc-mode)
       #+END_SRC
 ** packages
 *** origami-mode
@@ -1684,6 +1689,13 @@
 	:config
 	(global-hl-todo-mode))
     #+END_SRC
+*** fill-column-indicator
+    #+begin_src emacs-lisp :tangle yes
+      (use-package fill-column-indicator
+	:ensure t
+	:config
+	(add-hook 'prog-mode-hook 'fci-mode))
+    #+end_src
 *** grep/ack/wgrep
  #+BEGIN_SRC emacs-lisp :tangle yes
    (use-package ag
@@ -2255,6 +2267,10 @@ u**** highlight-symbol
 	  ("c" . highlight-symbol-remove-all)
 	  ("r" . highlight-symbol-query-replace))
 	 :config
+
+	 (evil-add-command-properties #'highlight-symbol-next :jump t)
+	 (evil-add-command-properties #'highlight-symbol-prev :jump t)
+
 	 (setq highlight-symbol-color "white")
 	 (face-spec-set 'highlight-symbol-face
 			'((t :weight ultra-bold))
@@ -2365,7 +2381,7 @@ u**** highlight-symbol
 			("i C" . string-inflection-camelcase)
 			("i c" . string-inflection-lower-camelcase)
 			("i U" . string-inflection-underscore)
-			("i u" . string-inflection-lower-underscore)))
+			("i u" . string-inflection-underscore)))
      #+end_src
 *** Plantuml-mode
     #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2804,11 +2820,21 @@ u**** highlight-symbol
 **** anaconda-mode
 ***** anaconda-mode
       #+BEGIN_SRC emacs-lisp :tangle yes
-	(use-package anaconda-mode
-	  :init
-	  (add-hook 'python-mode-hook 'anaconda-mode)
-	  (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-	  :ensure t)
+		(use-package anaconda-mode
+		  :init
+		  (add-hook 'python-mode-hook 'anaconda-mode)
+		  (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+		  :ensure t
+		  :config
+		  (evil-add-command-properties #'anaconda-mode-find-assignments :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-assignments-other-frams :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-assignments-other-windos :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-definitions :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-definitions-other-frams :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-definitions-other-windos :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-references :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-references-other-frams :jump t)
+		  (evil-add-command-properties #'anaconda-mode-find-references-other-windos :jump t))
       #+END_SRC
 
       #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2901,6 +2927,9 @@ u**** highlight-symbol
       #+END_SRC
 *****
 *** go-mode
+**** funcs
+     #+begin_src emacs-lisp :tangle yes
+     #+end_src
 **** Main package
      #+BEGIN_SRC emacs-lisp :tangle yes
        (use-package go-mode
@@ -2909,6 +2938,13 @@ u**** highlight-symbol
 	 (setq gofmt-command "goimports")
 	 (add-hook 'before-save-hook 'gofmt-before-save)
 
+	 (defun my/go-run-test-at-point()
+	   (interactive)
+	   (save-excursion
+	     (go-goto-function-name)
+	     (compile (format "go test -v -run %s" (symbol-at-point)))))
+
+
 	 (bind-map-for-major-mode godoc-mode
 	   :keys (my/emacs-mode-leader-key)
 	   :evil-keys (my/evil-mode-leader-key)
@@ -2916,6 +2952,7 @@ u**** highlight-symbol
 	   :bindings
 	   ("d d" 'godoc-at-point
 	    "d D" 'godoc))
+
 	 (bind-map-for-major-mode go-mode
 	   :keys (my/emacs-mode-leader-key)
 	   :evil-keys (my/evil-mode-leader-key)
@@ -2931,63 +2968,65 @@ u**** highlight-symbol
 	    "g i" 'go-goto-imports
 	    "g R" 'go-goto-method-receiver
 	    "g r" 'go-goto-return-values
+	    "c t" 'my/go-run-test-at-point
 	    ))
+
 	 (defun my/go-format-with-imports ()
 	   (interactive
 	    (let ((gofmt-command "goimports"))
 	      (gofmt))))
 
-	   (evil-add-command-properties #'godef-jump :jump t)
-	   (evil-add-command-properties #'go-goto-arguments :jump t)
-	   (evil-add-command-properties #'go-goto-docstring :jump t)
-	   (evil-add-command-properties #'go-goto-function :jump t)
-	   (evil-add-command-properties #'go-goto-function-name :jump t)
-	   (evil-add-command-properties #'go-goto-imports :jump t)
-	   (evil-add-command-properties #'go-goto-method-receiver :jump t)
-	   (evil-add-command-properties #'go-goto-return-values :jump t)
-	   (defun my/go-mode-hook ()
-	     ;; (go-eldoc-setup)
-	     (evil-mc-mode)
-	     (subword-mode)
-	     (setq tab-width 2)
-	     ;; (setq company-idle-delay 0.3)
-	     )
-
-	   (add-hook 'go-mode-hook 'my/go-mode-hook)
-
-	   (evil-define-key '(normal insert) 'go-mode-map
-	     (kbd "C-SPC") 'company-complete)
-
-	   (add-to-list 'display-buffer-alist
-			'("godoc*" (display-buffer-same-window ))))
-
-	 (use-package company-go
-	   :ensure t
-	   :config
-	   (add-hook 'go-mode-hook (lambda ()
-
-				     (setq company-backends '(( company-go )))
-				     (company-mode))))
-
-	 (use-package go-snippets
-	   :ensure t
-	   :config
-	   (add-hook 'go-mode-hook 'yas-minor-mode))
-
-	 (use-package go-imenu
-	   :ensure t)
-
-	 (use-package go-eldoc
-	   :ensure t
-	   :config
+	 (evil-add-command-properties #'godef-jump :jump t)
+	 (evil-add-command-properties #'go-goto-arguments :jump t)
+	 (evil-add-command-properties #'go-goto-docstring :jump t)
+	 (evil-add-command-properties #'go-goto-function :jump t)
+	 (evil-add-command-properties #'go-goto-function-name :jump t)
+	 (evil-add-command-properties #'go-goto-imports :jump t)
+	 (evil-add-command-properties #'go-goto-method-receiver :jump t)
+	 (evil-add-command-properties #'go-goto-return-values :jump t)
+	 (defun my/go-mode-hook ()
 	   ;; (go-eldoc-setup)
-	   ;; (add-hook 'go-mode-hook 'eldoc-mode)
-	   )
+	   (evil-mc-mode)
+	   (subword-mode)
+	   (setq tab-width 2)
+	   ;; (setq company-idle-delay 0.3)
+	   (set-fill-column 120))
 
-	 (use-package flycheck-gometalinter
-	   :ensure t
-	   :config
-	   (add-hook 'go-mode-hook 'flycheck-mode))
+	 (add-hook 'go-mode-hook 'my/go-mode-hook)
+
+	 (evil-define-key '(normal insert) 'go-mode-map
+	   (kbd "C-SPC") 'company-complete)
+
+	 (add-to-list 'display-buffer-alist
+		      '("godoc*" (display-buffer-same-window ))))
+
+       (use-package company-go
+	 :ensure t
+	 :config
+	 (add-hook 'go-mode-hook (lambda ()
+
+				   (setq company-backends '(( company-go )))
+				   (company-mode))))
+
+       (use-package go-snippets
+	 :ensure t
+	 :config
+	 (add-hook 'go-mode-hook 'yas-minor-mode))
+
+       (use-package go-imenu
+	 :ensure t)
+
+       (use-package go-eldoc
+	 :ensure t
+	 :config
+	 ;; (go-eldoc-setup)
+	 ;; (add-hook 'go-mode-hook 'eldoc-mode)
+	 )
+
+       (use-package flycheck-gometalinter
+	 :ensure t
+	 :config
+	 (add-hook 'go-mode-hook 'flycheck-mode))
      #+END_SRC
 **** godoctor
      #+begin_src emacs-lisp :tangle no
@@ -3047,6 +3086,13 @@ u**** highlight-symbol
       (add-hook 'erlang-mode-hook 'my/erlang-setup)
       (evil-add-command-properties #'edts-find-source-under-point :jump t)
     #+END_SRC
+**** gorepl-mode
+     #+begin_src emacs-lisp :tangle yes
+       (use-package gorepl-mode
+	 :ensure t
+	 :config
+	 (add-hook 'go-mode-hook 'gorepl-mode))
+     #+end_src
 * Todos
 ** DONE ivy resume bindings
    # ** TODO bindings for evil nerd commenter
