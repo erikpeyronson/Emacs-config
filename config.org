@@ -3038,6 +3038,11 @@ u**** highlight-symbol
        (use-package go-tag
 	 :ensure t)
      #+end_src
+**** go-dlv
+     #+begin_src emacs-lisp :tangle yes
+       (use-package go-dlv
+	 :ensure t)
+     #+end_src
 *** yaml-mode
     #+begin_src emacs-lisp :tangle yes
       (use-package yaml-mode
