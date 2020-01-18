@@ -773,6 +773,10 @@
      (setq scroll-step            0
 	   scroll-conservatively  10000)
    #+END_SRC
+   Start emacs server
+   #+begin_src emacs-lisp :tangle yes
+     (server-start)
+   #+end_src
 ** keys
 *** base-map
    These are the keymaps that make up the global leader key
@@ -1871,7 +1875,7 @@
      #+BEGIN_SRC emacs-lisp :tangle yes
        (bind-map-set-keys my/base-map
 	 "/" 'my/main-shell
-	 "'" 'my/buffer-shell)
+	 "'" 'eshell)
      #+END_SRC
 **** help-highlight
      #+BEGIN_SRC emacs-lisp :tangle yes
@@ -2487,6 +2491,7 @@ u**** highlight-symbol
        (add-hook 'c++-mode-hook 'my/setup-c++-mode)
        (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
        (add-to-list  'cc-search-directories "../inc")
+       (add-to-list  'cc-search-directories "../include")
        (add-to-list 'cc-search-directories "../src")
      #+END_SRC
      Setup keybindings
@@ -2938,11 +2943,13 @@ u**** highlight-symbol
 	 (setq gofmt-command "goimports")
 	 (add-hook 'before-save-hook 'gofmt-before-save)
 
+	 (defvar my/go-test-command "go test -tags unit_test -v")
+
 	 (defun my/go-run-test-at-point()
 	   (interactive)
 	   (save-excursion
 	     (go-goto-function-name)
-	     (compile (format "go test -v -run %s" (symbol-at-point)))))
+	     (compile (format "%s -run %s " my/go-test-command (symbol-at-point)))))
 
 
 	 (bind-map-for-major-mode godoc-mode
