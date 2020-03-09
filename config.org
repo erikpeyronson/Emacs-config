@@ -1239,6 +1239,22 @@
        (add-hook 'occur-mode-hook 'evil-mc-mode)
       #+END_SRC
 ** packages
+*** docker
+    #+begin_src emacs-lisp :tangle yes
+      (use-package docker
+	:ensure t)
+    #+end_src
+*** treemacs
+    #+begin_src emacs-lisp :tangle yes
+      (use-package treemacs
+	:ensure t
+	:config
+	(bind-map my/toggle-map
+	  :bindings
+	  ("t" 'treemacs)
+	  )
+	)
+    #+end_src
 *** origami-mode
     #+begin_src emacs-lisp :tangle yes
       (use-package origami
