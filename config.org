@@ -1263,7 +1263,7 @@
 	(global-origami-mode))
     #+end_src
 *** eldoc-overlay
-    #+begin_src emacs-lisp :tangle yes
+    #+begin_src emacs-lisp :tangle no
       (use-package eldoc-overlay
 	:ensure t)
     #+end_src
@@ -1930,15 +1930,17 @@
        :ensure t)
    #+END_SRC
 *** lsp-mode
-    #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle no
       (use-package lsp-mode
 	:ensure t)
       (use-package lsp-ui
 	:requires lsp-mode
+	:init
+
 	:ensure t)
     #+END_SRC
 *** company-lsp
-    #+BEGIN_SRC emacs-lisp :tangle yes
+    #+BEGIN_SRC emacs-lisp :tangle no
       (use-package company-lsp
 	:requires company lsp-mode
 	:ensure t)
@@ -2813,6 +2815,9 @@ u**** highlight-symbol
 **** python-mode
 ***** general
      #+BEGIN_SRC emacs-lisp :tangle yes
+       (add-to-list 'auto-mode-alist '("wscript\\'" . python-mode))
+       (add-to-list 'auto-mode-alist '("wscript_build\\'" . python-mode))
+       (add-hook 'python-mode-hook 'evil-mc-mode)
        (defun my-setup-python ()
 	 (eldoc-mode))
      #+END_SRC
@@ -3027,7 +3032,6 @@ u**** highlight-symbol
 	 :ensure t
 	 :config
 	 (add-hook 'go-mode-hook (lambda ()
-
 				   (setq company-backends '(( company-go )))
 				   (company-mode))))
 
@@ -3057,12 +3061,12 @@ u**** highlight-symbol
 	 :ensure t)
      #+end_src
 **** go-tag
-     #+begin_src emacs-lisp :tangle yes
+     #+begin_src emacs-lisp :tangle no
        (use-package go-tag
 	 :ensure t)
      #+end_src
 **** go-dlv
-     #+begin_src emacs-lisp :tangle yes
+     #+begin_src emacs-lisp :tangle no
        (use-package go-dlv
 	 :ensure t)
      #+end_src
