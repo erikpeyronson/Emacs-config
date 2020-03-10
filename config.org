@@ -804,8 +804,7 @@
 	";" 'evilnc-comment-operator
 	":" 'evilnc-comment-and-copy-operator
 	"SPC" 'counsel-M-x
-	"u" 'universal-argument
-	"d" 'dired))
+	"u" 'universal-argument))
      (bind-map my/mode-leader-map
        :evil-keys (my/evil-mode-leader-key)
        :evil-keys (my/emacs-mode-leader-key)
@@ -1240,10 +1239,26 @@
       #+END_SRC
 ** packages
 *** docker
-    #+begin_src emacs-lisp :tangle yes
-      (use-package docker
-	:ensure t)
-    #+end_src
+   *** docker
+   #+begin_src emacs-lisp :tangle yes
+     (use-package docker-api
+       :ensure t)
+     (use-package dockerfile-mode
+       :ensure t)
+     (use-package docker-compose-mode
+       :ensure t)
+     (use-package docker
+       :ensure t)
+     (bind-map my/docker-map
+       :keys ((my/make-emacs-prefix "d"))
+       :evil-keys ((my/make-evil-prefix "d"))
+       :evil-states (normal motion visual)
+       :prefix-cmd docker
+       :bindings
+       ("d" 'docker
+	"c" 'docker-containers
+	"n" 'docker-networks))
+   #+end_src
 *** treemacs
     #+begin_src emacs-lisp :tangle yes
       (use-package treemacs
@@ -3075,15 +3090,6 @@ u**** highlight-symbol
       (use-package yaml-mode
 	:ensure t)
     #+end_src
-*** docker
-#+begin_src emacs-lisp :tangle yes
-  (use-package docker-api
-      :ensure t)
-  (use-package dockerfile-mode
-     :ensure t)
-  (use-package docker-compose-mode
-    :ensure t)
-#+end_src
 *** json-mode
    #+begin_src emacs-lisp :tangle yes
      (use-package flymake-json
